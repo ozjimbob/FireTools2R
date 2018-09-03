@@ -43,7 +43,7 @@ log_it("Loading FMZ look up table")
 v_fmz_table = st_read(fire_gdb,i_vt_fmz_lut)
 log_it("Fixing names for joining")
 names(v_fmz_table)[names(v_fmz_table) == f_vt_fmz] = f_fmz
-v_fmz = left_join(v_fmz,v_fmz_table)
+v_fmz = left_join(v_fmz,v_fmz_table,by=f_fmz)
 
 
 log_it("Rasterizing fire management zone layer Max Interval")
