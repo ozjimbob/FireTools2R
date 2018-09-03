@@ -39,6 +39,6 @@ source("proc_sfaz.r")
 log_it("**** Rendering output maps")
 source("render_maps.r")
 log_it("**** Intersecting output polygon layer")
-source("intersect_poly_output.r")
+#source("intersect_poly_output.r")
 
 
