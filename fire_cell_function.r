@@ -1,5 +1,12 @@
 # veg logic
 
+log_it("Converting string to numeric variables")
+c_sfaz = as.numeric(c_sfaz)
+current_year = as.numeric(current_year)
+ras_res = as.numeric(ras_res)
+
+
+
 g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
@@ -223,7 +230,7 @@ proccell_fmz = function(i){
 
 log_it = function(strn){
   cat(paste0(Sys.time()," - ",strn),file=paste0(rast_temp,"/log.txt"),sep="\n",append=TRUE)
-  print(paste0(Sys.time()," - ",strn))
+  print(paste0("[FT2] ",Sys.time()," - ",strn))
 }
 
 
@@ -346,7 +353,6 @@ bigWrite <- function(r,out){
   s2 <- writeStart(r, filename=out, format='GTiff', overwrite=TRUE)
   tr <- blockSize(r)
   for (i in tr$n:1) {
-    print(i)
     v <- getValuesBlock(r, row=tr$row[i], nrows=tr$nrows[i])
     s2 <- writeValues(s2, v, tr$row[i])
   }

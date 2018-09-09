@@ -1,7 +1,3 @@
-log_it("Converting string to numeric variables")
-c_sfaz = as.numeric(c_sfaz)
-current_year = as.numeric(current_year)
-ras_res = as.numeric(ras_res)
 
 # Read the regions table, filter to region of interest, transform
 log_it("Loading regions")

@@ -19,6 +19,10 @@ source("fire_cell_function.r")
 # Prepare empty environment
 prepare()
 
+log_it("Converting string to numeric variables")
+c_sfaz = as.numeric(c_sfaz)
+current_year = as.numeric(current_year)
+ras_res = as.numeric(ras_res)
 
 
 ## Run file
