@@ -1,4 +1,8 @@
 # veg logic
+log_it = function(strn){
+  cat(paste0(Sys.time()," - ",strn),file=paste0(rast_temp,"/log.txt"),sep="\n",append=TRUE)
+  print(paste0("[FT2] ",Sys.time()," - ",strn))
+}
 
 log_it("Converting string to numeric variables")
 c_sfaz = as.numeric(c_sfaz)
@@ -228,10 +232,6 @@ proccell_fmz = function(i){
   return(op)
 }
 
-log_it = function(strn){
-  cat(paste0(Sys.time()," - ",strn),file=paste0(rast_temp,"/log.txt"),sep="\n",append=TRUE)
-  print(paste0("[FT2] ",Sys.time()," - ",strn))
-}
 
 
 ## FUNCTIONS

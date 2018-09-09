@@ -151,7 +151,6 @@ orast = list()
 log_it(paste0("Rasterizing ",length(int_list)," fire seasons"))
 rast_method = "external"
 for(yr in seq_along(int_list)){
-  print(yr)
   datx = filter(v_fire,numYear==int_list[yr])
   datx = st_cast(datx,"MULTIPOLYGON")
   
