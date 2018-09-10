@@ -4,7 +4,6 @@ log_it = function(strn){
   print(paste0("[FT2] ",Sys.time()," - ",strn))
 }
 
-log_it("Converting string to numeric variables")
 c_sfaz = as.numeric(c_sfaz)
 current_year = as.numeric(current_year)
 ras_res = as.numeric(ras_res)
