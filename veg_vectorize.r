@@ -8,10 +8,9 @@ log_it("Converting vegetation biodiversity threshold raster to polygons")
 
 if(OS=="Windows"){
 v_vegThreshold = polygonizer_win(r_vegThreshold,
-                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py",
-                                 quietish = FALSE)
+                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
 }else{
-  v_vegThreshold = polygonizer(r_vegThreshold, quietish = FALSE)
+  v_vegThreshold = polygonizer(r_vegThreshold)
 }
 
 v_vegThreshold = st_as_sf(v_vegThreshold)

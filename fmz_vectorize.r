@@ -7,10 +7,9 @@ r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
 log_it("Converting fire management zone threshold raster to polygons")
 if(OS=="Windows"){
 v_fmzout = polygonizer_win(r_fmzout,
-                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py",
-                                 quietish = FALSE)
+                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
 }else{
-  v_fmzout = polygonizer(r_fmzout, quietish = FALSE)
+  v_fmzout = polygonizer(r_fmzout)
 }
 
 v_fmzout = st_as_sf(v_fmzout)

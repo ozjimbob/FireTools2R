@@ -104,7 +104,7 @@ beginCluster(clustNo)
 
 c_func = function(x,y){ifelse(x==0,y,x)}
 s = stack(r_tsl_sfaz,r_fmz_bio)
-r_comb = clusterR(s,overlay,args=list(fun=c_func))
+r_comb = invisible(clusterR(s,overlay,args=list(fun=c_func)))
 s <- NULL
 rm(s)
 gc()
@@ -122,10 +122,9 @@ log_it("Converting SFAZ - FMZ - Heritage raster to polygons")
 
 if(OS == "Windows"){
 v_sfaz_all_out = polygonizer_win(r_comb,
-                           pypath="C:/OSGeo4W64/bin/gdal_polygonize.py",
-                           quietish = FALSE)
+                           pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
 }else{
-  v_sfaz_all_out = polygonizer(r_comb, quietish = FALSE)
+  v_sfaz_all_out = polygonizer(r_comb)
 }
 
 v_sfaz_all_out = st_as_sf(v_sfaz_all_out)

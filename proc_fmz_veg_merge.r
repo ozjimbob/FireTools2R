@@ -18,7 +18,7 @@ beginCluster(clustNo)
 
 c_func = function(x,y){ifelse(is.na(x),y,x)}
 s = stack(r_fmzout,r_vegout)
-r_comb = clusterR(s,overlay,args=list(fun=c_func))
+r_comb = invisible(clusterR(s,overlay,args=list(fun=c_func)))
 s <- NULL
 rm(s)
 gc()
@@ -33,10 +33,9 @@ bigWrite(r_comb,paste0(rast_temp,"/r_fmz_bio_out.tif"))
 log_it("Converting combined biodiversity and fire management zone threshold raster to polygons")
 if(OS=="Windows"){
 v_fmzbio = polygonizer_win(r_comb,
-                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py",
-                                 quietish = FALSE)
+                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
 }else{
-v_fmzbio = polygonizer(r_comb, quietish = FALSE)
+v_fmzbio = polygonizer(r_comb)
 }
 
 v_fmzbio = st_as_sf(v_fmzbio)
