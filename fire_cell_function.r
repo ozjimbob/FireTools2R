@@ -13,11 +13,11 @@ ras_res = as.numeric(ras_res)
 g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
-         "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS ",
+         "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q",
          paste0(rast_temp,"/",filename)," ",output)
   }else{
     paste0(gdal_rasterize," -a ",attribute," -l ",layer," -of GTiff ",
-           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q",
            paste0(rast_temp,"/",filename)," ",output)
   }
 }
@@ -25,11 +25,11 @@ g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
 g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
-           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q",
            paste0(rast_temp,"/",filename)," ",output)
   }else{
     paste0(gdal_rasterize," -a ",attribute," -l ",layer," -of GTiff ",
-           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q",
            paste0(rast_temp,"/",filename)," ",output)
   }
 }
@@ -293,7 +293,7 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   ## Now 'python' has to be substituted by OSGeo4W
   #system2('python',
   system2('C:\\OSGeo4W64\\OSGeo4W.bat',
-          args=(sprintf('"%1$s" "%2$s" -f "%3$s" "%4$s.shp"', 
+          args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"', 
                         pypath, rastpath, gdalformat, outshape)))
   unlink(f)
   if (isTRUE(readpoly)) {
@@ -330,7 +330,7 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   } else if (is.character(x)) {
     rastpath <- normalizePath(x)
   } else stop('x must be a file path (character string), or a Raster object.')
-  system2('python', args=(sprintf('"%1$s" "%2$s" -f "%3$s" "%4$s.shp"',
+  system2('python', args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"',
                                   pypath, rastpath, gdalformat, outshape)))
   if (isTRUE(readpoly)) {
     shp <- readOGR(dirname(outshape), layer = basename(outshape), verbose=!quiet)
