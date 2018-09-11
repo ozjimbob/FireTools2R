@@ -18,7 +18,7 @@ beginCluster(clustNo)
 
 c_func = function(x,y){ifelse(is.na(x),y,x)}
 s = stack(r_fmzout,r_vegout)
-r_comb = invisible(clusterR(s,overlay,args=list(fun=c_func)))
+invisible(capture.output(r_comb <-clusterR(s,overlay,args=list(fun=c_func))))
 s <- NULL
 rm(s)
 gc()

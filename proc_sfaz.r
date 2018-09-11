@@ -104,7 +104,7 @@ beginCluster(clustNo)
 
 c_func = function(x,y){ifelse(x==0,y,x)}
 s = stack(r_tsl_sfaz,r_fmz_bio)
-r_comb = invisible(clusterR(s,overlay,args=list(fun=c_func)))
+invisible(capture.output(r_comb <- clusterR(s,overlay,args=list(fun=c_func))))
 s <- NULL
 rm(s)
 gc()
