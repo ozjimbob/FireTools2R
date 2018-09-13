@@ -294,7 +294,7 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   #system2('python',
   system2('C:\\OSGeo4W64\\OSGeo4W.bat',
           args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"', 
-                        pypath, rastpath, gdalformat, outshape)))
+                        pypath, rastpath, gdalformat, outshape)),stdout=NULL)
   unlink(f)
   if (isTRUE(readpoly)) {
     shp <- readOGR(dirname(outshape), layer = basename(outshape), verbose=!quietish)
@@ -330,8 +330,10 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   } else if (is.character(x)) {
     rastpath <- normalizePath(x)
   } else stop('x must be a file path (character string), or a Raster object.')
+  
   system2('python', args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"',
-                                  pypath, rastpath, gdalformat, outshape)))
+                                  pypath, rastpath, gdalformat, outshape)),stdout=NULL)
+  
   if (isTRUE(readpoly)) {
     shp <- readOGR(dirname(outshape), layer = basename(outshape), verbose=!quiet)
     return(shp)
