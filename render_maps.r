@@ -31,8 +31,8 @@ tm = tm_shape(v,name="Heritage Threshold Status") +
           alpha = 0.7,
           title=paste0("Heritage Threshold Status ",current_year))+
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
-                                     "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
-                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
+                                     "Unknown"),
+                col=c("white","red","orange","grey","cyan","grey20"))+
   tm_view(view.legend.position=c("right","top"))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
@@ -65,8 +65,8 @@ tm = tm_shape(v,name="Fire Management Blocks Threshold Status") +
           alpha = 0.7,
           title=paste0("Fire Management Blocks Threshold Status ",current_year))+
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
-                                     "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
-                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
+                                     "Unknown"),
+                col=c("white","red","orange","grey","cyan","grey20"))+
   tm_view(view.legend.position=c("right","top"))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
@@ -83,17 +83,14 @@ saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
+
+
+
 # Plot SFAZ map
 v = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 v = dplyr::select(v,SFAZStatusText)
-v <-v %>%  mutate(color = case_when(SFAZStatusText=="NoFireRegime" ~ "#ffffff22",
-                                    SFAZStatusText=="TooFrequentlyBurnt" ~ "#ff000099",
-                                    SFAZStatusText=="Vulnerable" ~ "#ff660099",
-                                    SFAZStatusText=="WithinThreshold" ~ "#99999999",
-                                    SFAZStatusText=="LongUnburnt" ~ "#00ffff99",
-                                    SFAZStatusText=="Unknown" ~ "#cccccc99",
-                                    SFAZStatusText=="Recently Treated" ~ "#99FF9999",
-                                    SFAZStatusText=="Monitor OFH In the Field" ~ "#22662299",
+v <-v %>%  mutate(color = case_when(SFAZStatusText=="Recently Treated" ~ "#99FF9999",
+                                    SFAZStatusText=="Monitor OFH in the field" ~ "#22662299",
                                     SFAZStatusText=="Priority for Assessment and Treatment" ~ "#00ff0099"
 ))
 
@@ -103,9 +100,8 @@ tm = tm_shape(v,name="SFAZ Treatment Status") +
           style="cat",
           alpha = 0.7,
           title=paste0("SFAZ Treatment Status ",current_year))+
-  tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
-                                     "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
-                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
+  tm_add_legend(type="fill",labels=c("Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
+                col=c("lightgreen","darkgreen","green"))+
   tm_view(view.legend.position=c("right","top"))+ 
   tm_basemap(server = c(Topography="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
@@ -155,4 +151,39 @@ out_path = paste0(rast_temp,"/maps/sfaz_fmz_bio.html")
 saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
+
+# Plot SFAZ + fmz  map
+v = read_sf(paste0(rast_temp,"/v_sfaz_fmz_out.gpkg"))
+v = dplyr::select(v,FinalStatus)
+v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
+                                    FinalStatus=="TooFrequentlyBurnt" ~ "#ff000099",
+                                    FinalStatus=="Vulnerable" ~ "#ff660099",
+                                    FinalStatus=="WithinThreshold" ~ "#99999999",
+                                    FinalStatus=="LongUnburnt" ~ "#00ffff99",
+                                    FinalStatus=="Unknown" ~ "#cccccc99",
+                                    FinalStatus=="Recently Treated" ~ "#99FF9999",
+                                    FinalStatus=="Monitor OFH In the Field" ~ "#22662299",
+                                    FinalStatus=="Priority for Assessment and Treatment" ~ "#00ff0099"
+))
+
+
+tm = tm_shape(v,name="FMZ SFAZ Status") +
+  tm_fill(col="color",
+          style="cat",
+          alpha = 0.7,
+          title=paste0("FMZ and SFAZ Status ",current_year))+
+  tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
+                                     "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
+                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
+  tm_view(view.legend.position=c("right","top"))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
+
+
+
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/sfaz_fmz.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 

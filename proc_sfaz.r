@@ -57,8 +57,9 @@ rres = res(tmprast)
 #            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
 cmd = g_rasterize("v_sfaz","v_sfaz.gpkg",paste0(rast_temp,"/r_fmz.tif"),attribute="")
 system(cmd)
-unlink(paste0(rast_temp,"/v_fmz.gpkg"))
+unlink(paste0(rast_temp,"/v_sfaz.gpkg"))
 log_it("Finished rasterizing SFAZ layer")
+
 
 log_it("Loading time since fire vector layer")
 v_tsl = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
@@ -97,10 +98,96 @@ log_it("Loading SFAZ raster")
 r_tsl_sfaz = raster(paste0(rast_temp,"/r_tsl_sfaz.tif"))
 log_it("Loading biodiversity and fire zone raster")
 r_fmz_bio = raster(paste0(rast_temp,"/r_fmz_bio_out.tif"))
+log_it("Loading fire zone raster")
+r_fmz = raster(paste0(rast_temp,"/r_fmzout.tif"))
 
-log_it("Merging SFAZ to combined raster")
+## Load r_tsl
+
+
+
+log_it("Merging SFAZ to combined FMZ raster")
 beginCluster(clustNo)
 
+c_func = function(x,y){ifelse(x==0,y,x)}
+s = stack(r_tsl_sfaz,r_fmz)
+invisible(capture.output(r_comb <- clusterR(s,overlay,args=list(fun=c_func))))
+s <- NULL
+rm(s)
+gc()
+
+endCluster()
+
+log_it("Saving SFAZ - FMZ combined raster")
+bigWrite(r_comb,paste0(rast_temp,"/r_sfaz_fmz_out.tif"))
+
+
+#####################
+log_it("Vectorizing SFAZ - FMZ  combined categories")
+
+#r_comb = raster(paste0(rast_temp,"/r_sfaz_fmz_bio_out.tif"))
+log_it("Converting SFAZ - FMZ raster to polygons")
+
+if(OS == "Windows"){
+  v_sfaz_fmz_out = polygonizer_win(r_comb,
+                                   pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+}else{
+  v_sfaz_fmz_out = polygonizer(r_comb)
+}
+
+v_sfaz_fmz_out = st_as_sf(v_sfaz_fmz_out)
+st_crs(v_sfaz_fmz_out)=proj_crs
+
+log_it("Dissolving  SFAZ - FMZ  polygons")
+v_sfaz_fmz_out = v_sfaz_fmz_out %>% st_cast("MULTIPOLYGON") #%>% group_by(DN) %>% summarise()
+
+
+
+
+log_it("Repairing  SFAZ - FMZ - Heritage polygons")
+v_sfaz_fmz_out = filter(v_sfaz_fmz_out,as.numeric(st_area(v_sfaz_fmz_out))>0)
+
+v_sfaz_fmz_out = st_make_valid(v_sfaz_fmz_out)
+
+
+log_it("Clipping to region of interest")
+v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
+v_sfaz_fmz_out = st_intersection(v_sfaz_fmz_out,v_thisregion)
+
+
+t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
+                   FinalStatus = c("NoFireRegime",
+                                   "TooFrequentlyBurnt",
+                                   "Vulnerable",
+                                   "LongUnburnt",
+                                   "WithinThreshold",
+                                   "Unknown",
+                                   "Recently Treated",
+                                   "Monitor OFH In the Field",
+                                   "Priority for Assessment and Treatment",NA))
+
+log_it("Joining  SFAZ - FMZ labels to polygons")
+v_sfaz_fmz_out = left_join(v_sfaz_fmz_out,t_threshold)
+v_sfaz_fmz_out$DN = NULL
+
+
+log_it("Saving SFAZ - FMZ polygons")
+write_sf(v_sfaz_fmz_out,paste0(rast_temp,"/v_sfaz_fmz_out.gpkg"))
+log_it(" SFAZ - FMZ saved. Cleaning up")
+
+log_it("Cleaning up")
+r_comb <- NULL
+rm(r_comb)
+gc()
+
+
+
+
+
+#############################################################
+
+
+log_it("Merging SFAZ to combined heritage and FMZ raster")
+beginCluster(clustNo)
 
 c_func = function(x,y){ifelse(x==0,y,x)}
 s = stack(r_tsl_sfaz,r_fmz_bio)
@@ -113,6 +200,10 @@ endCluster()
 
 log_it("Saving SFAZ - FMZ - Heritage combined raster")
 bigWrite(r_comb,paste0(rast_temp,"/r_sfaz_fmz_bio_out.tif"))
+
+
+
+
 
 #####################
 log_it("Vectorizing SFAZ - FMZ - Heritage combined categories")
