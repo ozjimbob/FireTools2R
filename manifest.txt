@@ -1,0 +1,41 @@
+## Analysis Pack Contents
+
+# Raster Files
+
+* r_fmz.tif - binary raster indicating cells inside and outside Fire Management Zone areas
+* r_tsl_sfaz.tif - raster containing time since last fire within the SFAZ areas
+* r_vegadv.tif - binary raster indicating vegeation cells with the "Fire Advantage" attribute
+* r_vegcode.tif - raster containing vegetation code of each cell
+* r_vegfireprone.tif - binary raster indicating vegetation cells with the "Fire Prone" attribute
+* r_vegmax.tif - raster showing the maximum fire interval of each cell based on vegetation
+* r_vegmin.tif - raster showing the minimum fire interval of each cell based on vegetation
+* r_LastYearBurnt.tif - raster containing the last year each cell was burnt
+* r_NumTimesBurnt.tif - raster containing the number of times each cell has burnt
+* r_TimeSinceLast.tif - raster containing the number of years since each cell was burnt
+
+# Status Output Raster Files
+
+The following raster files include a colour table and attribute table of status codes
+
+* r_heritage_threshold_status.tif - raster containing the output FireTools status code for each cell based on vegetation.
+* r_fmz_threshold_status.tif - raster containing the output FireTools status code for each cell based on Fire Management Zone thresholds.
+* r_heritage_fmz_threshold_status.tif - raster containing the heritage/vegetation status, with FMZ thresholds overlaid where they exist.
+* r_fmz_sfaz_threshold_status.tif - raster containing the FMZ threshold status, with specific SFAZ status codes in SFAZ areas.
+* r_heritage_fmz_sfaz_threshold_status.tif - raster containing the heritage/vegetation status, with the FMZ and SFAZ status codes overlaid within those areas
+
+# Vector files
+
+Vectors are provided as GeoPackage files, which are compatible with most recent GIS software.
+
+v_region.gpkg - Polygon defining the region the analysis was constrained within
+v_tsl.gpkg - Polygons showing time since last fire
+v_tsl_sfaz.gpkg - Polygons showing time since last fire within the SFAZ areas
+v_vegBase.gpkg - Base vegetation layer showing vegetation codes, as well as Max/Min thresholds
+
+# Status output Vector Files
+
+v_fmz_threshold_status.gpkg  - polygons of the output FireTools status code for each cell based on vegetation.
+v_heritage_threshold_status.gpkg - polygons of the output FireTools status code for each cell based on Fire Management Zone thresholds.
+v_heritage_fmz_threshold_status.gpkg - polygons of the heritage/vegetation status, with FMZ thresholds overlaid where they exist.
+v_fmz_sfaz_threshold_status.gpkg - polygons of the FMZ threshold status, with specific SFAZ status codes in SFAZ areas.
+v_heritage_fmz_sfaz_threshold_status.gpkg - polygons of the heritage/vegetation status, with the FMZ and SFAZ status codes overlaid within those areas
