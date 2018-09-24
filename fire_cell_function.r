@@ -452,7 +452,7 @@ tile_linux <- function(infile,pypath=NULL){
   in_cfile = paste0(infile_b,".vrt")
   outfile = paste0(rast_temp,"/tiles/",infile)
   dir.create(outfile)
-  cmd="/usr/bin/gdal_translate.exe"
+  cmd="/usr/bin/gdal_translate"
   args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
   system2(cmd,args,wait=TRUE)
   system2('python',
