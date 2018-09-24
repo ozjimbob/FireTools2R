@@ -23,7 +23,9 @@ prepare()
 c_sfaz = as.numeric(c_sfaz)
 current_year = as.numeric(current_year)
 ras_res = as.numeric(ras_res)
-
+if(!exists("d_spatial_unit")){
+  d_spatial_unit=""
+}
 
 ## Run file
 log_it("**** Preparing fire history and vegetation rasters")
