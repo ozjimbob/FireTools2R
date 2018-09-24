@@ -255,6 +255,13 @@ calc_timesburnt = function(v){
   return(length(tyears))
 }
 
+tile_win <- function(infile,outdir,pypath=NULL){
+  pypath = "C:/OSGeo4W64/bin/gdal2tiles.py"
+  system2('C:\\OSGeo4W64\\OSGeo4W.bat',
+        args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"', 
+        pypath, infile, outdir)))
+}
+
 
 polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile', 
                         pypath=NULL, readpoly=TRUE, quietish=TRUE) {
@@ -411,3 +418,46 @@ st_or = function(x, y, dim = 2) {
   # return combined geometry set with attributes
   return(rbind(overlap, cb))
 }
+
+tile_win <- function(infile,pypath=NULL){
+  pypath = "C:/OSGeo4W64/bin/gdal2tiles.py"
+  if(!file.exists(paste0(rast_temp,"/tiles"))){
+    print("Making Dir")
+    dir.create(paste0(rast_temp,"/tiles"))
+  }
+  
+  infile_b = paste0(rast_temp,"/",infile)
+  in_pfile = paste0(infile_b,".tif")
+  in_cfile = paste0(infile_b,".vrt")
+  outfile = paste0(rast_temp,"/tiles/",infile)
+  dir.create(outfile)
+  cmd="C:/OSGeo4W64/bin/gdal_translate.exe"
+  args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
+  system2(cmd,args,wait=TRUE)
+  system2('C:\\OSGeo4W64\\OSGeo4W.bat',
+          args=(sprintf('"%1$s" "%2$s" -w none -r near -a 255,255,255,255 -z 10-14 "%3$s"', 
+                        pypath, normalizePath(in_cfile), normalizePath(outfile))),wait=TRUE)
+  unlink(in_cfile)
+}
+
+tile_linux <- function(infile,pypath=NULL){
+  pypath = "/usr/bin/gdal2tiles.py"
+  if(!file.exists(paste0(rast_temp,"/tiles"))){
+    print("Making Dir")
+    dir.create(paste0(rast_temp,"/tiles"))
+  }
+  
+  infile_b = paste0(rast_temp,"/",infile)
+  in_pfile = paste0(infile_b,".tif")
+  in_cfile = paste0(infile_b,".vrt")
+  outfile = paste0(rast_temp,"/tiles/",infile)
+  dir.create(outfile)
+  cmd="/usr/bin/gdal_translate.exe"
+  args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
+  system2(cmd,args,wait=TRUE)
+  system2('python',
+          args=(sprintf('"%1$s" "%2$s" -w none -r near -a 255,255,255,255 -z 10-14 "%3$s"', 
+                        pypath, normalizePath(in_cfile), normalizePath(outfile))),wait=TRUE)
+  unlink(in_cfile)
+}
+
