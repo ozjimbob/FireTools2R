@@ -260,6 +260,22 @@ log_it(" SFAZ - FMZ - Heritage saved. Cleaning up")
 
 log_it("Cleaning up")
 r_comb <- NULL
+r_tsl_sfaz <- NULL
+r_fmz <- NULL
+r_fmzbio <- NULL
+v_tsl_sfaz<- NULL
+v_sfaz_all_out<- NULL
+v_sfaz_fmz_out<- NULL
+v_fmzbio<- NULL
+v_fmz<- NULL
 rm(r_comb)
+rm(r_tsl_sfaz)
+rm(r_fmz)
+rm(r_fmzbio)
+rm(v_tsl_sfaz)
+rm(v_sfaz_all_out)
+rm(v_sfaz_fmz_out)
+rm(v_fmzbio)
+rm(v_fmz)
 gc()
 

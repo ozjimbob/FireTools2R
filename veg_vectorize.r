@@ -45,3 +45,7 @@ v_vegThreshold$DN = NULL
 
 log_it("Saving veg threshold polygons")
 write_sf(v_vegThreshold,paste0(rast_temp,"/v_vegout.gpkg"))
+
+r_vegThreshold <- NULL
+rm(r_vegThreshold)
+gc()

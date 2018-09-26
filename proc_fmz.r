@@ -92,6 +92,11 @@ for (i in tr$n:1) {
   s2 <- writeValues(s2, v, tr$row[i])
 }
 s2 <- writeStop(s2)
+v <- NULL
+s2 <- NULL
+rm(v)
+sm(s2)
+
 log_it("Fire management zone threshold write complete")
 
 # Generate merged fmz/biodiversity

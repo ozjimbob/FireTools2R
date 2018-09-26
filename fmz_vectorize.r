@@ -51,8 +51,12 @@ log_it("Fire management zones thresholds saved. Cleaning up")
 
 v_fmzout <- NULL
 tmprast <- NULL
+r_fmzout <- NULL
+rm(r_fmzout)
 rm(v_fmzout)
 rm(tmprast)
+v_vegThreshold <- NULL
+rm(v_vegThreshold)
 gc()
 
 

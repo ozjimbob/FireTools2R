@@ -176,6 +176,9 @@ for(yr in seq_along(int_list)){
   }
   orast[[yr]]=paste0(rast_temp,"/",int_list[yr],".tif")
 }
+datx <- NULL
+rm(datx)
+gc()
 log_it("Rasterizing seasons complete")
 
 
@@ -262,7 +265,7 @@ log_it("Processing times burnt raster complete")
 # Clean up times burnt
 log_it("Removing time since last from memory")
 r_timesburnt <- NULL
-rm(r_tsl)
+rm(v_tsl)
 r_lastb <- NULL
 rm(r_lastb)
 gc()

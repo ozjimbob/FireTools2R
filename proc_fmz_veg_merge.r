@@ -71,5 +71,15 @@ v_fmzbio$DN = NULL
 log_it("Saving combined biodiversity and fire management zone threshold polygons")
 write_sf(v_fmzbio,paste0(rast_temp,"/v_fmz_bio_out.gpkg"))
 
-
+r_comb <- NULL
+r_fmzbio <- NULL
+r_vegout <- NULL
+r_fmzout <- NULL
+v_fmzbio <- NULL
+rm(r_comb)
+rm(r_fmzbio)
+rm(r_vegout)
+rm(r_fmzout)
+rm(v_fmzbio)
+gc()
 
