@@ -30,7 +30,7 @@ tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
 
 
 library(future)
-plan(multiprocess)
+plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
 
 log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))

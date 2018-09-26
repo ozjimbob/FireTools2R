@@ -198,7 +198,7 @@ clusterExport(cl,"current_year")
 clusterExport(cl,"year_list")
 #r_lastb<- invisible(clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=2))
 
-invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=2)))
+invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=4)))
 
 
 endCluster()
@@ -247,11 +247,16 @@ gc()
 
 # process times burnt
 log_it("Processing times burnt raster")
-beginCluster(clustNo)
-cl=getCluster()
-clusterExport(cl,"year_list")
-invisible(capture.output(r_timesburnt <- clusterR(st, calc, args=list(fun=calc_timesburnt),filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=10)))
-endCluster()
+#beginCluster(clustNo)
+#cl=getCluster()
+#clusterExport(cl,"year_list")
+#invisible(capture.output(r_timesburnt <- clusterR(st, calc, args=list(fun=calc_timesburnt),filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=10)))
+#invisible(capture.output(r_timesburnt <- clusterR(st, fun=sum,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=4)))
+r_timesburnt = sum(st)
+raster::values(r_timesburnt)[raster::values(r_timesburnt)==0]=NA
+bigWrite(r_timesburnt,paste0(rast_temp,"/rNumTimesBurnt.tif"))
+#r_timesburnt <- raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+#endCluster()
 log_it("Processing times burnt raster complete")
 
 # Clean up times burnt

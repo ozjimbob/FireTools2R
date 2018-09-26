@@ -57,6 +57,9 @@ cmd = g_rasterize("v_fmz","v_fmz.gpkg",paste0(rast_temp,"/r_fmz.tif"),attribute=
 system(cmd)
 unlink(paste0(rast_temp,"/v_fmz.gpkg"))
 log_it("Finished rasterizing fire management zone layer")
+v_fmz <- NULL
+rm(v_fmz)
+gc()
 
 
 # Generate min/max table
@@ -66,7 +69,7 @@ log_it("Finished rasterizing fire management zone layer")
 
 
 library(future)
-plan(multiprocess)
+plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
 log_it(paste0("Starting fire management zone threshold function application on ",nrow(tmprast)," slices"))
 o = future_lapply(1:nrow(tmprast),FUN=proccell_fmz)
