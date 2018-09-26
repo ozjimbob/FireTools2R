@@ -95,7 +95,7 @@ s2 <- writeStop(s2)
 v <- NULL
 s2 <- NULL
 rm(v)
-sm(s2)
+rm(s2)
 
 log_it("Fire management zone threshold write complete")
 
