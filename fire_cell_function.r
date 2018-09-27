@@ -162,6 +162,18 @@ proccell2 = function(i){
     return(Status)
   }
   
+  statusNoFireRegime=1
+  statusTooFrequentlyBurnt = 2
+  statusVulnerable = 3
+  statusLongUnburnt = 4
+  statusUnknown = 9
+  statusWithinThreshold = 5
+  
+  # r_IntervalStatus (eg. within interval)
+  is_WithinThreshold = 1
+  is_Vulnerable = 2
+  is_TooFreq = 3
+  
   for(j in seq_along(ovec)){
     # Rasters we need
     # r_MaxThresh - derived from veg + lookup table
@@ -171,17 +183,7 @@ proccell2 = function(i){
     
     # output rasters:
     # r_Status (eg. no fire regime, too frequently burnt, vulnerable, long uburnt, unknown)
-    statusNoFireRegime=1
-    statusTooFrequentlyBurnt = 2
-    statusVulnerable = 3
-    statusLongUnburnt = 4
-    statusUnknown = 9
-    statusWithinThreshold = 5
     
-    # r_IntervalStatus (eg. within interval)
-    is_WithinThreshold = 1
-    is_Vulnerable = 2
-    is_TooFreq = 3
     
     # get vectors
     MaxThresh = r_vegmax[j]
