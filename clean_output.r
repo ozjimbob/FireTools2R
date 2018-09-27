@@ -98,3 +98,32 @@ if(OS=="Windows"){
   tile_linux("r_fmz_sfaz_threshold_status")
 }
 
+log_id("Writing Shapefile version")
+
+## Shapefile test
+in_file = read_sf(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_fmz_sfaz_threshold_status.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_fmz_threshold_status.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_threshold_status.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_threshold_status.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_heritage_threshold_status.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_region.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_region.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_tsl.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"))
+
+in_file = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"))
