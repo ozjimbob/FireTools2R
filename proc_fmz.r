@@ -72,7 +72,7 @@ library(future)
 plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
 log_it(paste0("Starting fire management zone threshold function application on ",nrow(tmprast)," slices"))
-o = future_lapply(1:nrow(tmprast),FUN=proccell_fmz)
+o = future_lapply(1:nrow(tmprast),FUN=proccell_fmz,future.scheduling=3)
 log_it("Fire management zone threshold calculation complete")
 
 

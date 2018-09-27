@@ -34,7 +34,7 @@ plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
 
 log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-o = future_lapply(1:nrow(tmprast),FUN=proccell2)
+o = future_lapply(1:nrow(tmprast),FUN=proccell2,future.scheduling=3)
 log_it("Biodiversity threshold calculation complete")
 
 
