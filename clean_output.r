@@ -98,7 +98,7 @@ if(OS=="Windows"){
   tile_linux("r_fmz_sfaz_threshold_status")
 }
 
-log_id("Writing Shapefile version")
+log_it("Writing Shapefile version")
 
 ## Shapefile test
 in_file = read_sf(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
