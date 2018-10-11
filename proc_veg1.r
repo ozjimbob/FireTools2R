@@ -30,6 +30,10 @@ tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
 
 
 library(future)
+if(OS=="Windows"){
+  print("Loading future.apply")
+  library("future.apply")
+}
 plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
 

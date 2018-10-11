@@ -187,3 +187,49 @@ lf = tmap_leaflet(tm)
 out_path = paste0(rast_temp,"/maps/sfaz_fmz.html")
 saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
+
+
+# Plot time since last fire map
+
+v = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
+
+
+tm = tm_shape(v,name="Time Since Last Fire") +
+  tm_fill(col="TSL",style="fixed",
+          alpha = 0.7,
+          breaks=c(0,10,20,30,40,50,60,70,80,90,Inf),
+          title=paste0("Time Since Last r. ",current_year),palette=c("red","yellow","green"))+
+  tm_view(view.legend.position=c("right","top"))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
+
+
+
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/tsl.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
+
+# Plot time since last fire map
+
+vr = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+
+
+tm = tm_shape(vr,name="Number of Times Burnt") +
+  tm_raster(col="rNumTimesBurnt",style="fixed",
+          alpha = 0.7,
+          breaks=c(0,1,2,3,4,5,6,7,8,9,Inf),
+          title=paste0("Number of Times Burnt r. ",current_year),palette=c("green","yellow","red","black"))+
+  tm_view(view.legend.position=c("right","top"))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
+
+
+
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/ntb.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
+
