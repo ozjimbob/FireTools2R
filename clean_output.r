@@ -122,6 +122,9 @@ write_sf(in_file,paste0(rast_temp,"/v_region.shp"))
 in_file = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_tsl.shp"))
 
+in_file = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_timesburnt.shp"))
+
 in_file = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"))
 

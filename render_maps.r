@@ -213,11 +213,11 @@ saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 # Plot time since last fire map
 
-vr = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+v = raster(paste0(rast_temp,"/v_timesburnt.gpkg"))
 
 
-tm = tm_shape(vr,name="Number of Times Burnt") +
-  tm_raster(col="rNumTimesBurnt",style="fixed",
+tm = tm_shape(v,name="Number of Times Burnt") +
+  tm_fill(col="TimesBurnt",style="fixed",
           alpha = 0.7,
           breaks=c(0,1,2,3,4,5,6,7,8,9,Inf),
           title=paste0("Number of Times Burnt r. ",current_year),palette=c("green","yellow","red","black"))+

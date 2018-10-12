@@ -29,6 +29,7 @@ Vectors are provided as GeoPackage files, which are compatible with most recent 
 
 v_region.gpkg - Polygon defining the region the analysis was constrained within
 v_tsl.gpkg - Polygons showing time since last fire
+v_timesburnt.gpkg - Polygons showing number of times each cell has burnt
 v_tsl_sfaz.gpkg - Polygons showing time since last fire within the SFAZ areas
 v_vegBase.gpkg - Base vegetation layer showing vegetation codes, as well as Max/Min thresholds
 

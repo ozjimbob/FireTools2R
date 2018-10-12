@@ -262,9 +262,42 @@ bigWrite(r_timesburnt,paste0(rast_temp,"/rNumTimesBurnt.tif"))
 #endCluster()
 log_it("Processing times burnt raster complete")
 
+
+
+
+log_it("Vectorizing times burnt")
+
+
+if(OS=="Windows"){
+  v_timesburnt = polygonizer_win(r_timesburnt,
+                          pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+}else{
+  v_timesburnt = polygonizer(r_timesburnt)
+}
+
+v_timesburnt = st_as_sf(v_timesburnt)
+st_crs(v_timesburnt)=proj_crs
+
+
+log_it("Dissolving times burnt polygons")
+v_timesburnt = v_timesburnt %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
+names(v_timesburnt)[1]="TimesBurnt"
+
+
+log_it("Repairing times burnt  polygons")
+v_timesburnt = filter(v_timesburnt,as.numeric(st_area(v_timesburnt))>0)
+v_timesburnt = st_make_valid(v_timesburnt)
+
+log_it("Writing times burnt  polygons")
+write_sf(v_timesburnt,paste0(rast_temp,"/v_timesburnt.gpkg"))
+
+
+
 # Clean up times burnt
 log_it("Removing time since last from memory")
 r_timesburnt <- NULL
+v_timesburnt <- NULL
+rm(v_timesburnt)
 rm(v_tsl)
 r_lastb <- NULL
 rm(r_lastb)
