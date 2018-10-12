@@ -10,10 +10,12 @@ source("../config/global_config.r")
 source("../config/config_linux.r")
 source("fire_cell_function.r")
 
+log_it("Creating map output directory")
 # Set up output folders
 dir.create(paste0(rast_temp,"/maps"))
 
-# Plot biodiversity map
+
+log_it("Plot biodiversity map")
 v = read_sf(paste0(rast_temp,"/v_vegout.gpkg"))
 v = dplyr::select(v,BioStatus)
 v <-v %>%  mutate(color = case_when(BioStatus=="NoFireRegime" ~ "#ffffff22",
@@ -47,7 +49,7 @@ saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
-# Plot fmz map
+log_it("Plot fmz map")
 v = read_sf(paste0(rast_temp,"/v_fmzout.gpkg"))
 v = dplyr::select(v,FMZStatus)
 v <-v %>%  mutate(color = case_when(FMZStatus=="NoFireRegime" ~ "#ffffff22",
@@ -86,7 +88,7 @@ saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
-# Plot SFAZ map
+log_it("Plot SFAZ map")
 v = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 v = dplyr::select(v,SFAZStatusText)
 v <-v %>%  mutate(color = case_when(SFAZStatusText=="Recently Treated" ~ "#99FF9999",
@@ -115,7 +117,7 @@ out_path = paste0(rast_temp,"/maps/sfaz.html")
 saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
-# Plot SFAZ + fmz + bio map
+log_it("Plot SFAZ + fmz + bio map") 
 v = read_sf(paste0(rast_temp,"/v_sfaz_fmz_bio_out.gpkg"))
 v = dplyr::select(v,FinalStatus)
 v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
@@ -152,7 +154,7 @@ saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
-# Plot SFAZ + fmz  map
+log_it("Plot SFAZ + fmz map") 
 v = read_sf(paste0(rast_temp,"/v_sfaz_fmz_out.gpkg"))
 v = dplyr::select(v,FinalStatus)
 v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
@@ -189,7 +191,7 @@ saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
-# Plot time since last fire map
+log_it("Plot TSL Fire map") 
 
 v = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 
@@ -211,9 +213,9 @@ lf = tmap_leaflet(tm)
 out_path = paste0(rast_temp,"/maps/tsl.html")
 saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
-# Plot time since last fire map
+log_it("Plot Times Burnt map") 
 
-v = raster(paste0(rast_temp,"/v_timesburnt.gpkg"))
+v = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
 
 
 tm = tm_shape(v,name="Number of Times Burnt") +
@@ -233,3 +235,4 @@ lf = tmap_leaflet(tm)
 out_path = paste0(rast_temp,"/maps/ntb.html")
 saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
+log_it("Map rendering complete") 
