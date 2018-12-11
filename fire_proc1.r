@@ -203,9 +203,16 @@ clusterExport(cl,"year_list")
 
 invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=4)))
 
+#####
+#####
+#  At this point, experiment with layer-based merging year-by-year
+
+
+#####
+#####
 
 endCluster()
-rm(cl)
+#rm(cl)
 log_it("Last burnt raster complete")
 
 # Write time since last
@@ -218,8 +225,8 @@ log_it("Vectorizing time since last burnt")
 
 
 if(OS=="Windows"){
-v_tsl = polygonizer_win(r_tsl,
-                        pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+  v_tsl = polygonizer_win(r_tsl,
+                          pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
 }else{
   v_tsl = polygonizer(r_tsl)
 }
@@ -256,7 +263,9 @@ log_it("Processing times burnt raster")
 #invisible(capture.output(r_timesburnt <- clusterR(st, calc, args=list(fun=calc_timesburnt),filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=10)))
 #invisible(capture.output(r_timesburnt <- clusterR(st, fun=sum,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=4)))
 r_timesburnt = sum(st)
-raster::values(r_timesburnt)[raster::values(r_timesburnt)==0]=NA
+rclmat = matrix(c(0,0,NA),nrow=1)
+#raster::values(r_timesburnt)[raster::values(r_timesburnt)==0]=NA
+r_timesburnt = reclassify(r_timesburnt,rclmat)
 bigWrite(r_timesburnt,paste0(rast_temp,"/rNumTimesBurnt.tif"))
 #r_timesburnt <- raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
 #endCluster()
@@ -270,7 +279,7 @@ log_it("Vectorizing times burnt")
 
 if(OS=="Windows"){
   v_timesburnt = polygonizer_win(r_timesburnt,
-                          pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
 }else{
   v_timesburnt = polygonizer(r_timesburnt)
 }
