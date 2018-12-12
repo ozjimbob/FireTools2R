@@ -334,7 +334,7 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   } else outshape <- tempfile()
   if (is(x, 'Raster')) {
     require(raster)
-    writeRaster(x, {f <- tempfile(fileext='.tif')})
+    bigWrite(x, {f <- tempfile(fileext='.tif')})
     rastpath <- normalizePath(f)
   } else if (is.character(x)) {
     rastpath <- normalizePath(x)
