@@ -370,9 +370,20 @@ log_it("Reading vegetation-fire LUT")
 v_vegfire_table = st_read(fire_gdb,i_vt_veg_lut)
 log_it("Aligning veg type fieldnames")
 names(v_veg)[toupper(names(v_veg))==toupper(f_vegid)] = f_vegid
+
+
+log_it("Veg fieldnames:")
+log_it(names(v_veg))
 names(v_vegfire_table)[toupper(names(v_vegfire_table))==toupper(f_vegid)] = f_vegid
+log_it("Veg LUT fieldnames:")
+log_it(names(v_vegfire_table))
+
 log_it("Joining vegetation to LUT")
 v_veg = left_join(v_veg,v_vegfire_table,by=f_vegid)
+log_it("Veg Output fieldnames:")
+log_it(names(v_veg))
+
+
 log_it("Saving Vegetation polygon layer")
 #v_veg = dplyr::select(v_veg,Code,Description,PWGArea,EstateName,PWGRegion,NSWCommunity,NSWClass,NSWFormation,VegSource,Region,VEG,MAX,MIN,FireProneV,ADV)
 write_sf(v_veg,paste0(rast_temp,"/v_vegBase.gpkg"),quiet = FALSE)
