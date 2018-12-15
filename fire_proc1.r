@@ -372,16 +372,17 @@ log_it("Aligning veg type fieldnames")
 names(v_veg)[toupper(names(v_veg))==toupper(f_vegid)] = f_vegid
 
 
-log_it("Veg fieldnames:")
-log_it(names(v_veg))
 names(v_vegfire_table)[toupper(names(v_vegfire_table))==toupper(f_vegid)] = f_vegid
-log_it("Veg LUT fieldnames:")
-log_it(names(v_vegfire_table))
+
+log_it("Checking and clearing pre-join names")
+to_remove=c(f_vegmin,f_vegmax,f_vegfireprone,f_vegadv)
+veg_enames = names(v_veg)
+to_remove = intersect(to_remove,veg_enames)
+v_veg = v_veg %>% select(-to_remove)
 
 log_it("Joining vegetation to LUT")
 v_veg = left_join(v_veg,v_vegfire_table,by=f_vegid)
-log_it("Veg Output fieldnames:")
-log_it(names(v_veg))
+
 
 
 log_it("Saving Vegetation polygon layer")
@@ -392,7 +393,6 @@ log_it("Vegetation polygon base saved")
 v_veg = NULL
 rm(v_veg)
 gc()
-
 
 
 # Rasterize
