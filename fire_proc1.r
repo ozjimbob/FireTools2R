@@ -51,10 +51,18 @@ bbox = st_bbox(v_thisregion)
 
 # Generate template raster of this extent and resolution
 log_it("Creating template raster")
-tmprast = raster(ext=extent(bbox[c(1,3,2,4)]), res=c(ras_res,ras_res), crs=proj_crs)
+
+# Load 25m NSW Alignment grid
+align_grid = raster("../config/grid.tif")
+tmp_extent = extent(bbox[c(1,3,2,4)])
+tmp_extent = alignExtent(tmp_extent,align_grid)
+
+# Make template raster
+tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
 # If we have defined a subextent, crop the template to that
 if(!is.null(subextent)){
+  subextent = alignExtent(subextent,align_grid)
   log_it("Clipping template raster to subextent")
   tmprast = crop(tmprast,subextent)
   v_thisregion = st_as_sfc(st_bbox(tmprast))
@@ -378,7 +386,7 @@ log_it("Checking and clearing pre-join names")
 to_remove=c(f_vegmin,f_vegmax,f_vegfireprone,f_vegadv)
 veg_enames = names(v_veg)
 to_remove = intersect(to_remove,veg_enames)
-v_veg = v_veg %>% select(-to_remove)
+v_veg = v_veg %>% dplyr::select(-to_remove)
 
 log_it("Joining vegetation to LUT")
 v_veg = left_join(v_veg,v_vegfire_table,by=f_vegid)
