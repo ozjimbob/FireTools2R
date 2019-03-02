@@ -390,7 +390,13 @@ v_veg = v_veg %>% dplyr::select(-to_remove)
 
 log_it("Joining vegetation to LUT")
 v_veg = left_join(v_veg,v_vegfire_table,by=f_vegid)
+log_it("Fixing Missing")
+v_veg[[f_vegmax]][is.na(v_veg[[f_vegmax]])]=0
+v_veg[[f_vegmin]][is.na(v_veg[[f_vegmin]])]=0
+v_veg[[f_vegfireprone]][is.na(v_veg[[f_vegfireprone]])]=0
+v_veg[[f_vegadv]][is.na(v_veg[[f_vegadv]])]=0
 
+#### Fill in missing here?
 
 
 log_it("Saving Vegetation polygon layer")
