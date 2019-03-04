@@ -35,7 +35,7 @@ tm = tm_shape(v,name="Heritage Threshold Status") +
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown"),
                 col=c("white","red","orange","grey","cyan","grey20"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
@@ -69,7 +69,7 @@ tm = tm_shape(v,name="Fire Management Blocks Threshold Status") +
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown"),
                 col=c("white","red","orange","grey","cyan","grey20"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
@@ -104,7 +104,7 @@ tm = tm_shape(v,name="SFAZ Treatment Status") +
           title=paste0("SFAZ Treatment Status ",current_year))+
   tm_add_legend(type="fill",labels=c("Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
                 col=c("lightgreen","darkgreen","green"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(Topography="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
@@ -140,7 +140,7 @@ tm = tm_shape(v,name="Heritage Fire Blocka and SFAZ Status") +
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
                 col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
@@ -177,7 +177,7 @@ tm = tm_shape(v,name="FMZ SFAZ Status") +
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
                 col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top",set.zoom.limits=c(8,11)))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
@@ -201,7 +201,7 @@ tm = tm_shape(v,name="Time Since Last Fire") +
           alpha = 0.7,
           breaks=c(0,10,20,30,40,50,60,70,80,90,Inf),
           title=paste0("Time Since Last r. ",current_year),palette=c("red","yellow","green"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
@@ -223,7 +223,7 @@ tm = tm_shape(v,name="Number of Times Burnt") +
           alpha = 0.7,
           breaks=c(0,1,2,3,4,5,6,7,8,9,Inf),
           title=paste0("Number of Times Burnt r. ",current_year),palette=c("green","yellow","red","black"))+
-  tm_view(view.legend.position=c("right","top"))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
