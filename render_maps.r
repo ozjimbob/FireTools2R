@@ -177,7 +177,7 @@ tm = tm_shape(v,name="FMZ SFAZ Status") +
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
                 col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
-  tm_view(view.legend.position=c("right","top",set.zoom.limits=c(8,11)))+ 
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
   tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
                         Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
