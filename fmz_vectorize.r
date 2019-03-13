@@ -16,7 +16,7 @@ v_fmzout = st_as_sf(v_fmzout)
 st_crs(v_fmzout)=proj_crs
 
 log_it("Dissolving fire management zone threshold polygons")
-v_fmzout = v_fmzout %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
+v_fmzout = v_fmzout %>% st_cast("MULTIPOLYGON")# %>% group_by(DN) %>% summarise()
 
 
 
@@ -24,7 +24,7 @@ v_fmzout = v_fmzout %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
 log_it("Repairing biodiversity threshold polygons")
 v_fmzout = filter(v_fmzout,as.numeric(st_area(v_fmzout))>0)
 
-v_fmzout = st_make_valid(v_fmzout)
+#v_fmzout = st_make_valid(v_fmzout)
 
 
 log_it("Clipping to region of interest")

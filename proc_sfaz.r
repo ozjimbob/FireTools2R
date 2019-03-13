@@ -146,7 +146,7 @@ v_sfaz_fmz_out = v_sfaz_fmz_out %>% st_cast("MULTIPOLYGON") #%>% group_by(DN) %>
 log_it("Repairing  SFAZ - FMZ - Heritage polygons")
 v_sfaz_fmz_out = filter(v_sfaz_fmz_out,as.numeric(st_area(v_sfaz_fmz_out))>0)
 
-v_sfaz_fmz_out = st_make_valid(v_sfaz_fmz_out)
+#v_sfaz_fmz_out = st_make_valid(v_sfaz_fmz_out)
 
 
 log_it("Clipping to region of interest")
@@ -230,7 +230,7 @@ v_sfaz_all_out = v_sfaz_all_out %>% st_cast("MULTIPOLYGON") #%>% group_by(DN) %>
 log_it("Repairing  SFAZ - FMZ - Heritage polygons")
 v_sfaz_all_out = filter(v_sfaz_all_out,as.numeric(st_area(v_sfaz_all_out))>0)
 
-v_sfaz_all_out = st_make_valid(v_sfaz_all_out)
+#v_sfaz_all_out = st_make_valid(v_sfaz_all_out)
 
 
 log_it("Clipping to region of interest")
