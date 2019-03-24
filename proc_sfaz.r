@@ -29,7 +29,7 @@ log_it("Reading fire management zones, projecting and repairing")
 v_fmz= read_sf(asset_gdb,i_vt_fmz)
 v_fmz = st_transform(v_fmz,crs=proj_crs)
 v_fmz = st_cast(v_fmz,"MULTIPOLYGON") # Multisurface features cause errors
-v_fmz = st_make_valid(v_fmz) # repair invalid geometries
+#v_fmz = st_make_valid(v_fmz) # repair invalid geometries
 log_it("Fire management zone import complete")
 
 
@@ -44,7 +44,7 @@ log_it("Extracting SFAZ polygons")
 v_sfaz = filter(v_fmz,(!!rlang::sym(f_fmz)) == c_sfaz)
 
 log_it("Repairing SFAZ polygons")
-v_sfaz = st_make_valid(v_sfaz)
+#v_sfaz = st_make_valid(v_sfaz)
 
 log_it("Writing SFAZ polygons")
 write_sf(v_sfaz,paste0(rast_temp,"/v_sfaz.gpkg"))

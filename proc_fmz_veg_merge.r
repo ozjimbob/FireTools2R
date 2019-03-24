@@ -49,7 +49,7 @@ v_fmzbio = v_fmzbio %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
 
 log_it("Repairing combined biodiversity and fire management zone threshold polygons")
 v_fmzbio = filter(v_fmzbio,as.numeric(st_area(v_fmzbio))>0)
-v_fmzbio = st_make_valid(v_fmzbio) # repair invalid geometries
+#v_fmzbio = st_make_valid(v_fmzbio) # repair invalid geometries
 
 log_it("Clipping to region of interest")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
