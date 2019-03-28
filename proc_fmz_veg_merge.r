@@ -42,7 +42,7 @@ v_fmzbio = st_as_sf(v_fmzbio)
 st_crs(v_fmzbio)=proj_crs
 
 log_it("Dissolving combined biodiversity and fire management zone threshold polygons")
-v_fmzbio = v_fmzbio %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
+v_fmzbio = v_fmzbio %>% st_cast("MULTIPOLYGON")# %>% group_by(DN) %>% summarise()
 
 
 

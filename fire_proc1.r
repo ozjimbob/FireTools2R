@@ -355,16 +355,19 @@ if(length(i_vt_veg)>1){
   log_it("Loading single layer")
   v_veg = read_sf(veg_gdb,i_vt_veg)
 }
+
+
 log_it("Projecting and repairing vegetation layer")
 v_veg = st_transform(v_veg,crs=proj_crs)
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
-v_veg = st_make_valid(v_veg) # repair invalid geometries
-log_it("Projecting vegetation complete")
-
 # Clip veg to region of interest
 log_it("Clipping vegetation layer")
 v_veg = st_intersection(v_veg,v_thisregion)
 log_it("Clipping vegetation complete")
+v_veg = st_make_valid(v_veg) # repair invalid geometries
+log_it("Projecting vegetation complete")
+
+
 
 # Remove empty polygons
 log_it("Cleaning vegetation layer")
