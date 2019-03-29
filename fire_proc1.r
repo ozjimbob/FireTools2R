@@ -22,28 +22,6 @@ log_it("Writing region template")
 write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
 log_it("Finished writing region template")
 
-
-
-
-#########
-# Read fire history table and transform
-log_it("Reading fire history, projecting and repairing")
-v_fire = read_sf(fire_gdb,i_vt_fire_history)
-v_fire = st_transform(v_fire,crs=proj_crs)
-v_fire = st_cast(v_fire,"MULTIPOLYGON") # Multisurface features cause errors
-v_fire = st_make_valid(v_fire) # repair invalid geometries
-log_it("Fire history import complete")
-
-
-# Clip fire to region of interest
-log_it("Clipping fire history to ROI")
-v_fire = st_intersection(v_fire,v_thisregion)
-log_it("Clipping fire history complete")
-
-# Add numeric year field to fire and a count flag field
-v_fire$numYear = as.numeric(substr(as.character(v_fire[[f_fireseason]]),1,4))
-v_fire$count = 1
-
 #### Create template raster
 
 # Define bounding box of raster
@@ -69,6 +47,30 @@ if(!is.null(subextent)){
   write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
   log_it("Clipping complete")
 }
+
+
+
+
+#########
+# Read fire history table and transform
+log_it("Reading fire history, projecting and repairing")
+v_fire = read_sf(fire_gdb,i_vt_fire_history)
+v_fire = st_transform(v_fire,crs=proj_crs)
+v_fire = st_cast(v_fire,"MULTIPOLYGON") # Multisurface features cause errors
+v_fire = st_make_valid(v_fire) # repair invalid geometries
+log_it("Fire history import complete")
+
+
+# Clip fire to region of interest
+log_it("Clipping fire history to ROI")
+v_fire = st_intersection(v_fire,v_thisregion)
+log_it("Clipping fire history complete")
+
+# Add numeric year field to fire and a count flag field
+v_fire$numYear = as.numeric(substr(as.character(v_fire[[f_fireseason]]),1,4))
+v_fire$count = 1
+
+
 do_gazette=FALSE
 ### If present load gazette data
 if(gazette_gdb != ""){
@@ -133,7 +135,7 @@ if(do_gazette){
 ##### Make fire count raster
 
 # Get list of seasons, and also numeric years
-v_fire = st_make_valid(v_fire)
+v_fire = st_buffer(v_fire,0)
 
 v_firex = filter(v_fire,st_geometry_type(v_fire)=="GEOMETRYCOLLECTION")
 v_fire= filter(v_fire,!st_geometry_type(v_fire)=="GEOMETRYCOLLECTION")
@@ -159,6 +161,7 @@ orast = list()
 log_it(paste0("Rasterizing ",length(int_list)," fire seasons"))
 rast_method = "external"
 for(yr in seq_along(int_list)){
+  
   datx = filter(v_fire,numYear==int_list[yr])
   datx = st_cast(datx,"MULTIPOLYGON")
   
@@ -280,7 +283,7 @@ bigWrite(r_timesburnt,paste0(rast_temp,"/rNumTimesBurnt.tif"))
 log_it("Processing times burnt raster complete")
 
 
-
+##<-
 
 log_it("Vectorizing times burnt")
 
@@ -362,12 +365,15 @@ v_veg = st_transform(v_veg,crs=proj_crs)
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
 # Clip veg to region of interest
 log_it("Clipping vegetation layer")
-v_veg = st_intersection(v_veg,v_thisregion)
+v_veg=st_buffer(v_veg,0)
+
+
+#v_veg = st_intersection(v_veg,v_thisregion)
 log_it("Clipping vegetation complete")
-v_veg = st_make_valid(v_veg) # repair invalid geometries
+#v_veg = st_make_valid(v_veg) # repair invalid geometries
 log_it("Projecting vegetation complete")
 
-
+# <-
 
 # Remove empty polygons
 log_it("Cleaning vegetation layer")

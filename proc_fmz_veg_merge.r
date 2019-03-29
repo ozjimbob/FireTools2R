@@ -18,7 +18,9 @@ beginCluster(clustNo)
 
 c_func = function(x,y){ifelse(is.na(x),y,x)}
 s = stack(r_fmzout,r_vegout)
-invisible(capture.output(r_comb <-clusterR(s,overlay,args=list(fun=c_func))))
+#s = brick(s)
+invisible(capture.output(r_comb <-clusterR(s,raster::overlay,args=list(fun=c_func))))
+#invisible(capture.output(r_comb = overlay(r_fmzout,r_vegout,fun=function(x,y){ifelse(is.na(x),y,x)})))
 s <- NULL
 rm(s)
 gc()
@@ -53,7 +55,7 @@ v_fmzbio = filter(v_fmzbio,as.numeric(st_area(v_fmzbio))>0)
 
 log_it("Clipping to region of interest")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
-v_fmzbio = st_intersection(v_fmzbio,v_thisregion)
+#v_fmzbio = st_intersection(v_fmzbio,v_thisregion)
 
 
 t_threshold=tibble(DN=c(1,2,3,4,5,9,NA),

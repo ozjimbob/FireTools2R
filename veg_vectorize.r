@@ -31,7 +31,7 @@ v_vegThreshold = filter(v_vegThreshold,as.numeric(st_area(v_vegThreshold))>0)
 #v_vegThreshold = st_make_valid(v_vegThreshold) # repair invalid geometries
 
 log_it("Clipping to region of interest")
-v_vegThreshold = st_intersection(v_vegThreshold,v_thisregion)
+#v_vegThreshold = st_intersection(v_vegThreshold,v_thisregion)
 
 
 t_threshold=tibble(DN=c(1,2,3,4,5,9,NA),

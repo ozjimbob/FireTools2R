@@ -51,6 +51,8 @@ v_sfaz = st_buffer(v_sfaz,0)
 log_it("Writing SFAZ polygons")
 write_sf(v_sfaz,paste0(rast_temp,"/v_sfaz.gpkg"))
 
+
+
 log_it("Rasterizing SFAZ polygons")
 rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
 rres = res(tmprast)
@@ -153,7 +155,7 @@ v_sfaz_fmz_out = filter(v_sfaz_fmz_out,as.numeric(st_area(v_sfaz_fmz_out))>0)
 
 log_it("Clipping to region of interest")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
-v_sfaz_fmz_out = st_intersection(v_sfaz_fmz_out,v_thisregion)
+#v_sfaz_fmz_out = st_intersection(v_sfaz_fmz_out,v_thisregion)
 
 
 t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
@@ -237,7 +239,7 @@ v_sfaz_all_out = filter(v_sfaz_all_out,as.numeric(st_area(v_sfaz_all_out))>0)
 
 log_it("Clipping to region of interest")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
-v_sfaz_all_out = st_intersection(v_sfaz_all_out,v_thisregion)
+#v_sfaz_all_out = st_intersection(v_sfaz_all_out,v_thisregion)
 
 
 t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
