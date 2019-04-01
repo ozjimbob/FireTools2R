@@ -35,9 +35,9 @@ log_it("Fire management zone import complete")
 log_it("Loading region boundary")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 
-log_it("Clipping fire management zone to ROI")
-v_fmz = st_intersection(v_fmz,v_thisregion)
-log_it("Clipping  fire management zone complete")
+#log_it("Clipping fire management zone to ROI")
+#v_fmz = st_intersection(v_fmz,v_thisregion)
+#log_it("Clipping  fire management zone complete")
 
 log_it("Loading FMZ look up table")
 v_fmz_table = st_read(fire_gdb,i_vt_fmz_lut)
