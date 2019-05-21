@@ -20,7 +20,11 @@ int_list = year_list$year
 
 # Set up variables
 log_it("Calculating TSFF")
-TSFF = current_year-min(int_list)
+if(v_TSFF == ""){
+  TSFF = current_year-min(int_list)
+}else{
+  TSFF = as.numeric(v_TSFF)
+}
 
 log_it("Loading template raster")
 tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
