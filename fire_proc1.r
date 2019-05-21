@@ -70,6 +70,10 @@ log_it("Clipping fire history complete")
 v_fire$numYear = as.numeric(substr(as.character(v_fire[[f_fireseason]]),1,4))
 v_fire$count = 1
 
+# If v_TSFF is defined, subset v_fire to only years including or after this fireseason
+if(v_TSFF != ""){
+  v_fire = filter(v_fire,numYear >= as.numeric(v_TSFF))
+}
 
 do_gazette=FALSE
 ### If present load gazette data
