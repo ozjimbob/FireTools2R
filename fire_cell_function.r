@@ -274,8 +274,10 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   # readpoly: should the polygon shapefile be read back into R, and returned by this function? (logical)
   # quietish: should (some) messages be suppressed? (logical)
   if (isTRUE(readpoly)) require(rgdal)
+  
   if (is.null(pypath)) {
-    pypath <- Sys.which('gdal_polygonize.py')
+    cmd = ifelse(.Platform$OS=="windows", "C:/OSGeo4W64/OSGeo4W.bat", "python")
+    pypath <- Sys.which('gdal_polygonize')
   }
   ## The line below has been commented:
   # if (!file.exists(pypath)) stop("Can't find gdal_polygonize.py on your system.") 
@@ -301,12 +303,17 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   
   ## Now 'python' has to be substituted by OSGeo4W
   #system2('python',
-  system2('C:\\OSGeo4W64\\OSGeo4W.bat',
-          args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"', 
-                        pypath, rastpath, gdalformat, outshape)))
+  #system2('C:\\OSGeo4W64\\OSGeo4W.bat',
+  #        args=(sprintf('"%1$s" "%2$s" -q -f "%3$s.shp"', 
+ #                       pypath, rastpath, outshape)))
+ # system2(cmd,
+ #         args=(sprintf('"%1$s" "%2$s" -q -f "%3$s.shp"', 
+  #                      pypath, rastpath, outshape)))
+  tcmd = paste(cmd,pypath,rastpath,paste0(outshape,".shp"))
+  system(tcmd)
   unlink(f)
   if (isTRUE(readpoly)) {
-    shp <- readOGR(dirname(outshape), layer = basename(outshape), verbose=!quietish)
+    shp <- readOGR(paste0(outshape,".shp"),  verbose=!quietish)
     return(shp) 
   }
   return(NULL)

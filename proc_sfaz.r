@@ -132,8 +132,7 @@ log_it("Vectorizing SFAZ - FMZ  combined categories")
 log_it("Converting SFAZ - FMZ raster to polygons")
 
 if(OS == "Windows"){
-  v_sfaz_fmz_out = polygonizer_win(r_comb,
-                                   pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+  v_sfaz_fmz_out = polygonizer_win(r_comb)
 }else{
   v_sfaz_fmz_out = polygonizer(r_comb)
 }
@@ -216,8 +215,7 @@ log_it("Vectorizing SFAZ - FMZ - Heritage combined categories")
 log_it("Converting SFAZ - FMZ - Heritage raster to polygons")
 
 if(OS == "Windows"){
-v_sfaz_all_out = polygonizer_win(r_comb,
-                           pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+v_sfaz_all_out = polygonizer_win(r_comb)
 }else{
   v_sfaz_all_out = polygonizer(r_comb)
 }

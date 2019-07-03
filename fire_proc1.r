@@ -241,7 +241,7 @@ log_it("Vectorizing time since last burnt")
 
 if(OS=="Windows"){
   v_tsl = polygonizer_win(r_tsl,
-                          pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+                          pypath=NULL)
 }else{
   v_tsl = polygonizer(r_tsl)
 }
@@ -293,8 +293,7 @@ log_it("Vectorizing times burnt")
 
 
 if(OS=="Windows"){
-  v_timesburnt = polygonizer_win(r_timesburnt,
-                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+  v_timesburnt = polygonizer_win(r_timesburnt)
 }else{
   v_timesburnt = polygonizer(r_timesburnt)
 }

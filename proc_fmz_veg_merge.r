@@ -34,8 +34,7 @@ bigWrite(r_comb,paste0(rast_temp,"/r_fmz_bio_out.tif"))
 
 log_it("Converting combined biodiversity and fire management zone threshold raster to polygons")
 if(OS=="Windows"){
-v_fmzbio = polygonizer_win(r_comb,
-                                 pypath="C:/OSGeo4W64/bin/gdal_polygonize.py")
+v_fmzbio = polygonizer_win(r_comb)
 }else{
 v_fmzbio = polygonizer(r_comb)
 }
