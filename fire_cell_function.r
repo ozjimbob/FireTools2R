@@ -277,13 +277,14 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   
   if (is.null(pypath)) {
     cmd = ifelse(.Platform$OS=="windows", "C:/OSGeo4W64/OSGeo4W.bat", "python")
-    pypath <- Sys.which('gdal_polygonize')
+    #pypath <- Sys.which('C:/OSGeo4W64/bin/gdal_polygonize.py')
+    pypath = "gdal_polygonize"
   }
   ## The line below has been commented:
   # if (!file.exists(pypath)) stop("Can't find gdal_polygonize.py on your system.") 
   owd <- getwd()
   on.exit(setwd(owd))
-  setwd(dirname(pypath))
+ setwd("C:/OSGeo4W64/bin")
   if (!is.null(outshape)) {
     outshape <- sub('\\.shp$', '', outshape)
     f.exists <- file.exists(paste(outshape, c('shp', 'shx', 'dbf'), sep='.'))

@@ -240,8 +240,7 @@ log_it("Vectorizing time since last burnt")
 
 
 if(OS=="Windows"){
-  v_tsl = polygonizer_win(r_tsl,
-                          pypath=NULL)
+  v_tsl = polygonizer_win(r_tsl)
 }else{
   v_tsl = polygonizer(r_tsl)
 }
@@ -425,6 +424,9 @@ gc()
 log_it("Rasterizing vegetation ID")
 cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegcode.tif"),attribute=f_vegid)
 system(cmd)
+
+
+
 #r_vegcode = fasterize(v_veg,tmprast,field=f_vegid)
 #writeRaster(r_vegcode,paste0(rast_temp,"/r_vegcode.tif"),overwrite=TRUE)
 #r_vegcode <- NULL

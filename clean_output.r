@@ -67,6 +67,61 @@ rx_write("r_sfaz_fmz_out.tif","r_fmz_sfaz_threshold_status.tif")
 log_it("Writing combined raster table")
 rx_write("r_sfaz_fmz_bio_out.tif","r_heritage_fmz_sfaz_threshold_status.tif")
 
+# Add table to vegetation map
+log_it("Adding labels to vegetation raster")
+
+log_it("Loading vegetation raster and vector")
+vegbase = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
+vegcode = raster(paste0(rast_temp,"/r_vegcode.tif"))
+
+
+log_it("Generating code table")
+codelist = tibble(ID=unique(vegbase[[f_vegid]]))
+codelist$category = ""
+for(i in seq_along(codelist$ID)){
+  thisveg = filter(vegbase,!!rlang::sym(f_vegid)==codelist$ID[i])
+  codelist$category[i] = thisveg$VEGTEXT[1]
+}
+
+codelist = as.data.frame(codelist)
+
+
+
+tr <- ratify(vegcode)
+
+rat <- levels(tr)[[1]]
+
+rat <- left_join(rat,codelist)
+rat$category[is.na(rat$category)]=""
+
+log_it("Generating colour table")
+col_vec = colorRampPalette(c("white","brown","green","red","blue","yellow","pink","purple"))(nrow(rat))
+
+log_it("Assigning colours and names")
+ids = as.numeric(rownames(rat))
+codes = rat$ID
+
+tr = reclassify(tr,cbind(codes,ids))
+rat$ID = ids
+
+levels(tr) <- rat
+
+col_vec[1]="#ffffff"
+col_vec=c("#ffffff",col_vec)
+colortable(tr) <- col_vec
+
+log_it("Writing file")
+bigWrite(tr,paste0(rast_temp,"/r_vegcode2.tif"))
+
+
+log_it("Removing old files")
+unlink(paste0(rast_temp,"/r_vegcode.tif"))
+unlink(paste0(rast_temp,"/r_vegcode.tif.aux.xml"))
+file.rename(paste0(rast_temp,"/r_vegcode2.tif"),paste0(rast_temp,"/r_vegcode.tif"))
+file.rename(paste0(rast_temp,"/r_vegcode2.tif.aux.xml"),paste0(rast_temp,"/r_vegcode.tif.aux.xml"))
+
+
+
 log_it("Renaming files")
 
 file.rename(paste0(rast_temp,"/rLastYearBurnt.tif"),paste0(rast_temp,"/r_LastYearBurnt.tif"))
