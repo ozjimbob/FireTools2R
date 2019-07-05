@@ -183,5 +183,8 @@ write_sf(in_file,paste0(rast_temp,"/v_timesburnt.shp"))
 in_file = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"))
 
+in_file = read_sf(paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg"))
+write_sf(in_file,paste0(rast_temp,"/v_sfaz_candidate_blocks.shp"))
+
 in_file = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"))
