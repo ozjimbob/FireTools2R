@@ -32,6 +32,8 @@ log_it("Writing raster tables")
 
 
 rx_write=function(file,outfile){
+  require(foreign)
+  require(sp)
   rtable = data.frame(ID = c(1,2,3,4,5,6,7,8,9),
                       Status = c("NoFireRegime",
                                  "TooFrequentlyBurnt",
@@ -51,6 +53,22 @@ rx_write=function(file,outfile){
   rat <- left_join(rat,rtable)
   levels(tr) <- rat
   colortable(tr) <- col_vec
+  
+  # Write ESRI DB
+  
+  atable = levels(tr)[[1]]
+  names(atable)=c("VALUE","CATEGORY")
+  x = as.data.frame(table(values(tr)))
+  names(x)=c("VALUE","COUNT")
+  x$VALUE = as.numeric(as.character(x$VALUE))
+  a2 = left_join(atable,x)
+  a2$COUNT[is.na(a2$COUNT)]=0
+  a2 = select(a2,VALUE,COUNT,CATEGORY)
+  write.dbf(a2,paste0(rast_temp,"/",outfile,".vat.dbf"))
+  
+  # Fix projection
+  
+  crs(tr) <- CRS('+init=EPSG:3308')
   bigWrite(tr,paste0(rast_temp,"/",outfile))
   unlink(paste0(rast_temp,"/",file))
   
