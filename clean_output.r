@@ -34,6 +34,7 @@ log_it("Writing raster tables")
 rx_write=function(file,outfile){
   require(foreign)
   require(sp)
+  require(raster)
   rtable = data.frame(ID = c(1,2,3,4,5,6,7,8,9),
                       Status = c("NoFireRegime",
                                  "TooFrequentlyBurnt",
@@ -58,7 +59,7 @@ rx_write=function(file,outfile){
   
   atable = levels(tr)[[1]]
   names(atable)=c("VALUE","CATEGORY")
-  x = as.data.frame(table(values(tr)))
+  x = as.data.frame(table(raster::values(tr)))
   names(x)=c("VALUE","COUNT")
   x$VALUE = as.numeric(as.character(x$VALUE))
   a2 = left_join(atable,x)
