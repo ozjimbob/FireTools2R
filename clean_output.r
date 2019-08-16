@@ -64,7 +64,7 @@ rx_write=function(file,outfile){
   x$VALUE = as.numeric(as.character(x$VALUE))
   a2 = left_join(atable,x)
   a2$COUNT[is.na(a2$COUNT)]=0
-  a2 = select(a2,VALUE,COUNT,CATEGORY)
+  a2 = dplyr::select(a2,VALUE,COUNT,CATEGORY)
   write.dbf(a2,paste0(rast_temp,"/",outfile,".vat.dbf"))
   
   # Fix projection
