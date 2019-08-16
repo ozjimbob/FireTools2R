@@ -69,7 +69,7 @@ rx_write=function(file,outfile){
   
   # Fix projection
   
-  crs(tr) <- CRS('+init=EPSG:3308')
+  crs(tr) <- CRS('+init=epsg:3308')
   bigWrite(tr,paste0(rast_temp,"/",outfile))
   unlink(paste0(rast_temp,"/",file))
   
