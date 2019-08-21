@@ -30,6 +30,7 @@ file.copy("manifest.txt",paste0(rast_temp,"/MANIFEST.txt"))
 log_it("Writing raster tables")
 
 
+mask_tif<-raster(paste0(rast_temp,"/roi_mask.tif"))
 
 rx_write=function(file,outfile){
   require(foreign)
@@ -49,6 +50,7 @@ rx_write=function(file,outfile){
               "#ffffff","#ff0000","#ff6600","#00ffff","#999999","#99FF99","#226622","#00ff00","#cccccc")
   
   tr <- raster(paste0(rast_temp,"/",file))
+  tr = tr * mask_tif
   tr <- ratify(tr)
   rat <- levels(tr)[[1]]
   rat <- left_join(rat,rtable)
@@ -70,6 +72,7 @@ rx_write=function(file,outfile){
   # Fix projection
   
   crs(tr) <- CRS('+init=epsg:3308')
+  
   bigWrite(tr,paste0(rast_temp,"/",outfile))
   unlink(paste0(rast_temp,"/",file))
   
@@ -115,7 +118,7 @@ log_it("Adding labels to vegetation raster")
 log_it("Loading vegetation raster and vector")
 vegbase = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
 vegcode = raster(paste0(rast_temp,"/r_vegcode.tif"))
-
+vegcode = vegcode * mask_tif
 
 log_it("Generating code table")
 codelist = tibble(ID=unique(vegbase[[f_vegid]]))
@@ -177,13 +180,27 @@ file.rename(paste0(rast_temp,"/r_vegcode2.tif.aux.xml"),paste0(rast_temp,"/r_veg
 
 
 
-log_it("Renaming files")
+log_it("Renaming and masking files")
 
 file.rename(paste0(rast_temp,"/rLastYearBurnt.tif"),paste0(rast_temp,"/r_LastYearBurnt.tif"))
+temp_d = raster(paste0(rast_temp,"/r_LastYearBurnt.tif"))
+temp_d = temp * mask_tif
+bigWrite(temp_d,paste0(rast_temp,"/r_LastYearBurnt.tif"))
 esri_output("r_LastYearBurnt.tif")
+
+
+
 file.rename(paste0(rast_temp,"/rNumTimesBurnt.tif"),paste0(rast_temp,"/r_NumTimesBurnt.tif"))
+temp_d = raster(paste0(rast_temp,"/r_NumTimesBurnt.tif"))
+temp_d = temp_d * mask_tif
+bigWrite(temp_d,paste0(rast_temp,"/r_NumTimesBurnt.tif"))
 esri_output("r_NumTimesBurnt.tif")
+
+
 file.rename(paste0(rast_temp,"/rTimeSinceLast.tif"),paste0(rast_temp,"/r_TimeSinceLast.tif"))
+temp_d = raster(paste0(rast_temp,"/r_TimeSinceLast.tif"))
+temp_d = temp_d * mask_tif
+bigWrite(temp_d,paste0(rast_temp,"/r_TimeSinceLast.tif"))
 esri_output("r_TimeSinceLast.tif")
 
 file.rename(paste0(rast_temp,"/v_vegout.gpkg"),paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))

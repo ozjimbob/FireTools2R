@@ -48,6 +48,14 @@ if(!is.null(subextent)){
   log_it("Clipping complete")
 }
 
+# Make mask raster for ROI
+v_thisregion$flag = 1
+log_it("Rasterizing ROI Mask")
+mask_tif = fasterize(v_thisregion,tmprast,field="flag")
+log_it("Writing ROI Mask")
+bigWrite(mask_tif,paste0(rast_temp,"/roi_mask.tif"))
+rm(mask_tif)
+#mask_tif=raster(paste0(rast_temp,"/roi_mask.tif"))
 
 
 
@@ -207,7 +215,6 @@ gc()
 
 st = stack(orast)
 
-
 # process last year burnt
 log_it("Processing last burnt raster")
 beginCluster(clustNo)
@@ -233,6 +240,9 @@ log_it("Last burnt raster complete")
 # Write time since last
 log_it("Writing time since last fire raster")
 r_tsl = current_year - r_lastb
+
+# Exclude external
+log_it("Masking time since last fire raster")
 writeRaster(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'),overwrite=TRUE)
 
 
@@ -280,6 +290,9 @@ r_timesburnt = sum(st)
 rclmat = matrix(c(0,0,NA),nrow=1)
 #raster::values(r_timesburnt)[raster::values(r_timesburnt)==0]=NA
 r_timesburnt = reclassify(r_timesburnt,rclmat)
+log_it("Writing time since last fire raster")
+
+
 bigWrite(r_timesburnt,paste0(rast_temp,"/rNumTimesBurnt.tif"))
 #r_timesburnt <- raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
 #endCluster()

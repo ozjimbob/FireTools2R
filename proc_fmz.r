@@ -23,6 +23,7 @@ int_list = year_list$year
 log_it("Loading template raster")
 tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
 
+
 #### Read fire management zones
 # Read fire history table and transform
 log_it("Reading fire management zones, projecting and repairing")

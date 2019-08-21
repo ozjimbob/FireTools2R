@@ -22,6 +22,7 @@ g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   }
 }
 
+
 g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
