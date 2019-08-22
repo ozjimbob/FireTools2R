@@ -184,7 +184,7 @@ log_it("Renaming and masking files")
 
 file.rename(paste0(rast_temp,"/rLastYearBurnt.tif"),paste0(rast_temp,"/r_LastYearBurnt.tif"))
 temp_d = raster(paste0(rast_temp,"/r_LastYearBurnt.tif"))
-temp_d = temp * mask_tif
+temp_d = temp_d * mask_tif
 bigWrite(temp_d,paste0(rast_temp,"/r_LastYearBurnt.tif"))
 esri_output("r_LastYearBurnt.tif")
 
