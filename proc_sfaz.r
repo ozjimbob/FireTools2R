@@ -132,12 +132,12 @@ system(cmd)
 log_it("Loading SFAZ raster")
 r_tsl_sfaz = raster(paste0(rast_temp,"/r_tsl_sfaz.tif"))
 
-bigWrite(r_tsl_sfaz,paste0(rast_temp,"/r_tsl_sfaz.tif"))
+#bigWrite(r_tsl_sfaz,paste0(rast_temp,"/r_tsl_sfaz.tif"))
 
 log_it("Loading biodiversity and fire zone raster")
 r_fmz_bio = raster(paste0(rast_temp,"/r_fmz_bio_out.tif"))
 
-bigWrite(r_fmz_bio,paste0(rast_temp,"/r_fmz_bio_out.tif"))
+#bigWrite(r_fmz_bio,paste0(rast_temp,"/r_fmz_bio_out.tif"))
 
 log_it("Loading fire zone raster")
 r_fmz = raster(paste0(rast_temp,"/r_fmzout.tif"))
