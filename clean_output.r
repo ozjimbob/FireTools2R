@@ -123,9 +123,10 @@ vegcode = vegcode * mask_tif
 log_it("Generating code table")
 codelist = tibble(ID=unique(vegbase[[f_vegid]]))
 codelist$category = ""
+vt = which(substr(names(thisveg),1,7)=="VEGTEXT")[1]
 for(i in seq_along(codelist$ID)){
   thisveg = filter(vegbase,!!rlang::sym(f_vegid)==codelist$ID[i])
-  codelist$category[i] = thisveg$VEGTEXT[1]
+  codelist$category[i] = as.character(thisveg[1,vt])[1]
 }
 
 codelist = as.data.frame(codelist)
