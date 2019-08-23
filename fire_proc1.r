@@ -290,6 +290,9 @@ r_timesburnt = sum(st)
 rclmat = matrix(c(0,0,NA),nrow=1)
 #raster::values(r_timesburnt)[raster::values(r_timesburnt)==0]=NA
 r_timesburnt = reclassify(r_timesburnt,rclmat)
+mask_tif<-raster(paste0(rast_temp,"/roi_mask.tif"))
+r_timesburnt = r_timesburnt * mask_tif
+rm(mask_tif)
 log_it("Writing time since last fire raster")
 
 

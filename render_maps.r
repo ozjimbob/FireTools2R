@@ -132,7 +132,7 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm = tm_shape(v,name="Heritage Fire Blocka and SFAZ Status") +
+tm = tm_shape(v,name="Heritage Fire Blocks and SFAZ Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,

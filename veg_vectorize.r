@@ -3,6 +3,11 @@
 # Load vegetation raster
 log_it("Loading vegetation biodiversity threshold output raster")
 r_vegThreshold = raster(paste0(rast_temp,"/r_vegout.tif"))
+mask_tif<-raster(paste0(rast_temp,"/roi_mask.tif"))
+r_vegThreshold = r_vegThreshold * mask_tif
+rm(mask_tif)
+gc()
+bigWrite(r_vegThreshold,paste0(rast_temp,"/r_vegout.tif"))
 
 log_it("Converting vegetation biodiversity threshold raster to polygons")
 
