@@ -234,33 +234,44 @@ log_it("Writing Shapefile version")
 ## Shapefile test
 in_file = read_sf(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_fmz_sfaz_threshold_status.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_fmz_sfaz_threshold_status.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_fmz_threshold_status.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_fmz_threshold_status.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_threshold_status.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_threshold_status.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_heritage_threshold_status.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_heritage_threshold_status.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_region.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_region.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_tsl.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_tsl.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_timesburnt.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_timesburnt.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_tsl_sfaz.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_sfaz_candidate_blocks.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_sfaz_candidate_blocks.prj"))
 
 in_file = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"))
+file.copy("3308.prj",paste0(rast_temp,"/v_vegBase.prj"))
