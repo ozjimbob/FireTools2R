@@ -14,7 +14,7 @@ log_it("Creating map output directory")
 # Set up output folders
 dir.create(paste0(rast_temp,"/maps"))
 
-
+install.packages("OpenStreetMap")
 
 
 log_it("Plot biodiversity map")
