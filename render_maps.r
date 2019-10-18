@@ -14,7 +14,7 @@ log_it("Creating map output directory")
 # Set up output folders
 dir.create(paste0(rast_temp,"/maps"))
 
-install.packages("OpenStreetMap")
+
 
 
 log_it("Plot biodiversity map")
@@ -28,13 +28,13 @@ v <-v %>%  mutate(color = case_when(BioStatus=="NoFireRegime" ~ "#ffffff22",
                                     BioStatus=="Unknown" ~ "#cccccc99"
 ))
 log_it("Downloading OSM Background")
-CBS_bb <- bb(v)
-CBS_osm1 <- read_osm(CBS_bb, type="osm")
+#CBS_bb <- bb(v)
+#CBS_osm1 <- read_osm(CBS_bb, type="osm")
 
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() + 
-  tm_shape(v,name="Heritage Threshold Status") +
+#tm = tm_shape(CBS_osm1) + tm_raster() + 
+tm =   tm_shape(v,name="Heritage Threshold Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -60,8 +60,7 @@ v <-v %>%  mutate(color = case_when(FMZStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="Fire Management Blocks Threshold Status") +
+tm =  tm_shape(v,name="Fire Management Blocks Threshold Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -90,8 +89,7 @@ v <-v %>%  mutate(color = case_when(SFAZStatusText=="Recently Treated" ~ "#99FF9
 ))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="SFAZ Treatment Status") +
+tm = tm_shape(v,name="SFAZ Treatment Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -120,8 +118,7 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() + 
-  tm_shape(v,name="Heritage Fire Blocks and SFAZ Status") +
+tm =  tm_shape(v,name="Heritage Fire Blocks and SFAZ Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -151,8 +148,7 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm =  tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="FMZ SFAZ Status") +
+tm =   tm_shape(v,name="FMZ SFAZ Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -173,8 +169,7 @@ log_it("Plot TSL Fire map")
 v = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster()+
-  tm_shape(v,name="Time Since Last Fire") +
+tm = tm_shape(v,name="Time Since Last Fire") +
   tm_fill(col="TSL",style="fixed",
           alpha = 0.7,
           breaks=c(0,10,20,30,40,50,60,70,80,90,Inf),
@@ -194,8 +189,7 @@ log_it("Plot Times Burnt map")
 v = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="Number of Times Burnt") +
+tm =  tm_shape(v,name="Number of Times Burnt") +
   tm_fill(col="TimesBurnt",style="fixed",
           alpha = 0.7,
           breaks=c(0,1,2,3,4,5,6,7,8,9,Inf),
