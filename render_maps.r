@@ -14,9 +14,8 @@ log_it("Creating map output directory")
 # Set up output folders
 dir.create(paste0(rast_temp,"/maps"))
 
-log_it("Downloading OSM Background")
-CBS_bb <- bb(v)
-CBS_osm1 <- read_osm(CBS_bb, type="osm")
+
+
 
 log_it("Plot biodiversity map")
 v = read_sf(paste0(rast_temp,"/v_vegout.gpkg"))
@@ -28,8 +27,9 @@ v <-v %>%  mutate(color = case_when(BioStatus=="NoFireRegime" ~ "#ffffff22",
                                     BioStatus=="LongUnburnt" ~ "#00ffff99",
                                     BioStatus=="Unknown" ~ "#cccccc99"
 ))
-
-
+log_it("Downloading OSM Background")
+CBS_bb <- bb(v)
+CBS_osm1 <- read_osm(CBS_bb, type="osm")
 
 
 
