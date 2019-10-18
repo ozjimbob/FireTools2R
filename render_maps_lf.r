@@ -14,37 +14,38 @@ log_it("Creating map output directory")
 # Set up output folders
 dir.create(paste0(rast_temp,"/maps"))
 
-log_it("Downloading OSM Background")
-CBS_bb <- bb(v)
-CBS_osm1 <- read_osm(CBS_bb, type="osm")
 
 log_it("Plot biodiversity map")
 v = read_sf(paste0(rast_temp,"/v_vegout.gpkg"))
 v = dplyr::select(v,BioStatus)
 v <-v %>%  mutate(color = case_when(BioStatus=="NoFireRegime" ~ "#ffffff22",
-                                    BioStatus=="TooFrequentlyBurnt" ~ "#ff000099",
-                                    BioStatus=="Vulnerable" ~ "#ff660099",
-                                    BioStatus=="WithinThreshold" ~ "#99999999",
-                                    BioStatus=="LongUnburnt" ~ "#00ffff99",
-                                    BioStatus=="Unknown" ~ "#cccccc99"
-))
+                              BioStatus=="TooFrequentlyBurnt" ~ "#ff000099",
+                              BioStatus=="Vulnerable" ~ "#ff660099",
+                              BioStatus=="WithinThreshold" ~ "#99999999",
+                              BioStatus=="LongUnburnt" ~ "#00ffff99",
+                              BioStatus=="Unknown" ~ "#cccccc99"
+                              ))
 
-
-
-
-
-tm = tm_shape(CBS_osm1) + tm_raster() + 
-  tm_shape(v,name="Heritage Threshold Status") +
+            
+tm = tm_shape(v,name="Heritage Threshold Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
           title=paste0("Heritage Threshold Status ",current_year))+
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown"),
-                col=c("white","red","orange","grey","cyan","grey20"))
+                col=c("white","red","orange","grey","cyan","grey20"))+
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
-out_path = paste0(rast_temp,"/maps/heritage.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
+
+
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/heritage.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
@@ -60,20 +61,26 @@ v <-v %>%  mutate(color = case_when(FMZStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="Fire Management Blocks Threshold Status") +
+tm = tm_shape(v,name="Fire Management Blocks Threshold Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
           title=paste0("Fire Management Blocks Threshold Status ",current_year))+
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown"),
-                col=c("white","red","orange","grey","cyan","grey20"))
+                col=c("white","red","orange","grey","cyan","grey20"))+
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
 
 
-out_path = paste0(rast_temp,"/maps/fmz.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
+lf = tmap_leaflet(tm)
+
+
+
+out_path = paste0(rast_temp,"/maps/fmz.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
@@ -90,19 +97,24 @@ v <-v %>%  mutate(color = case_when(SFAZStatusText=="Recently Treated" ~ "#99FF9
 ))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="SFAZ Treatment Status") +
+tm = tm_shape(v,name="SFAZ Treatment Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
           title=paste0("SFAZ Treatment Status ",current_year))+
   tm_add_legend(type="fill",labels=c("Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
-                col=c("lightgreen","darkgreen","green"))
+                col=c("lightgreen","darkgreen","green"))+
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(Topography="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
 
-out_path = paste0(rast_temp,"/maps/sfaz.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
 
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/sfaz.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 log_it("Plot SFAZ + fmz + bio map") 
@@ -120,19 +132,25 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() + 
-  tm_shape(v,name="Heritage Fire Blocks and SFAZ Status") +
+tm = tm_shape(v,name="Heritage Fire Blocks and SFAZ Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
           title=paste0("Heritage Fire Block and SFAZ Status ",current_year))+
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
-                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))
+                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
 
-out_path = paste0(rast_temp,"/maps/sfaz_fmz_bio.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
+
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/sfaz_fmz_bio.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
@@ -151,20 +169,25 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm =  tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="FMZ SFAZ Status") +
+tm = tm_shape(v,name="FMZ SFAZ Status") +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
           title=paste0("FMZ and SFAZ Status ",current_year))+
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown","Recently Treated","Monitor OFH In the Field","Priority for Assessment and Treatment"),
-                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))
+                col=c("white","red","orange","grey","cyan","grey20","lightgreen","darkgreen","green"))+
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
 
 
-out_path = paste0(rast_temp,"/maps/sfaz_fmz.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/sfaz_fmz.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 
 
@@ -173,37 +196,43 @@ log_it("Plot TSL Fire map")
 v = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster()+
-  tm_shape(v,name="Time Since Last Fire") +
+tm = tm_shape(v,name="Time Since Last Fire") +
   tm_fill(col="TSL",style="fixed",
           alpha = 0.7,
           breaks=c(0,10,20,30,40,50,60,70,80,90,Inf),
           title=paste0("Time Since Last r. ",current_year),palette=c("red","yellow","green"))+
-  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
 
 
+lf = tmap_leaflet(tm)
 
 
-out_path = paste0(rast_temp,"/maps/tsl.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
-
+out_path = paste0(rast_temp,"/maps/tsl.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 log_it("Plot Times Burnt map") 
 
 v = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
 
 
-tm = tm_shape(CBS_osm1) + tm_raster() +
-  tm_shape(v,name="Number of Times Burnt") +
+tm = tm_shape(v,name="Number of Times Burnt") +
   tm_fill(col="TimesBurnt",style="fixed",
           alpha = 0.7,
           breaks=c(0,1,2,3,4,5,6,7,8,9,Inf),
-          title=paste0("Number of Times Burnt r. ",current_year),palette=c("green","yellow","red","black"))
+          title=paste0("Number of Times Burnt r. ",current_year),palette=c("green","yellow","red","black"))+
+  tm_view(view.legend.position=c("right","top"),set.zoom.limits=c(8,11))+ 
+  tm_basemap(server = c(NSW="http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}",
+                        Aerial = "http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}"))
 
 
-out_path = paste0(rast_temp,"/maps/ntb.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
 
+lf = tmap_leaflet(tm)
+
+
+out_path = paste0(rast_temp,"/maps/ntb.html")
+saveWidgetFix(lf, file=out_path,selfcontained = FALSE)
 
 log_it("Map rendering complete") 
