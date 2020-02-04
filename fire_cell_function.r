@@ -443,12 +443,12 @@ tile_win <- function(infile,pypath=NULL){
   outfile = paste0(rast_temp,"/tiles/",infile)
   dir.create(outfile)
   cmd="C:/OSGeo4W64/bin/gdal_translate.exe"
-  args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
-  system2(cmd,args,wait=TRUE)
-  system2('C:\\OSGeo4W64\\OSGeo4W.bat',
-          args=(sprintf('"%1$s" "%2$s" -w none -r near -a 255,255,255,255 -z 10-14 "%3$s"', 
-                        pypath, normalizePath(in_cfile), normalizePath(outfile))),wait=TRUE)
-  unlink(in_cfile)
+  #args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
+  #system2(cmd,args,wait=TRUE)
+  #system2('C:\\OSGeo4W64\\OSGeo4W.bat',
+  #        args=(sprintf('"%1$s" "%2$s" -w none -r near -a 255,255,255,255 -z 10-14 "%3$s"', 
+  #                      pypath, normalizePath(in_cfile), normalizePath(outfile))),wait=TRUE)
+  #unlink(in_cfile)
 }
 
 tile_linux <- function(infile,pypath=NULL){
@@ -464,11 +464,11 @@ tile_linux <- function(infile,pypath=NULL){
   outfile = paste0(rast_temp,"/tiles/",infile)
   dir.create(outfile)
   cmd="/usr/bin/gdal_translate"
-  args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
-  system2(cmd,args,wait=TRUE)
-  system2('python',
-          args=(sprintf('"%1$s" "%2$s" -w none -r near -a 255,255,255,255 -z 10-14 "%3$s"', 
-                        pypath, normalizePath(in_cfile), normalizePath(outfile))),wait=TRUE)
-  unlink(in_cfile)
+  #args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
+  #system2(cmd,args,wait=TRUE)
+  #system2('python',
+  #        args=(sprintf('"%1$s" "%2$s" -w none -r near -a 255,255,255,255 -z 10-14 "%3$s"', 
+  #                      pypath, normalizePath(in_cfile), normalizePath(outfile))),wait=TRUE)
+  #unlink(in_cfile)
 }
 
