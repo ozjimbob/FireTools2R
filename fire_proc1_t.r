@@ -172,8 +172,9 @@ orast = list()
 
 log_it(paste0("Rasterizing ",length(int_list)," fire seasons"))
 rast_method = "external"
+beginCluster(clustNo)
 for(yr in seq_along(int_list)){
-  
+  print(int_list[yr])
   datx = filter(v_fire,numYear==int_list[yr])
   datx = st_cast(datx,"MULTIPOLYGON")
   
@@ -195,10 +196,38 @@ for(yr in seq_along(int_list)){
     #            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
     cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
     system(cmd)
+    # Load this year, multiply by year
+    this_year = raster(paste0(rast_temp,"/",int_list[yr],".tif"))
+    if(yr==1){
+      r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+      r_timesburnt = calc(this_year,fun = function(x){0},filename=paste0(rast_temp,"/rNumTimesBurnt.tif"),overwrite=TRUE)
+    }  else {
+      r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+      r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+    }# We now have two temp files
+    log_it("Adding to stack")
+    log_it("New maximum")
+    r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
+    log_it("Adding to count")
+    log_it("Writing intermediate rasters")
+    print(plot(r_lastb))
+    writeRaster(r_lastb,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    writeRaster(r_timesburnt + this_year,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
+    print(plot(r_timesburnt))
+    log_it("removing temp files")
+    removeTmpFiles(h=0)
     unlink(paste0(rast_temp,"/","year_fire.gpkg"))
   }
+  
   orast[[yr]]=paste0(rast_temp,"/",int_list[yr],".tif")
 }
+
+
+#rm(comp_stack)
+gc()
+endCluster()
+
+
 datx <- NULL
 rm(datx)
 gc()
@@ -216,15 +245,15 @@ gc()
 
 
 # process last year burnt
-log_it("Processing last burnt raster")
-st = stack(orast)
-beginCluster(clustNo)
-cl=getCluster()
-clusterExport(cl,"current_year")
-clusterExport(cl,"year_list")
+#log_it("Processing last burnt raster")
+#st = stack(orast)
+#beginCluster(clustNo)
+#cl=getCluster()
+#clusterExport(cl,"current_year")
+#clusterExport(cl,"year_list")
 #r_lastb<- invisible(clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=2))
 
-invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=4)))
+#invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=4)))
 
 #####
 #####
@@ -234,28 +263,34 @@ invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),fil
 #####
 #####
 
-endCluster()
+#endCluster()
 
 ### Split by extent
 ### Multiply by year vec
 ### Find maximum year
 ### Merge rasters
 ### write year into rLastYearBurnt
-st = stack(orast,quick=TRUE)
-beginCluster(clustNo)
-st = st * year_list
-st = max(st,na.rm=TRUE)
-endCluster()
-gc()
-bigWrite(st,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+#st = stack(orast,quick=TRUE)
+#beginCluster(clustNo)
+#st = st * year_list
+#st = max(st,na.rm=TRUE)
+#endCluster()
+#gc()
+#bigWrite(st,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
 
-st <- NULL
-rm(st)
-gc()
+#st <- NULL
+#rm(st)
+#gc()
 
 
 #rm(cl)
+log_it("Last burnt zero to NA")
+r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+rclmat = matrix(c(0,0,NA),nrow=1)
+r_lastb = reclassify(r_lastb,rclmat)
+writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
 log_it("Last burnt raster complete")
+
 
 # Write time since last
 log_it("Writing time since last fire raster")
@@ -306,8 +341,8 @@ log_it("Processing times burnt raster")
 #clusterExport(cl,"year_list")
 #invisible(capture.output(r_timesburnt <- clusterR(st, calc, args=list(fun=calc_timesburnt),filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=10)))
 #invisible(capture.output(r_timesburnt <- clusterR(st, fun=sum,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'), overwrite=TRUE,m=4)))
-st = stack(orast)
-r_timesburnt = sum(st)
+#st = stack(orast)
+r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
 rclmat = matrix(c(0,0,NA),nrow=1)
 #raster::values(r_timesburnt)[raster::values(r_timesburnt)==0]=NA
 r_timesburnt = reclassify(r_timesburnt,rclmat)

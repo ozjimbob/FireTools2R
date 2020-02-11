@@ -84,7 +84,10 @@ esri_output = function(tfile){
   infile = paste0(rast_temp,"/",tfile)
   tempfile = paste0(rast_temp,"/",tfile,".tmp")
   gt = Sys.which("gdal_translate")
-  cmd=paste0(gt," ",infile," -a_srs 3308.prj -co COMPRESS=LZW ",tempfile)
+  if(gt==""){
+    gt="C:/OSGeo4W64/bin/gdal_translate.exe"
+  }
+  cmd=paste0(gt," ",infile," -a_srs 3308.prj -co COMPRESS=LZW -of GTiff ",tempfile)
   cout = system(cmd,intern=TRUE)
   log_it(cout)
   unlink(infile)

@@ -30,7 +30,7 @@ if(!exists("d_spatial_unit")){
 
 ## Run file
 log_it("**** Preparing fire history and vegetation rasters")
-source("fire_proc1.r")
+source("fire_proc1_t.r")
 log_it("**** Processing heritage vegetation thresholds")
 source("proc_veg1.r")
 log_it("**** Vectorizing vegetation")
