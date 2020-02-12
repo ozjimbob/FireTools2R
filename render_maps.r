@@ -32,9 +32,11 @@ log_it("Downloading OSM Background")
 #CBS_osm1 <- read_osm(CBS_bb, type="osm")
 
 
+log_it("Plot heritage status map")
 
-tm = tm_shape(nsw_bg) + tm_rgb() +
-tm_shape(v,name="Heritage Threshold Status",is.master = TRUE) +
+stex = crop(nsw_bg,extent(v))
+tm = tm_shape(stex) + tm_rgb() +
+  tm_shape(v,name="Heritage Threshold Status",is.master = TRUE) +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -42,7 +44,7 @@ tm_shape(v,name="Heritage Threshold Status",is.master = TRUE) +
   tm_add_legend(type="fill",labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","WithinThreshold","LongUnburnt",
                                      "Unknown"),
                 col=c("white","red","orange","grey","cyan","grey20"))
-
+log_it("Saving")
 out_path = paste0(rast_temp,"/maps/heritage.png")
 tmap_save(tm,out_path,width=800,units="px",dpi=150)
 
@@ -60,7 +62,7 @@ v <-v %>%  mutate(color = case_when(FMZStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm =  tm_shape(nsw_bg) + tm_rgb() +tm_shape(v,name="Fire Management Blocks Threshold Status",is.master = TRUE) +
+tm =  tm_shape(stex) + tm_rgb() +tm_shape(v,name="Fire Management Blocks Threshold Status",is.master = TRUE) +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -89,7 +91,7 @@ v <-v %>%  mutate(color = case_when(SFAZStatusText=="Recently Treated" ~ "#99FF9
 ))
 
 
-tm = tm_shape(nsw_bg) + tm_rgb() +tm_shape(v,name="SFAZ Treatment Status",is.master = TRUE) +
+tm = tm_shape(stex) + tm_rgb() +tm_shape(v,name="SFAZ Treatment Status",is.master = TRUE) +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -99,8 +101,9 @@ tm = tm_shape(nsw_bg) + tm_rgb() +tm_shape(v,name="SFAZ Treatment Status",is.mas
 
 
 out_path = paste0(rast_temp,"/maps/sfaz.png")
-tmap_save(tm,out_path,width=800,units="px",dpi=150)
-
+if(nrow(v)>0){
+  tmap_save(tm,out_path,width=800,units="px",dpi=150)
+}
 
 
 log_it("Plot SFAZ + fmz + bio map") 
@@ -118,7 +121,7 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm = tm_shape(nsw_bg) + tm_rgb() + tm_shape(v,name="Heritage Fire Blocks and SFAZ Status",is.master=TRUE) +
+tm = tm_shape(stex) + tm_rgb() + tm_shape(v,name="Heritage Fire Blocks and SFAZ Status",is.master=TRUE) +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -148,7 +151,7 @@ v <-v %>%  mutate(color = case_when(FinalStatus=="NoFireRegime" ~ "#ffffff22",
 ))
 
 
-tm =  tm_shape(nsw_bg) + tm_rgb() + tm_shape(v,name="FMZ SFAZ Status",is.master=TRUE) +
+tm =  tm_shape(stex) + tm_rgb() + tm_shape(v,name="FMZ SFAZ Status",is.master=TRUE) +
   tm_fill(col="color",
           style="cat",
           alpha = 0.7,
@@ -169,7 +172,7 @@ log_it("Plot TSL Fire map")
 v = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 
 
-tm =tm_shape(nsw_bg) + tm_rgb() + tm_shape(v,name="Time Since Last Fire",is.master=TRUE) +
+tm =tm_shape(stex) + tm_rgb() + tm_shape(v,name="Time Since Last Fire",is.master=TRUE) +
   tm_fill(col="TSL",style="fixed",
           alpha = 0.7,
           breaks=c(0,10,20,30,40,50,60,70,80,90,Inf),
@@ -189,7 +192,7 @@ log_it("Plot Times Burnt map")
 v = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
 
 
-tm =tm_shape(nsw_bg) + tm_rgb() +  tm_shape(v,name="Number of Times Burnt",is.master=TRUE) +
+tm =tm_shape(stex) + tm_rgb() +  tm_shape(v,name="Number of Times Burnt",is.master=TRUE) +
   tm_fill(col="TimesBurnt",style="fixed",
           alpha = 0.7,
           breaks=c(0,1,2,3,4,5,6,7,8,9,Inf),
@@ -201,3 +204,4 @@ tmap_save(tm,out_path,width=800,units="px",dpi=150)
 
 
 log_it("Map rendering complete") 
+

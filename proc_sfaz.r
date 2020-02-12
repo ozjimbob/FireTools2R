@@ -71,8 +71,10 @@ v_tsl = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 log_it("Intersecting SFAZ and TSF layers")
 v_tsl_sfaz = st_intersection(v_sfaz,v_tsl)
 
+
+
 log_it("Generating SFAZ threshold class")
-v_tsl_sfaz$SFAZStatus = 0
+#v_tsl_sfaz$SFAZStatus = 0
 
 
 log_it("Extracting finding MAXINT")
@@ -87,7 +89,7 @@ v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatus = case_when(TSL<=6 ~ 6,
                                          TSL >10 ~ 8))
 
 
-v_tsl_sfaz$SFAZStatusText = ""
+#v_tsl_sfaz$SFAZStatusText = ""
 v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(TSL<=6 ~ "Recently Treated",
                                                          TSL >6 & TSL <= 10 ~ "Monitor OFH in the field",
                                                          TSL >10 ~ "Priority for Assessment and Treatment"))
@@ -99,7 +101,7 @@ v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(TSL<=f_sfaz_custom 
                                                          TSL >10 ~ 8))
 
 
-v_tsl_sfaz_c$SFAZStatusText = ""
+#v_tsl_sfaz_c$SFAZStatusText = ""
 v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatusText = case_when(TSL<=f_sfaz_custom ~ "Recently Treated",
                                                              TSL >f_sfaz_custom & TSL <= this_maxint ~ "Monitor OFH in the field",
                                                              TSL >this_maxint ~ "Priority for Assessment and Treatment"))
