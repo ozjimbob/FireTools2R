@@ -11,7 +11,7 @@ library(mapview)
 library(fasterize)
 library(velox)
 library(lwgeom)
-
+library(future.apply)
 source("../config/global_config.r")
 source("../config/config_linux.r")
 source("fire_cell_function.r")
