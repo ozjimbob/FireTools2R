@@ -75,6 +75,7 @@ rx_write=function(file,outfile){
   
   bigWrite(tr,paste0(rast_temp,"/",outfile))
   unlink(paste0(rast_temp,"/",file))
+  gc()
   
 }
 
