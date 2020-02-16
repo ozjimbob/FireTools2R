@@ -34,7 +34,9 @@ log_it("Downloading OSM Background")
 
 log_it("Plot heritage status map")
 
-stex = crop(nsw_bg,extent(v))
+log_it("Cropping")
+ax = st_bbox(v)
+stex = crop(nsw_bg,extent(ax[1],ax[3],ax[2],ax[4]))
 tm = tm_shape(stex) + tm_rgb() +
   tm_shape(v,name="Heritage Threshold Status",is.master = TRUE) +
   tm_fill(col="color",

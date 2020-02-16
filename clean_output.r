@@ -95,27 +95,32 @@ esri_output = function(tfile){
   file.rename(tempfile,infile)
 }
 
+rm(v_sfaz)
+gc()
+rm(tm)
+gc()
 
 log_it("Writing heritage raster table")
 rx_write("r_vegout.tif","r_heritage_threshold_status.tif")
 esri_output("r_heritage_threshold_status.tif")
+gc()
 
 log_it("Writing fmz raster table")
 rx_write("r_fmzout.tif","r_fmz_threshold_status.tif")
 esri_output("r_fmz_threshold_status.tif")
-
+gc()
 log_it("Writing Heritage plus FMZ raster table")
 rx_write("r_fmz_bio_out.tif","r_heritage_fmz_threshold_status.tif")
 esri_output("r_heritage_fmz_threshold_status.tif")
-
+gc()
 log_it("Writing FMZ plus SFAZ raster table")
 rx_write("r_sfaz_fmz_out.tif","r_fmz_sfaz_threshold_status.tif")
 esri_output("r_fmz_sfaz_threshold_status.tif")
-
+gc()
 log_it("Writing combined raster table")
 rx_write("r_sfaz_fmz_bio_out.tif","r_heritage_fmz_sfaz_threshold_status.tif")
 esri_output("r_heritage_fmz_sfaz_threshold_status.tif")
-
+gc()
 # Add table to vegetation map
 log_it("Adding labels to vegetation raster")
 
@@ -183,6 +188,10 @@ unlink(paste0(rast_temp,"/r_vegcode.tif.aux.xml"))
 file.rename(paste0(rast_temp,"/r_vegcode2.tif"),paste0(rast_temp,"/r_vegcode.tif"))
 file.rename(paste0(rast_temp,"/r_vegcode2.tif.aux.xml"),paste0(rast_temp,"/r_vegcode.tif.aux.xml"))
 
+rm(vegbase)
+rm(tr)
+rm(vegcode)
+gc()
 
 
 log_it("Renaming and masking files")
@@ -192,7 +201,8 @@ temp_d = raster(paste0(rast_temp,"/r_LastYearBurnt.tif"))
 temp_d = temp_d * mask_tif
 bigWrite(temp_d,paste0(rast_temp,"/r_LastYearBurnt.tif"))
 esri_output("r_LastYearBurnt.tif")
-
+rm(temp_d)
+gc()
 
 
 file.rename(paste0(rast_temp,"/rNumTimesBurnt.tif"),paste0(rast_temp,"/r_NumTimesBurnt.tif"))
@@ -200,13 +210,17 @@ temp_d = raster(paste0(rast_temp,"/r_NumTimesBurnt.tif"))
 temp_d = temp_d * mask_tif
 bigWrite(temp_d,paste0(rast_temp,"/r_NumTimesBurnt.tif"))
 esri_output("r_NumTimesBurnt.tif")
-
+rm(temp_d)
+gc()
 
 file.rename(paste0(rast_temp,"/rTimeSinceLast.tif"),paste0(rast_temp,"/r_TimeSinceLast.tif"))
 temp_d = raster(paste0(rast_temp,"/r_TimeSinceLast.tif"))
 temp_d = temp_d * mask_tif
 bigWrite(temp_d,paste0(rast_temp,"/r_TimeSinceLast.tif"))
 esri_output("r_TimeSinceLast.tif")
+rm(temp_d)
+gc()
+
 
 file.rename(paste0(rast_temp,"/v_vegout.gpkg"),paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
 file.rename(paste0(rast_temp,"/v_fmzout.gpkg"),paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
