@@ -98,7 +98,16 @@ esri_output = function(tfile){
 rm(v_sfaz)
 gc()
 rm(tm)
+rm(stex)
+rm(nsw_bg)
+rm(v)
+rm(v_tsl)
+rm(any_fire)
+rm(v_thisregion)
 gc()
+
+endCluster()
+
 
 log_it("Writing heritage raster table")
 rx_write("r_vegout.tif","r_heritage_threshold_status.tif")

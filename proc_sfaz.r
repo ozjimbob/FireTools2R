@@ -38,7 +38,7 @@ log_it("Loading region boundary")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 
 #log_it("Clipping fire management zone to ROI")
-#v_fmz = st_intersection(v_fmz,v_thisregion)
+v_fmz = st_crop(st_buffer(v_fmz,0),v_thisregion)
 #log_it("Clipping  fire management zone complete")
 
 log_it("Extracting SFAZ polygons")
@@ -71,8 +71,17 @@ v_tsl = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 log_it("Intersecting SFAZ and TSF layers")
 v_tsl_sfaz = st_intersection(v_sfaz,v_tsl)
 
+# Difference
+v_tsl$id=NA
+any_fire = v_tsl %>% group_by(id) %>% summarise()
 
-
+v_tsl_sfaz2 = st_difference(v_sfaz,any_fire)
+#write_sf(v_tsl_sfaz,paste0(rast_temp,"/v_sfaz_j_tsl.gpkg"))
+#write_sf(v_tsl_sfaz2,paste0(rast_temp,"/v_sfaz_j2_tsl.gpkg"))
+names(v_tsl_sfaz2)[which(names(v_tsl_sfaz2)=="id")]="TSL"
+v_tsl_sfaz = rbind(v_tsl_sfaz,v_tsl_sfaz2)
+rm(v_tsl_sfaz2)
+gc()
 log_it("Generating SFAZ threshold class")
 #v_tsl_sfaz$SFAZStatus = 0
 
@@ -84,25 +93,26 @@ this_maxint = v_sfaz_table[[f_vt_maxint]]
 v_tsl_sfaz_c = v_tsl_sfaz
 
 log_it("Categorizing standard SFAZ")
-v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatus = case_when(TSL<=6 ~ 6,
+v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 9,
+                                        TSL<=6 ~ 6,
                                          TSL >6 & TSL <= 10 ~ 7,
                                          TSL >10 ~ 8))
 
 
 #v_tsl_sfaz$SFAZStatusText = ""
-v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(TSL<=6 ~ "Recently Treated",
+v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Unknown",TSL<=6 ~ "Recently Treated",
                                                          TSL >6 & TSL <= 10 ~ "Monitor OFH in the field",
                                                          TSL >10 ~ "Priority for Assessment and Treatment"))
 
 
 log_it("Categorizing custom SFAZ")
-v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(TSL<=f_sfaz_custom ~ 6,
+v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 9,TSL<=f_sfaz_custom ~ 6,
                                                          TSL >f_sfaz_custom & TSL <= 10 ~ 7,
                                                          TSL >10 ~ 8))
 
 
 #v_tsl_sfaz_c$SFAZStatusText = ""
-v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatusText = case_when(TSL<=f_sfaz_custom ~ "Recently Treated",
+v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Unknown",TSL<=f_sfaz_custom ~ "Recently Treated",
                                                              TSL >f_sfaz_custom & TSL <= this_maxint ~ "Monitor OFH in the field",
                                                              TSL >this_maxint ~ "Priority for Assessment and Treatment"))
 
@@ -134,7 +144,7 @@ system(cmd)
 log_it("Loading SFAZ raster")
 r_tsl_sfaz = raster(paste0(rast_temp,"/r_tsl_sfaz.tif"))
 
-#bigWrite(r_tsl_sfaz,paste0(rast_temp,"/r_tsl_sfaz.tif"))
+#bigWrite(r_tsl_sfaz,paste0(rast_temp,"/r_tsl_sfaz.tif"))  <-----
 
 log_it("Loading biodiversity and fire zone raster")
 r_fmz_bio = raster(paste0(rast_temp,"/r_fmz_bio_out.tif"))
@@ -223,7 +233,7 @@ gc()
 
 
 
-
+#<<<<----
 
 #############################################################
 
