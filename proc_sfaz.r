@@ -93,26 +93,29 @@ this_maxint = v_sfaz_table[[f_vt_maxint]]
 v_tsl_sfaz_c = v_tsl_sfaz
 
 log_it("Categorizing standard SFAZ")
-v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 9,
+v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 10,
                                         TSL<=6 ~ 6,
                                          TSL >6 & TSL <= 10 ~ 7,
                                          TSL >10 ~ 8))
 
 
 #v_tsl_sfaz$SFAZStatusText = ""
-v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Unknown",TSL<=6 ~ "Recently Treated",
+v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Priority for Assessment and Treatment",
+                                                             TSL<=6 ~ "Recently Treated",
                                                          TSL >6 & TSL <= 10 ~ "Monitor OFH in the field",
                                                          TSL >10 ~ "Priority for Assessment and Treatment"))
 
 
 log_it("Categorizing custom SFAZ")
-v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 9,TSL<=f_sfaz_custom ~ 6,
+v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 10,
+                                                             TSL<=f_sfaz_custom ~ 6,
                                                          TSL >f_sfaz_custom & TSL <= 10 ~ 7,
                                                          TSL >10 ~ 8))
 
 
 #v_tsl_sfaz_c$SFAZStatusText = ""
-v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Unknown",TSL<=f_sfaz_custom ~ "Recently Treated",
+v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Priority for Assessment and Treatment",
+                                                                 TSL<=f_sfaz_custom ~ "Recently Treated",
                                                              TSL >f_sfaz_custom & TSL <= this_maxint ~ "Monitor OFH in the field",
                                                              TSL >this_maxint ~ "Priority for Assessment and Treatment"))
 
@@ -206,7 +209,7 @@ v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 #v_sfaz_fmz_out = st_intersection(v_sfaz_fmz_out,v_thisregion)
 
 
-t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
+t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,10,NA),
                    FinalStatus = c("NoFireRegime",
                                    "TooFrequentlyBurnt",
                                    "Vulnerable",
@@ -215,6 +218,7 @@ t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
                                    "Unknown",
                                    "Recently Treated",
                                    "Monitor OFH In the Field",
+                                   "Priority for Assessment and Treatment",
                                    "Priority for Assessment and Treatment",NA))
 
 log_it("Joining  SFAZ - FMZ labels to polygons")
@@ -289,7 +293,7 @@ v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 #v_sfaz_all_out = st_intersection(v_sfaz_all_out,v_thisregion)
 
 
-t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
+t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,10,NA),
                    FinalStatus = c("NoFireRegime",
                                  "TooFrequentlyBurnt",
                                  "Vulnerable",
@@ -298,6 +302,7 @@ t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,NA),
                                  "Unknown",
                                  "Recently Treated",
                                  "Monitor OFH In the Field",
+                                 "Priority for Assessment and Treatment",
                                  "Priority for Assessment and Treatment",NA))
 
 log_it("Joining  SFAZ - FMZ - Heritage labels to polygons")

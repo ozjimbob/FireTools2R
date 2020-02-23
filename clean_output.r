@@ -36,7 +36,7 @@ rx_write=function(file,outfile){
   require(foreign)
   require(sp)
   require(raster)
-  rtable = data.frame(ID = c(1,2,3,4,5,6,7,8,9),
+  rtable = data.frame(ID = c(1,2,3,4,5,6,7,8,9,10),
                       Status = c("NoFireRegime",
                                  "TooFrequentlyBurnt",
                                  "Vulnerable",
@@ -45,7 +45,8 @@ rx_write=function(file,outfile){
                                  "Recently Treated",
                                  "Monitor OFH In the Field",
                                  "Priority for Assessment and Treatment",
-                                 "Unknown"))
+                                 "Unknown",
+                                 "Priority for Assessment and Treatment"))
   col_vec = c("#ffffff",
               "#ffffff","#ff0000","#ff6600","#00ffff","#999999","#99FF99","#226622","#00ff00","#cccccc")
   
@@ -118,14 +119,17 @@ log_it("Writing fmz raster table")
 rx_write("r_fmzout.tif","r_fmz_threshold_status.tif")
 esri_output("r_fmz_threshold_status.tif")
 gc()
+
 log_it("Writing Heritage plus FMZ raster table")
 rx_write("r_fmz_bio_out.tif","r_heritage_fmz_threshold_status.tif")
 esri_output("r_heritage_fmz_threshold_status.tif")
 gc()
+
 log_it("Writing FMZ plus SFAZ raster table")
 rx_write("r_sfaz_fmz_out.tif","r_fmz_sfaz_threshold_status.tif")
 esri_output("r_fmz_sfaz_threshold_status.tif")
 gc()
+
 log_it("Writing combined raster table")
 rx_write("r_sfaz_fmz_bio_out.tif","r_heritage_fmz_sfaz_threshold_status.tif")
 esri_output("r_heritage_fmz_sfaz_threshold_status.tif")
@@ -259,46 +263,60 @@ if(OS=="Windows"){
 log_it("Writing Shapefile version")
 
 ## Shapefile test
+log_it("Writing v_fmz_sfaz_threshold_status")
 in_file = read_sf(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_fmz_sfaz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_fmz_sfaz_threshold_status.prj"),overwrite=TRUE)
 
+log_it("Writing v_fmz_threshold_status")
 in_file = read_sf(paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_fmz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_fmz_threshold_status.prj"),overwrite=TRUE)
 
+log_it("Writing v_heritage_fmz_threshold_status")
 in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_threshold_status.prj"),overwrite=TRUE)
 
+log_it("Writing v_heritage_threshold_status")
 in_file = read_sf(paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_heritage_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_threshold_status.prj"),overwrite=TRUE)
 
+log_it("Writing v_heritage_fmz_sfaz_threshold_status.shp")
 in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.prj"),overwrite=TRUE)
 
+log_it("Writing v_region")
 in_file = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_region.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_region.prj"),overwrite=TRUE)
 
+log_it("Writing v_tsl")
 in_file = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_tsl.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_tsl.prj"),overwrite=TRUE)
 
+log_it("Writing v_timesburnt.shp")
 in_file = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
 write_sf(in_file,paste0(rast_temp,"/v_timesburnt.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_timesburnt.prj"),overwrite=TRUE)
 
+log_it("Writing v_tsl_sfaz")
 in_file = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"))
+in_file = dplyr::select(in_file,TSL,SFAZStatus,SFAZStatusText )
+write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"),delete_dsn=TRUE,delete_layer=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_tsl_sfaz.prj"),overwrite=TRUE)
 
+log_it("Writing v_sfaz_candidate_blocks")
 in_file = read_sf(paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_sfaz_candidate_blocks.shp"))
+in_file = dplyr::select(in_file,TSL,SFAZStatus,SFAZStatusText )
+write_sf(in_file,paste0(rast_temp,"/v_sfaz_candidate_blocks.shp"),delete_dsn=TRUE,delete_layer=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_sfaz_candidate_blocks.prj"),overwrite=TRUE)
 
+log_it("Writing v_vegBase")
 in_file = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"))
+write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"),delete_dsn=TRUE,delete_layer=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_vegBase.prj"),overwrite=TRUE)
+
