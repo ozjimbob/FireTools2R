@@ -157,21 +157,33 @@ r_fmz_bio = raster(paste0(rast_temp,"/r_fmz_bio_out.tif"))
 log_it("Loading fire zone raster")
 r_fmz = raster(paste0(rast_temp,"/r_fmzout.tif"))
 
+
 ## Load r_tsl
 
 
 
 log_it("Merging SFAZ to combined FMZ raster")
-beginCluster(clustNo)
+
 
 c_func = function(x,y){ifelse(x==0,y,x)}
 s = stack(r_tsl_sfaz,r_fmz)
-invisible(capture.output(r_comb <- clusterR(s,overlay,args=list(fun=c_func))))
+
+invisible(capture.output({
+  beginCluster(clustNo)
+  r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
+  if(class(r_comb)=="try-error"){
+    r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
+  }
+  endCluster()
+}))
+
+
 s <- NULL
 rm(s)
 gc()
 
-endCluster()
+
+
 
 log_it("Saving SFAZ - FMZ combined raster")
 bigWrite(r_comb,paste0(rast_temp,"/r_sfaz_fmz_out.tif"))
@@ -243,16 +255,25 @@ gc()
 
 
 log_it("Merging SFAZ to combined heritage and FMZ raster")
-beginCluster(clustNo)
+
 
 c_func = function(x,y){ifelse(x==0,y,x)}
 s = stack(r_tsl_sfaz,r_fmz_bio)
-invisible(capture.output(r_comb <- clusterR(s,overlay,args=list(fun=c_func))))
+
+invisible(capture.output({
+  beginCluster(clustNo)
+  r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
+  if(class(r_comb)=="try-error"){
+    r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
+  }
+  endCluster()
+}))
+
 s <- NULL
 rm(s)
 gc()
 
-endCluster()
+
 
 log_it("Saving SFAZ - FMZ - Heritage combined raster")
 bigWrite(r_comb,paste0(rast_temp,"/r_sfaz_fmz_bio_out.tif"))
