@@ -131,6 +131,14 @@ v_tsl_sfaz_c = v_tsl_sfaz_c %>% st_cast("MULTIPOLYGON")
 v_tsl_sfaz_c = filter(v_tsl_sfaz_c,as.numeric(st_area(v_tsl_sfaz_c))>0)
 
 
+log_it("Clipping to region of interest")
+v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
+v_tsl_sfaz = st_crop(st_buffer(v_tsl_sfaz,0),v_thisregion)
+v_tsl_sfaz_c = st_crop(st_buffer(v_tsl_sfaz_c,0),v_thisregion)
+v_thisregion <- NULL
+rm(v_thisregion)
+gc()
+
 log_it("Saving SFAZ threshold polygons")
 write_sf(v_tsl_sfaz,paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 write_sf(v_tsl_sfaz_c,paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg"))

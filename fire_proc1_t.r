@@ -165,14 +165,14 @@ write_csv(tibble(year = int_list),paste0(rast_temp,"/yearlist.csv"))
 
 # Simplify fire spatial file to save memory
 v_fire = dplyr::select(v_fire,numYear,count)
-
+gc()
 # Store rasters in a list
 orast = list()
 
 
 log_it(paste0("Rasterizing ",length(int_list)," fire seasons"))
 rast_method = "external"
-beginCluster(clustNo)
+#beginCluster(clustNo)
 for(yr in seq_along(int_list)){
   print(int_list[yr])
   datx = filter(v_fire,numYear==int_list[yr])
