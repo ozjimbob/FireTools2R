@@ -109,8 +109,8 @@ v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Prior
 log_it("Categorizing custom SFAZ")
 v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 10,
                                                              TSL<=f_sfaz_custom ~ 6,
-                                                         TSL >f_sfaz_custom & TSL <= 10 ~ 7,
-                                                         TSL >10 ~ 8))
+                                                         TSL >f_sfaz_custom & TSL <= this_maxint ~ 7,
+                                                         TSL >this_maxint ~ 8))
 
 
 #v_tsl_sfaz_c$SFAZStatusText = ""
