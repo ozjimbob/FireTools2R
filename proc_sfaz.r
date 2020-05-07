@@ -173,21 +173,26 @@ r_fmz = raster(paste0(rast_temp,"/r_fmzout.tif"))
 log_it("Merging SFAZ to combined FMZ raster")
 
 
-c_func = function(x,y){ifelse(x==0,y,x)}
-s = stack(r_tsl_sfaz,r_fmz)
-
-invisible(capture.output({
-  beginCluster(clustNo)
-  r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
-  if(class(r_comb)=="try-error"){
-    r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
-  }
-  endCluster()
-}))
-
-
-s <- NULL
-rm(s)
+old=FALSE
+if(old){
+  c_func = function(x,y){ifelse(x==0,y,x)}
+  s = stack(r_tsl_sfaz,r_fmz)
+  
+  invisible(capture.output({
+    beginCluster(clustNo)
+    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
+    if(class(r_comb)=="try-error"){
+      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
+    }
+    endCluster()
+  }))
+  
+  
+  s <- NULL
+  rm(s)
+}else{
+  r_comb <-cover(r_tsl_sfaz,r_fmz)
+}
 gc()
 
 

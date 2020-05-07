@@ -458,7 +458,8 @@ log_it("Cleaning vegetation layer complete")
 
 # join fire parameters
 log_it("Reading vegetation-fire LUT")
-v_vegfire_table = st_read(fire_gdb,i_vt_veg_lut)
+v_vegfire_table = st_read(fire_gdb,i_vt_veg_lut) 
+#v_vegfire_table = read_csv(i_vt_veg_lut)  ########################################### <<<<<<<
 log_it("Aligning veg type fieldnames")
 names(v_veg)[toupper(names(v_veg))==toupper(f_vegid)] = f_vegid
 

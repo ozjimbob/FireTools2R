@@ -8,7 +8,22 @@ c_sfaz = as.numeric(c_sfaz)
 current_year = as.numeric(current_year)
 ras_res = as.numeric(ras_res)
 
-
+getFreeMemoryKB <- function() {
+  osName <- Sys.info()[["sysname"]]
+  if (osName == "Windows") {
+    x <- system2("wmic", args =  "OS get FreePhysicalMemory /Value", stdout = TRUE)
+    x <- x[grepl("FreePhysicalMemory", x)]
+    x <- gsub("FreePhysicalMemory=", "", x, fixed = TRUE)
+    x <- gsub("\r", "", x, fixed = TRUE)
+    return(as.integer(x)/1000000)
+  } else if (osName == 'Linux') {
+    x <- system2('free', args='-k', stdout=TRUE)
+    x <- strsplit(x[2], " +")[[1]][4]
+    return(as.integer(x)/1000000)
+  } else {
+    stop("Only supported on Windows and Linux")
+  }
+}
 
 g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){

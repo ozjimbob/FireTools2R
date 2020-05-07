@@ -12,21 +12,32 @@ log_it("Loading biodiversity threshold raster")
 r_vegout = raster(paste0(rast_temp,"/r_vegout.tif"))
 log_it("Loading fire management zone threshold raster")
 r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
+log_it(paste0("System Memory Available: ",getFreeMemoryKB))
 
 log_it("Overlaying Rasters")
-beginCluster(clustNo)
 
-c_func = function(x,y){ifelse(is.na(x),y,x)}
-s = stack(r_fmzout,r_vegout)
-#s = brick(s)
-invisible(capture.output(r_comb <-clusterR(s,raster::overlay,args=list(fun=c_func))))
-#invisible(capture.output(r_comb = overlay(r_fmzout,r_vegout,fun=function(x,y){ifelse(is.na(x),y,x)})))
-s <- NULL
-rm(s)
+old=FALSE
+if(old){
+  beginCluster(clustNo)
+  
+  c_func = function(x,y){ifelse(is.na(x),y,x)}
+  s = stack(r_fmzout,r_vegout)
+  #s = brick(s)
+  invisible(capture.output(r_comb <-clusterR(s,raster::overlay,args=list(fun=c_func))))
+  #invisible(capture.output(r_comb = overlay(r_fmzout,r_vegout,fun=function(x,y){ifelse(is.na(x),y,x)})))
+  s <- NULL
+  rm(s)
+  endCluster()
+}else{
+  r_comb <-cover(r_fmzout,r_vegout)
+}
+
+
+
 gc()
 
 #r_comb = overlay(r_fmzout,r_vegout,fun=function(x,y){ifelse(is.na(x),y,x)})
-endCluster()
+
 
 log_it("Writing combined biodiversity and fire management zone threshold raster")
 bigWrite(r_comb,paste0(rast_temp,"/r_fmz_bio_out.tif"))
