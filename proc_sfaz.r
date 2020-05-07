@@ -171,6 +171,7 @@ r_fmz = raster(paste0(rast_temp,"/r_fmzout.tif"))
 
 
 log_it("Merging SFAZ to combined FMZ raster")
+log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 
 old=FALSE

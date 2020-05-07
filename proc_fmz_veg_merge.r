@@ -12,7 +12,7 @@ log_it("Loading biodiversity threshold raster")
 r_vegout = raster(paste0(rast_temp,"/r_vegout.tif"))
 log_it("Loading fire management zone threshold raster")
 r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
-log_it(paste0("System Memory Available: ",getFreeMemoryKB))
+log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 log_it("Overlaying Rasters")
 
