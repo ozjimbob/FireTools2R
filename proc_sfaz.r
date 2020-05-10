@@ -270,21 +270,27 @@ gc()
 
 log_it("Merging SFAZ to combined heritage and FMZ raster")
 
+log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
-c_func = function(x,y){ifelse(x==0,y,x)}
-s = stack(r_tsl_sfaz,r_fmz_bio)
-
-invisible(capture.output({
-  beginCluster(clustNo)
-  r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
-  if(class(r_comb)=="try-error"){
-    r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
-  }
-  endCluster()
-}))
-
-s <- NULL
-rm(s)
+old=FALSE
+if(old){
+  c_func = function(x,y){ifelse(x==0,y,x)}
+  s = stack(r_tsl_sfaz,r_fmz_bio)
+  
+  invisible(capture.output({
+    beginCluster(clustNo)
+    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
+    if(class(r_comb)=="try-error"){
+      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
+    }
+    endCluster()
+  }))
+  
+  s <- NULL
+  rm(s)
+}else{
+  r_comb <-cover(r_tsl_sfaz,r_fmz_bio)
+}
 gc()
 
 
