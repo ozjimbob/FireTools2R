@@ -174,7 +174,7 @@ log_it("Merging SFAZ to combined FMZ raster")
 log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 
-old=FALSE
+
 if(old){
   c_func = function(x,y){ifelse(x==0,y,x)}
   s = stack(r_tsl_sfaz,r_fmz)
@@ -272,7 +272,7 @@ log_it("Merging SFAZ to combined heritage and FMZ raster")
 
 log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
-old=FALSE
+
 if(old){
   c_func = function(x,y){ifelse(x==0,y,x)}
   s = stack(r_tsl_sfaz,r_fmz_bio)

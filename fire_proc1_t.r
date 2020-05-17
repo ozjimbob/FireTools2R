@@ -188,21 +188,34 @@ for(yr in seq_along(int_list)){
     gc()
   }else{
     # Ship out to gdal
+    log_it("Writing Temp gpkg")
     write_sf(datx,paste0(rast_temp,"/","year_fire.gpkg"))
     rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
     rres = res(tmprast)
     #cmd = paste0(gdal_rasterize," -burn 1 -l year_fire -of GTiff ",
     #             "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot byte -co COMPRESS=PACKBITS ",
     #            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
+    log_it("rasterize this year")
     cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
     system(cmd)
+    log_it("Loading this year")
     # Load this year, multiply by year
     this_year = raster(paste0(rast_temp,"/",int_list[yr],".tif"))
     if(yr==1){
+      log_it("Year 1 - calculating r_lastb")
       r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
-      r_timesburnt = calc(this_year,fun = function(x){0},filename=paste0(rast_temp,"/rNumTimesBurnt.tif"),overwrite=TRUE)
+      log_it("Year 1 - calculating r_timesbunr")
+      #r_timesburnt = calc(this_year,fun = function(x){0},filename=paste0(rast_temp,"/rNumTimesBurnt.tif"),overwrite=TRUE)
+      r_timesburnt = r_lastb
+      log_it("Zeroing")
+      raster::values(r_timesburnt)=0
+      log_it("writing")
+      writeRaster(r_timesburnt,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
+      gc()
     }  else {
+      log_it("loading r_lasb")
       r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+      log_it("loading r_timesbunrt")
       r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
     }# We now have two temp files
     log_it("Adding to stack")
@@ -210,13 +223,18 @@ for(yr in seq_along(int_list)){
     r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
     log_it("Adding to count")
     log_it("Writing intermediate rasters")
-    print(plot(r_lastb))
+    #print(plot(r_lastb))
     writeRaster(r_lastb,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
     writeRaster(r_timesburnt + this_year,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
-    print(plot(r_timesburnt))
+    log_it("Deleting")
+    rm(r_lastb)
+    rm(r_timesburnt)
+    gc()
+    #print(plot(r_timesburnt))
     log_it("removing temp files")
     removeTmpFiles(h=0)
     unlink(paste0(rast_temp,"/","year_fire.gpkg"))
+    
   }
   
   orast[[yr]]=paste0(rast_temp,"/",int_list[yr],".tif")

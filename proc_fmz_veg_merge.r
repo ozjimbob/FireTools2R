@@ -16,7 +16,7 @@ log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 log_it("Overlaying Rasters")
 
-old=FALSE
+
 if(old){
   beginCluster(clustNo)
   
