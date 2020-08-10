@@ -333,6 +333,8 @@ st_crs(v_tsl)=proj_crs
 
 
 log_it("Dissolving Time Since Last Fire polygons")
+v_tsl = st_make_valid(v_tsl)
+v_tsl = st_buffer(v_tsl,0)
 v_tsl = v_tsl %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
 names(v_tsl)[1]="TSL"
 
