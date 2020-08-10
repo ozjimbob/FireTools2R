@@ -394,6 +394,8 @@ st_crs(v_timesburnt)=proj_crs
 
 
 log_it("Dissolving times burnt polygons")
+v_timesburnt = st_make_valid(v_timesburnt)
+v_timesburnt = st_buffer(v_timesburnt,0)
 v_timesburnt = v_timesburnt %>% st_cast("MULTIPOLYGON") %>% group_by(DN) %>% summarise()
 names(v_timesburnt)[1]="TimesBurnt"
 
