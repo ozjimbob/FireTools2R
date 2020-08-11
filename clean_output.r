@@ -88,6 +88,8 @@ esri_output = function(tfile){
   gt = Sys.which("gdal_translate")
   if(gt==""){
     gt="C:/OSGeo4W64/bin/gdal_translate.exe"
+  }else{
+    gt=paste0(gdal_path,"gdal_translate")
   }
   cmd=paste0(gt," ",infile," -a_srs 3308.prj -co COMPRESS=LZW -of GTiff ",tempfile)
   cout = system(cmd,intern=TRUE)

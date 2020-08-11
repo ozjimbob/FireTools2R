@@ -467,7 +467,7 @@ tile_win <- function(infile,pypath=NULL){
 }
 
 tile_linux <- function(infile,pypath=NULL){
-  pypath = "/usr/bin/gdal2tiles.py"
+  pypath = paste0(gdal_path,"gdal2tiles.py")
   if(!file.exists(paste0(rast_temp,"/tiles"))){
     print("Making Dir")
     dir.create(paste0(rast_temp,"/tiles"))
@@ -478,7 +478,7 @@ tile_linux <- function(infile,pypath=NULL){
   in_cfile = paste0(infile_b,".vrt")
   outfile = paste0(rast_temp,"/tiles/",infile)
   dir.create(outfile)
-  cmd="/usr/bin/gdal_translate"
+  cmd=paste0(gdal_path,"gdal_translate")
   #args=c("-of vrt","-expand rgba",in_pfile,in_cfile)
   #system2(cmd,args,wait=TRUE)
   #system2('python',
