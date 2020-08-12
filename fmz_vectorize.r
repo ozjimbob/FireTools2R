@@ -28,6 +28,10 @@ v_fmzout = filter(v_fmzout,as.numeric(st_area(v_fmzout))>0)
 
 log_it("Clipping to region of interest")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
+v_fmzout = st_buffer(v_fmzout,0)
+v_fmzout = st_make_valid(v_fmzout)
+v_thisregion = st_buffer(v_thisregion,0)
+
 v_fmzout = st_intersection(v_fmzout,v_thisregion)
 
 
