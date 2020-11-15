@@ -3,14 +3,14 @@ library(tidyverse)
 library(sf)
 library(velox)
 library(raster)
-library(spatial.tools)
+#library(spatial.tools)
 library(foreach)
 library(doParallel)
 
 # Setup
-source("../config/global_config.r")
-source("../config/config_linux.r")
-source("fire_cell_function.r")
+#source("../config/global_config.r")
+#source("../config/config_linux.r")
+#source("fire_cell_function.r")
 
 log_it("Starting fire management zone analysis")
 ### Load rasters
@@ -89,6 +89,9 @@ log_it("Generating SFAZ threshold class")
 log_it("Extracting finding MAXINT")
 v_sfaz_table = filter(v_fmz_table,(!!rlang::sym(f_fmz)) == c_sfaz)
 this_maxint = v_sfaz_table[[f_vt_maxint]]
+log_it(paste0("Maxint is: ",this_maxint))
+f_sfaz_custom = as.numeric(f_sfaz_custom)
+log_it(paste0("SFAZ treatment custom is: ",f_sfaz_custom))
 
 v_tsl_sfaz_c = v_tsl_sfaz
 
@@ -106,20 +109,23 @@ v_tsl_sfaz= v_tsl_sfaz %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Prior
                                                          TSL >10 ~ "Priority for Assessment and Treatment"))
 
 
+v_tsl_sfaz$TSL[is.na(v_tsl_sfaz$TSL)]=9999
+
+
 log_it("Categorizing custom SFAZ")
 v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatus = case_when(is.na(TSL) ~ 10,
                                                              TSL<=f_sfaz_custom ~ 6,
-                                                         TSL >f_sfaz_custom & TSL <= this_maxint ~ 7,
+                                                         (TSL >f_sfaz_custom) & (TSL <= this_maxint) ~ 7,
                                                          TSL >this_maxint ~ 8))
 
 
 #v_tsl_sfaz_c$SFAZStatusText = ""
 v_tsl_sfaz_c= v_tsl_sfaz_c %>% mutate(SFAZStatusText = case_when(is.na(TSL) ~ "Priority for Assessment and Treatment",
                                                                  TSL<=f_sfaz_custom ~ "Recently Treated",
-                                                             TSL >f_sfaz_custom & TSL <= this_maxint ~ "Monitor OFH in the field",
+                                                             (TSL >f_sfaz_custom) & (TSL <= this_maxint) ~ "Monitor OFH in the field",
                                                              TSL >this_maxint ~ "Priority for Assessment and Treatment"))
 
-
+v_tsl_sfaz_c$TSL[is.na(v_tsl_sfaz_c$TSL)]=9999
 
 
 log_it("Writing SFAZ threshold polygons")

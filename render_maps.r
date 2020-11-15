@@ -6,9 +6,9 @@ library(tmap)
 library(tmaptools)
 library(htmlwidgets)
 
-source("../config/global_config.r")
-source("../config/config_linux.r")
-source("fire_cell_function.r")
+#source("../config/global_config.r")
+#source("../config/config_linux.r")
+#source("fire_cell_function.r")
 
 log_it("Creating map output directory")
 # Set up output folders

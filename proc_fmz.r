@@ -3,14 +3,14 @@ library(tidyverse)
 library(sf)
 library(velox)
 library(raster)
-library(spatial.tools)
+#library(spatial.tools)
 library(foreach)
 library(doParallel)
 
 # Setup
-source("../config/global_config.r")
-source("../config/config_linux.r")
-source("fire_cell_function.r")
+#source("../config/global_config.r")
+#source("../config/config_linux.r")
+#source("fire_cell_function.r")
 
 log_it("Starting fire management zone analysis")
 ### Load rasters

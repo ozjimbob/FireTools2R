@@ -6,9 +6,9 @@ library(tmap)
 library(tmaptools)
 library(htmlwidgets)
 
-source("../config/global_config.r")
-source("../config/config_linux.r")
-source("fire_cell_function.r")
+#source("../config/global_config.r")
+#source("../config/config_linux.r")
+#source("fire_cell_function.r")
 
 # Get list of years
 yl <- read_csv(paste0(rast_temp,"/yearlist.csv"))

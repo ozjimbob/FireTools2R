@@ -4,7 +4,7 @@
 library(tidyverse)
 library(sf)
 library(raster)
-library(spatial.tools)
+#library(spatial.tools)
 library(foreach)
 library(doParallel)
 library(mapview)
@@ -24,6 +24,7 @@ c_sfaz = as.numeric(c_sfaz)
 current_year = as.numeric(current_year)
 ras_res = as.numeric(ras_res)
 f_sfaz_custom = as.numeric(f_sfaz_custom)
+
 if(!exists("d_spatial_unit")){
   d_spatial_unit=""
 }

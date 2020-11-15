@@ -3,7 +3,7 @@ library(tidyverse)
 library(sf)
 library(velox)
 library(raster)
-library(spatial.tools)
+#library(spatial.tools)
 library(foreach)
 library(doParallel)
 
