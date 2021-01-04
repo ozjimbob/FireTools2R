@@ -183,7 +183,7 @@ for(yr in seq_along(int_list)){
     tt=fasterize(datx,tmprast,field="count",fun="sum")
     #tt = velox(tt)
     #tt$write(paste0(rast_temp,"/",int_list[yr],".tif"),overwrite=TRUE)
-    bigWriteBinary(tt,filename=paste0(rast_temp,"/",int_list[yr],".tif"))
+    bigWriteBinary(tt,paste0(rast_temp,"/",int_list[yr],".tif"))
     rm(tt)
     gc()
   }else{
@@ -210,7 +210,7 @@ for(yr in seq_along(int_list)){
       log_it("Zeroing")
       raster::values(r_timesburnt)=0
       log_it("writing")
-      bigWrite(r_timesburnt,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
+      bigWrite(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
       log_it("Writing complete")
       gc()
       log_it("Garbage Collected")
@@ -226,8 +226,8 @@ for(yr in seq_along(int_list)){
     log_it("Adding to count")
     log_it("Writing intermediate rasters")
     #print(plot(r_lastb))
-    bigWrite(r_lastb,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'))
-    bigWrite(r_timesburnt + this_year,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
+    bigWrite(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+    bigWrite(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
     log_it("Deleting")
     rm(r_lastb)
     rm(r_timesburnt)
