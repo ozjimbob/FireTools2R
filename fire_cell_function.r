@@ -393,6 +393,16 @@ bigWrite <- function(r,out){
   s2 <- writeStop(s2)
 }
 
+bigWriteBinary <- function(r,out){
+  s2 <- writeStart(r, filename=out, format='GTiff', overwrite=TRUE,datatype="INT1U")
+  tr <- blockSize(r)
+  for (i in tr$n:1) {
+    v <- getValuesBlock(r, row=tr$row[i], nrows=tr$nrows[i])
+    s2 <- writeValues(s2, v, tr$row[i])
+  }
+  s2 <- writeStop(s2)
+}
+
 saveWidgetFix <- function (widget,file,...) {
   ## A wrapper to saveWidget which compensates for arguable BUG in
   ## saveWidget which requires `file` to be in current working
