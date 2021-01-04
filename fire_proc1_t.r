@@ -210,8 +210,10 @@ for(yr in seq_along(int_list)){
       log_it("Zeroing")
       raster::values(r_timesburnt)=0
       log_it("writing")
-      writeRaster(r_timesburnt,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
+      bigWrite(r_timesburnt,filename=paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
+      log_it("Writing complete")
       gc()
+      log_it("Garbage Collected")
     }  else {
       log_it("loading r_lasb")
       r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
