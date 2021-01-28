@@ -16,7 +16,7 @@ source("../config/global_config.r")
 source("../config/config_linux.r")
 
 
-if(OS=="Windows"){
+if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
   library(future.apply)
 }
 

@@ -34,7 +34,7 @@ tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
 
 
 library(future)
-if(OS=="Windows"){
+if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
   print("Loading future.apply")
   library("future.apply")
 }
