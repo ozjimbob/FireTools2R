@@ -198,6 +198,7 @@ if(old){
   s <- NULL
   rm(s)
 }else{
+  r_tsl_sfaz = reclassify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
   r_comb <-cover(r_tsl_sfaz,r_fmz)
 }
 gc()
@@ -295,6 +296,7 @@ if(old){
   s <- NULL
   rm(s)
 }else{
+  r_tsl_sfaz = reclassify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
   r_comb <-cover(r_tsl_sfaz,r_fmz_bio)
 }
 gc()
