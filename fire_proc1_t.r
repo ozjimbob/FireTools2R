@@ -65,6 +65,9 @@ log_it("Reading fire history, projecting and repairing")
 v_fire = read_sf(fire_gdb,i_vt_fire_history)
 v_fire = st_transform(v_fire,crs=proj_crs)
 v_fire = st_cast(v_fire,"MULTIPOLYGON") # Multisurface features cause errors
+
+v_fire <- remove_invalid_poly(v_fire)
+
 v_fire = st_make_valid(v_fire) # repair invalid geometries
 log_it("Fire history import complete")
 
@@ -81,6 +84,13 @@ v_fire$count = 1
 # If v_TSFF is defined, subset v_fire to only years including or after this fireseason
 if(v_TSFF != ""){
   v_fire = filter(v_fire,numYear >= as.numeric(v_TSFF))
+}
+
+# If v_TSFF is defined, subset v_fire to only years including or after this fireseason
+if(exists("v_TSFilter")){
+  if(v_TSFilter != ""){
+    v_fire = filter(v_fire,numYear < as.numeric(v_TSFilter))
+  }
 }
 
 do_gazette=FALSE
@@ -189,18 +199,31 @@ for(yr in seq_along(int_list)){
   }else{
     # Ship out to gdal
     log_it("Writing Temp gpkg")
+    
+    
     write_sf(datx,paste0(rast_temp,"/","year_fire.gpkg"))
+    
     rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
     rres = res(tmprast)
-    #cmd = paste0(gdal_rasterize," -burn 1 -l year_fire -of GTiff ",
-    #             "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot byte -co COMPRESS=PACKBITS ",
-    #            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
-    log_it("rasterize this year")
-    cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
-    system(cmd)
-    log_it("Loading this year")
-    # Load this year, multiply by year
-    this_year = raster(paste0(rast_temp,"/",int_list[yr],".tif"))
+    
+    if(nrow(datx)>0){
+      
+      #cmd = paste0(gdal_rasterize," -burn 1 -l year_fire -of GTiff ",
+      #             "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot byte -co COMPRESS=PACKBITS ",
+      #            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
+      log_it("rasterize this year")
+      cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
+      system(cmd)
+      log_it("Loading this year")
+      # Load this year, multiply by year
+      this_year <- raster(paste0(rast_temp,"/",int_list[yr],".tif"))
+    }else{
+      log_it("NO FIRE FOUND skipping to blank raster.")
+      this_year <- tmprast
+      raster::values(this_year)<-0
+    }
+    
+    
     if(yr==1){
       log_it("Year 1 - calculating r_lastb")
       r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
@@ -461,9 +484,15 @@ if(length(i_vt_veg)>1){
 log_it("Projecting and repairing vegetation layer")
 v_veg = st_transform(v_veg,crs=proj_crs)
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
+
+# NEW - remove invalid polygons, rather than buffer to 0?
+v_veg <- remove_invalid_poly(v_veg)
+
+
 # Clip veg to region of interest
 log_it("Clipping vegetation layer")
-v_veg=st_buffer(v_veg,0)
+
+#v_veg=st_buffer(v_veg,0)
 
 
 #v_veg = st_intersection(v_veg,v_thisregion)
@@ -477,7 +506,7 @@ log_it("Projecting vegetation complete")
 log_it("Cleaning vegetation layer")
 v_veg = filter(v_veg,as.numeric(st_area(v_veg))>0)
 v_veg = filter(v_veg,st_geometry_type(v_veg) %in% c("POLYGON","MULTIPOLYGON"))
-v_veg = st_cast(v_veg,"MULTIPOLYGON")
+v_veg = st_cast(v_veg,"POLYGON") # Changed from multipolygon
 log_it("Cleaning vegetation layer complete")
 
 # join fire parameters
@@ -521,7 +550,7 @@ gc()
 log_it("Rasterizing vegetation ID")
 cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegcode.tif"),attribute=f_vegid)
 system(cmd)
-
+log_it("Rasterizing vegetation ID Complete")
 
 
 #r_vegcode = fasterize(v_veg,tmprast,field=f_vegid)
@@ -568,7 +597,6 @@ log_it("Rasterizing vegetation fire advantage complete")
 
 # Clean up
 log_it("Cleaning up memory")
-rm(st)
 rm(r_timesburnt)
 rm(tmprast)
 gc()

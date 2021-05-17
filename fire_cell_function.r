@@ -28,11 +28,11 @@ getFreeMemoryKB <- function() {
 g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
-         "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q ",
+         "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
          paste0(rast_temp,"/",filename)," ",output)
   }else{
     paste0(gdal_rasterize," -a ",attribute," -l ",layer," -of GTiff ",
-           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
            paste0(rast_temp,"/",filename)," ",output)
   }
 }
@@ -41,11 +41,11 @@ g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
 g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
-           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
            paste0(rast_temp,"/",filename)," ",output)
   }else{
     paste0(gdal_rasterize," -a ",attribute," -l ",layer," -of GTiff ",
-           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -q ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
            paste0(rast_temp,"/",filename)," ",output)
   }
 }
@@ -373,6 +373,39 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   }
   return(NULL)
 }
+
+polygonize_by_name <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
+                        pypath=NULL, readpoly=TRUE, quietish=TRUE) {
+  quiet = quietish
+  if (isTRUE(readpoly)) require(rgdal)
+  if (is.null(pypath)) {
+    pypath <- Sys.which('gdal_polygonize.py')
+  }
+  if (!file.exists(pypath)) stop("Can't find gdal_polygonize.py on your system.")
+  owd <- getwd()
+  on.exit(setwd(owd))
+  setwd(dirname(pypath))
+  if (!is.null(outshape)) {
+    outshape <- sub('\\.shp$', '', outshape)
+    f.exists <- file.exists(paste(outshape, c('shp', 'shx', 'dbf'), sep='.'))
+    if (any(f.exists))
+      stop(sprintf('File already exists: %s',
+                   toString(paste(outshape, c('shp', 'shx', 'dbf'),
+                                  sep='.')[f.exists])), call.=FALSE)
+  } else outshape <- tempfile()
+  
+  rastpath <- normalizePath(x)
+  
+  system2('python', args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"',
+                                  pypath, rastpath, gdalformat, outshape)))
+  
+  if (isTRUE(readpoly)) {
+    shp <- readOGR(dirname(outshape), layer = basename(outshape), verbose=!quiet)
+    return(shp)
+  }
+  return(NULL)
+}
+
 # Prepare file output space
 prepare <- function(){
   # Prepare filesystem
@@ -497,3 +530,29 @@ tile_linux <- function(infile,pypath=NULL){
   #unlink(in_cfile)
 }
 
+remove_invalid_poly <- function(xx){
+  to_fix=c()
+  for(i in 1:nrow(xx)){
+    mn <- min(sapply(st_geometry(xx)[[i]], function(x) nrow(x[[1]])))
+    if(mn < 4){
+      to_fix <- c(to_fix,i)
+    }
+  }
+  
+  for(fix_list in to_fix){
+    aa = st_geometry(xx)[[fix_list]]
+    to_remove = c()
+    for(i in 1:length(aa)){
+      nr <- nrow(aa[[i]][[1]])
+      if(nr<4){
+        
+        to_remove <- c(to_remove,i)
+      }
+    }
+    to_remove <- rev(to_remove)
+    for(i in to_remove){
+      st_geometry(xx)[[fix_list]][[i]]<-NULL
+    }
+  }
+return(xx)
+}

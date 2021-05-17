@@ -2,13 +2,16 @@
 
 # Load vegetation raster
 log_it("Loading fire management zone threshold output raster")
-r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
+
+
 
 log_it("Converting fire management zone threshold raster to polygons")
 if(OS=="Windows"){
+  r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
   v_fmzout = polygonizer_win(r_fmzout)
 }else{
-  v_fmzout = polygonizer(r_fmzout)
+  v_fmzout = polygonize_by_name(paste0(rast_temp,"/r_fmzout.tif"))
+  
 }
 
 v_fmzout = st_as_sf(v_fmzout)

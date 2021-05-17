@@ -418,7 +418,7 @@ log_it("Projecting vegetation complete")
 log_it("Cleaning vegetation layer")
 v_veg = filter(v_veg,as.numeric(st_area(v_veg))>0)
 v_veg = filter(v_veg,st_geometry_type(v_veg) %in% c("POLYGON","MULTIPOLYGON"))
-v_veg = st_cast(v_veg,"MULTIPOLYGON")
+v_veg = st_cast(v_veg,"POLYGON") # Change to POLYGON
 log_it("Cleaning vegetation layer complete")
 
 # join fire parameters
