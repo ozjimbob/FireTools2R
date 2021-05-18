@@ -41,8 +41,8 @@ log_it("**** Preparing fire history and vegetation rasters")
 source("fire_proc_preprocess.r")
 
 
-#log_it("**** Intersecting output polygon layer")
+
 log_it("#!#!#!# ANALYSIS COMPLETE")
-#source("intersect_poly_output.r")
+
 
 

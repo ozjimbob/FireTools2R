@@ -556,3 +556,25 @@ remove_invalid_poly <- function(xx){
   }
 return(xx)
 }
+
+# GDAL function to convert zero cells to NA
+zero_raster <- function(x){
+  
+  log_it("Raster Zero to NA")
+  infile = paste0(rast_temp,"/",x)
+  tempfile = paste0(rast_temp,"/",x,".tmp")
+  gt = Sys.which("gdal_translate")
+  if(gt==""){
+    gt="C:/OSGeo4W64/bin/gdal_translate.exe"
+  }else{
+    gt=paste0(gdal_path,"gdal_translate")
+  }
+  cmd=paste0(gt," -of GTiff -a_nodata 0 -co COMPRESS=LZW ",infile," ",tempfile)
+  cout = system(cmd,intern=TRUE)
+  log_it(cout)
+  unlink(infile)
+  file.rename(tempfile,infile)
+  
+  #gdal_translate -of GTiff -a_nodata 0 -co COMPRESS=LZW rLastYearBurnt_2018.tif test_lyb.tif
+  
+}

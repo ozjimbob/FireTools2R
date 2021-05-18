@@ -165,8 +165,10 @@ for(yr in seq_along(int_list)){
   log_it("Adding to count")
   log_it("Writing intermediate rasters")
   #print(plot(r_lastb))
+  
   bigWrite(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
   bigWrite(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
+  
   file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
   file.copy(paste0(rast_temp,"/",'rNumTimesBurnt.tif'),paste0(rast_temp,"/",'rNumTimesBurnt_',int_list[yr],'.tif'))
   log_it("Deleting")
@@ -208,15 +210,18 @@ gc()
 
 #rm(cl)
 log_it("Last burnt zero to NA")
-r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
-rclmat = matrix(c(0,NA),nrow=1)
-r_lastb = reclassify(r_lastb,rclmat)
-writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+
+#r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+#rclmat = matrix(c(0,NA),nrow=1)
+#r_lastb = reclassify(r_lastb,rclmat)
+#writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+
+zero_raster('rLastYearBurnt.tif')
 
 for(yr in seq_along(int_list)){
-  r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
-  r_lastb = reclassify(r_lastb,rclmat)
-  bigWrite(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
+  #r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
+  #r_lastb = reclassify(r_lastb,rclmat)
+  zero_raster(paste0('rLastYearBurnt_',int_list[yr],'.tif'))
   }
 
 
@@ -261,7 +266,7 @@ for(this_year in full_year_list){
   nearest_year = max(nearest_year[!nearest_year > 0]) + this_year
   r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt_",nearest_year,".tif"))
   r_timesburnt = reclassify(r_timesburnt,rclmat)
-  r_timesburnt = r_timesburnt * mask_tif
+  #r_timesburnt = r_timesburnt * mask_tif
   bigWrite(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt_',this_year,'.tif'))
 }
 
