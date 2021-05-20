@@ -229,22 +229,34 @@ log_it("Last burnt raster complete")
 
 
 # Write time since last
-log_it("Writing time since last fire raster")
+log_it("Loading Last Year Burnt raster")
 r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+log_it("Subtracting")
 r_tsl = current_year - r_lastb
-
+log_it("Writing main Time Since Last raster")
 # Exclude external
-log_it("Masking time since last fire raster")
+#log_it("Masking time since last fire raster")
 writeRaster(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'),overwrite=TRUE)
 
+log_it("Generating year list")
 full_year_list = min(int_list):(current_year + future_years)
+log_it(full_year_list)
 
+log_it("Looping through year list to generate incremental time since last")
 for(this_year in full_year_list){
+  log_it(paste0("Year: ",this_year))
   nearest_year = int_list - this_year
   nearest_year = max(nearest_year[!nearest_year > 0]) + this_year
+  log_it(paste0("Nearest past year: ",nearest_year))
+  log_it(paste0("Past year exists? ", file.exists(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))))
+  log_it("Loading file")
   r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))
+  log_it("Subtracting")
   r_tsl = this_year - r_lastb
+  log_it("Writing incremental Time Since Last")
   bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast_',this_year,'.tif'))
+  log_it("Cleaning up")
+  gc()
 }
 
 
@@ -252,24 +264,35 @@ for(this_year in full_year_list){
 # process times burnt
 log_it("Processing times burnt raster")
 
+log_it("Loading Number of Times Burnt")
 r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+log_it("Zero to NA reclassify")
 rclmat = matrix(c(0,NA),nrow=1)
 r_timesburnt = reclassify(r_timesburnt,rclmat)
-mask_tif<-raster(paste0(rast_temp,"/roi_mask.tif"))
-r_timesburnt = r_timesburnt * mask_tif
+#mask_tif<-raster(paste0(rast_temp,"/roi_mask.tif"))
+#r_timesburnt = r_timesburnt * mask_tif
 
-log_it("Writing time since last fire raster")
+log_it("Writing Number of Times Burnt raster")
 bigWrite(r_timesburnt,paste0(rast_temp,"/rNumTimesBurnt.tif"))
 
+log_it("Processing incremental Number of Times Burnt")
 for(this_year in full_year_list){
+  log_it(paste0("Year: ",this_year))
   nearest_year = int_list - this_year
   nearest_year = max(nearest_year[!nearest_year > 0]) + this_year
-  r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt_",nearest_year,".tif"))
-  r_timesburnt = reclassify(r_timesburnt,rclmat)
+  log_it(paste0("Nearest past year: ",nearest_year))
+  log_it(paste0("Past year exists? ", file.exists(paste0(rast_temp,"/rNumTimesBurnt_",nearest_year,".tif"))))
+  #r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt_",nearest_year,".tif"))
+  #r_timesburnt = reclassify(r_timesburnt,rclmat)
   #r_timesburnt = r_timesburnt * mask_tif
-  bigWrite(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt_',this_year,'.tif'))
+  #bigWrite(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt_',this_year,'.tif'))
+  if(nearest_year != this_year){
+    file.copy(paste0(rast_temp,"/rNumTimesBurnt_",nearest_year,".tif"),paste0(rast_temp,"/rNumTimesBurnt_",this_year,".tif"),overwrite = TRUE)
+  }
+  log_it("Copying to current year")
+  
 }
 
-rm(mask_tif)
+#rm(mask_tif)
 log_it("Processing times burnt raster complete")
 
