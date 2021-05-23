@@ -87,19 +87,26 @@ rm(o)
 rm(oul)
 gc()
 
-s2 <- writeStart(tmprast, filename=paste0(rast_temp,"/r_fmzout.tif"), format='GTiff', overwrite=TRUE)
-tr <- blockSize(tmprast)
-for (i in tr$n:1) {
-  v <- getValuesBlock(tmprast, row=tr$row[i], nrows=tr$nrows[i])
-  s2 <- writeValues(s2, v, tr$row[i])
-}
-s2 <- writeStop(s2)
-v <- NULL
-s2 <- NULL
-rm(v)
-rm(s2)
+
+bigWrite(tmprast,paste0(rast_temp,"/r_fmzout.tif"))
+
+#s2 <- writeStart(tmprast, filename=paste0(rast_temp,"/r_fmzout.tif"), format='GTiff', overwrite=TRUE)
+#tr <- blockSize(tmprast)
+#for (i in tr$n:1) {
+#  v <- getValuesBlock(tmprast, row=tr$row[i], nrows=tr$nrows[i])
+#  s2 <- writeValues(s2, v, tr$row[i])
+#}
+#s2 <- writeStop(s2)
+#v <- NULL
+#s2 <- NULL
+#rm(v)
+#rm(s2)
+
+
 
 log_it("Fire management zone threshold write complete")
+Sys.sleep(4)
+log_it(paste0("Testing if exsits: ",file.exists(paste0(rast_temp,"/r_fmzout.tif"))))
 
 # Generate merged fmz/biodiversity
 
