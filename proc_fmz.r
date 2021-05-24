@@ -79,6 +79,8 @@ log_it("Fire management zone threshold calculation complete")
 
 
 log_it("Rasterizing fire management zone threshold and writing to disk")
+log_it(getFreeMemoryKB())
+
 log_it("Assigning Values")
 oul = unlist(o)
 values(tmprast)=oul
@@ -87,10 +89,10 @@ oul <- NULL
 rm(o)
 rm(oul)
 gc()
-
+log_it(getFreeMemoryKB())
 log_it("Big Write")
 bigWrite(tmprast,paste0(rast_temp,"/r_fmzout.tif"))
-
+log_it(getFreeMemoryKB())
 #s2 <- writeStart(tmprast, filename=paste0(rast_temp,"/r_fmzout.tif"), format='GTiff', overwrite=TRUE)
 #tr <- blockSize(tmprast)
 #for (i in tr$n:1) {

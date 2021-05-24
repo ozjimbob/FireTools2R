@@ -1,29 +1,35 @@
 
 # Read the regions table, filter to region of interest, transform
 log_it("Loading regions")
-v_regions = read_sf(corp_gdb,i_vt_boundary)
 
-if(d_spatial_unit != ""){
-  log_it(paste0("Filtering region layer to ROI:",d_spatial_unit))
-  v_thisregion = filter(v_regions,(!!rlang::sym(f_spatial_unit)) == d_spatial_unit)
-  log_it("Filtering fire history to ROI complete")
+if(file.exists(paste0(rast_temp,"/v_region.gpkg"))){
+  log_it("region found")
+  v_thisregion <- read_sf(v_thisregion)
 }else{
-  log_it("No filtering of region, creating union")
-  v_regions$flag=1
-  v_thisregion <- v_regions %>% group_by(flag) %>% summarise()
-  log_it("Union complete")
+
+  v_regions = read_sf(corp_gdb,i_vt_boundary)
+  
+  if(d_spatial_unit != ""){
+    log_it(paste0("Filtering region layer to ROI:",d_spatial_unit))
+    v_thisregion = filter(v_regions,(!!rlang::sym(f_spatial_unit)) == d_spatial_unit)
+    log_it("Filtering fire history to ROI complete")
+  }else{
+    log_it("No filtering of region, creating union")
+    v_regions$flag=1
+    v_thisregion <- v_regions %>% group_by(flag) %>% summarise()
+    log_it("Union complete")
+  }
+  
+  
+  log_it("Projecting and repairing region")
+  v_thisregion = st_transform(v_thisregion,crs=proj_crs)
+  v_thisregion = st_make_valid(v_thisregion)
+  log_it("Region projection complete")
+  
+  log_it("Writing region template")
+  write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
+  log_it("Finished writing region template")
 }
-
-
-log_it("Projecting and repairing region")
-v_thisregion = st_transform(v_thisregion,crs=proj_crs)
-v_thisregion = st_make_valid(v_thisregion)
-log_it("Region projection complete")
-
-log_it("Writing region template")
-write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
-log_it("Finished writing region template")
-
 #### Create template raster
 
 # Define bounding box of raster
@@ -110,7 +116,12 @@ orast = list()
 log_it(paste0("Rasterizing ",length(int_list)," fire seasons"))
 
 for(yr in seq_along(int_list)){
-  print(int_list[yr])
+
+  log_it(int_list[yr])
+  if(file.exists(paste0(rast_temp,"/",int_list[yr],".tif"))){
+    log_it("Skipping year as it exists from a previous run.")
+    next
+  }
   datx = filter(v_fire,numYear==int_list[yr])
   datx = st_cast(datx,"MULTIPOLYGON")
   # Ship out to gdal
@@ -236,7 +247,7 @@ r_tsl = current_year - r_lastb
 log_it("Writing main Time Since Last raster")
 # Exclude external
 #log_it("Masking time since last fire raster")
-writeRaster(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'),overwrite=TRUE)
+bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'))
 
 log_it("Generating year list")
 full_year_list = min(int_list):(current_year + future_years)
@@ -254,8 +265,15 @@ for(this_year in full_year_list){
   log_it("Subtracting")
   r_tsl = this_year - r_lastb
   log_it("Writing incremental Time Since Last")
-  bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast_',this_year,'.tif'))
+  try(bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast_',this_year,'.tif')))
   log_it("Cleaning up")
+  
+  r_lastb <- NULL
+  r_tsl <- NULL
+  
+  rm(r_lastb)
+  rm(r_tsl)
+  
   gc()
 }
 
