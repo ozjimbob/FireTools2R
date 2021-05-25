@@ -423,9 +423,9 @@ bigWrite <- function(r,out){
   tr <- blockSize(r)
   log_it(paste0("Looping through blocks:",tr$n))
   for (i in tr$n:1) {
-    log_it(paste("Block: ",i))
+    #log_it(paste("Block: ",i))
     v <- getValuesBlock(r, row=tr$row[i], nrows=tr$nrows[i])
-    log_it("Writing Values")
+    #log_it("Writing Values")
     s2 <- writeValues(s2, v, tr$row[i])
   }
   s2 <- writeStop(s2)
