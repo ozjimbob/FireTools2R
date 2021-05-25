@@ -262,10 +262,17 @@ for(this_year in full_year_list){
   log_it(paste0("Past year exists? ", file.exists(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))))
   log_it("Loading file")
   r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))
-  log_it("Subtracting")
+  Sys.sleep(1)
+  log_it("File info:")
+  log_it(print(r_lastb))
+  log_it(paste0("Subtracting from year: ",this_year))
   r_tsl = this_year - r_lastb
+  Sys.sleep(1)
+  log_it("Subtraction Complete")
+  
   log_it("Writing incremental Time Since Last")
   try(bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast_',this_year,'.tif')))
+  Sys.sleep(1)
   log_it("Cleaning up")
   
   r_lastb <- NULL

@@ -428,7 +428,9 @@ bigWrite <- function(r,out){
     #log_it("Writing Values")
     s2 <- writeValues(s2, v, tr$row[i])
   }
+  log_it("Stop Write")
   s2 <- writeStop(s2)
+  log_it("Write done")
 }
 
 bigWriteBinary <- function(r,out){
