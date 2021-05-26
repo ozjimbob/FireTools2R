@@ -37,7 +37,9 @@ if(!exists("d_spatial_unit")){
 }
 
 ## Run file
-log_it("**** Preparing fire history and vegetation rasters")
+log_it(paste0("Env Var:",Sys.getenv("TMPDIR")))
+log_it(paste0("Temp Dir: ",tempdir()))
+log_it("**** Preparing fire history  rasters")
 source("fire_proc_preprocess.r")
 
 
