@@ -358,7 +358,8 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   } else outshape <- tempfile()
   if (is(x, 'Raster')) {
     require(raster)
-    bigWrite(x, {f <- tempfile(fileext='.tif')})
+    f <- tempfile(fileext='.tif')
+    bigWrite(x, f)
     rastpath <- normalizePath(f)
   } else if (is.character(x)) {
     rastpath <- normalizePath(x)
@@ -417,20 +418,20 @@ prepare <- function(){
 }
 
 bigWrite <- function(r,out){
-  log_it("Write Start")
+  #log_it("Write Start")
   s2 <- writeStart(r, filename=out, format='GTiff', options="COMPRESS=LZW", overwrite=TRUE)
-  log_it("Getting Block Size")
+  #log_it("Getting Block Size")
   tr <- blockSize(r)
-  log_it(paste0("Looping through blocks:",tr$n))
+  #log_it(paste0("Looping through blocks:",tr$n))
   for (i in tr$n:1) {
     #log_it(paste("Block: ",i))
     v <- getValuesBlock(r, row=tr$row[i], nrows=tr$nrows[i])
     #log_it("Writing Values")
     s2 <- writeValues(s2, v, tr$row[i])
   }
-  log_it("Stop Write")
+  #log_it("Stop Write")
   s2 <- writeStop(s2)
-  log_it("Write done")
+ # log_it("Write done")
 }
 
 bigWriteBinary <- function(r,out){

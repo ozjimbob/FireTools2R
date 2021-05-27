@@ -348,11 +348,14 @@ log_it("Vectorizing time since last burnt")
 
 
 if(OS=="Windows"){
+  log_it("Windows Polygonizer")
   v_tsl = polygonizer_win(r_tsl)
 }else{
+  log_it("Linux Polygonizer")
   v_tsl = polygonizer(r_tsl)
 }
-
+log_it(system("df -h"))
+log_it("Converting SP to SF")
 v_tsl = st_as_sf(v_tsl)
 st_crs(v_tsl)=proj_crs
 
@@ -445,7 +448,7 @@ rm(r_lastb)
 gc()
 
 
-
+log_it(system("df -h"))
 
 
 # Write static rasters for current, earliest year

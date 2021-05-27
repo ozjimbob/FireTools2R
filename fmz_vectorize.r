@@ -3,7 +3,7 @@
 # Load vegetation raster
 log_it("Loading fire management zone threshold output raster")
 
-
+log_it(system("df -h"))
 
 log_it("Converting fire management zone threshold raster to polygons")
 if(OS=="Windows"){
@@ -49,7 +49,7 @@ t_threshold=tibble(DN=c(1,2,3,4,5,9,NA),
 log_it("Joining threshold labels to polygons")
 v_fmzout = left_join(v_fmzout,t_threshold)
 v_fmzout$DN = NULL
-
+log_it(system("df -h"))
 
 log_it("Saving fire management zone threshold polygons")
 write_sf(v_fmzout,paste0(rast_temp,"/v_fmzout.gpkg"))
