@@ -395,8 +395,8 @@ polygonize_by_name <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
                                   sep='.')[f.exists])), call.=FALSE)
   } else outshape <- tempfile()
   
-  rastpath <- normalizePath(x)
-  
+  rastpath <- normalizePath(paste0(owd,"/",x))
+
   system2('python', args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"',
                                   pypath, rastpath, gdalformat, outshape)))
   
