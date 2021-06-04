@@ -12,6 +12,7 @@ library(fasterize)
 library(velox)
 library(lwgeom)
 
+
 source("../config/global_config.r")
 source("../config/config_linux.r")
 

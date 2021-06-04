@@ -565,6 +565,27 @@ remove_invalid_poly <- function(xx){
 return(xx)
 }
 
+
+remove_invalid_poly_multi <- function(xx){
+  for(i in 1:nrow(xx)){
+    if(i %% 100 == 0){print(i)}
+    this_geom = st_geometry(xx[i,])[[1]][[1]]
+    to_check <- length(this_geom)
+    to_fix = c()
+    for(j in 1:to_check){
+      if(nrow(this_geom[[j]]) <4){
+        to_fix = c(to_fix,j)
+      }
+    }
+    for(j in rev(to_fix)){
+      st_geometry(xx[i,])[[1]][[1]][[j]] <- NULL
+    }
+  }
+  return(xx)
+}
+
+
+
 # GDAL function to convert zero cells to NA
 zero_raster <- function(x){
   
