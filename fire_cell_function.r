@@ -50,11 +50,202 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
   }
 }
 
+
+proccell2_post = function(i,cyear=0){
+  
+  if(cyear == 0){
+    st = stack(file_list,quick=TRUE)
+    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
+    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
+    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt.tif"),values=FALSE)
+    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast.tif"),values=FALSE)
+  } else {
+    
+    reduced_year = all_years[all_years < cyear]
+    to_keep = which(int_list %in% reduced_year)
+    file_list = file_list[to_keep]
+    int_list = int_list[to_keep]
+    
+    
+    st = stack(file_list,quick=TRUE)
+   
+    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
+    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
+    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
+    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
+  }
+  
+  st = getValues(st,row=i)
+  r_vegmax = getValues(r_vegmax,row=i)
+  r_vegmin = getValues(r_vegmin,row=i)
+  r_timesburnt = getValues(r_timesburnt,row=i)
+  r_tsl = getValues(r_tsl,row=i)
+  
+  ovec = rep(NA,length(r_vegmax))
+  
+  calc_status=function(){
+    Status = 0
+    IntervalStatus = 0 # 1 
+    if(MaxThresh == 0 && MinThresh == 0){
+      Status = statusNoFireRegime
+      return(Status)
+    }else{
+      if(is.na(FireFrequency)){
+        FireFrequency = 0
+      }
+      #2
+      if(MaxThresh == 9999 && MinThresh == 9999){
+        # 3
+        # Repair NA in FireFreq
+        
+        if(FireFrequency > 0){
+          Status = statusTooFrequentlyBurnt
+          return(Status)
+        }else{
+          Status = statusVulnerable
+          return(Status)
+        }
+      }else{
+        #4
+        if(FireFrequency == 0){
+          #5
+          if(TSFF > MaxThresh){
+            Status = statusLongUnburnt
+            return(Status)
+          }else{
+            Status = statusUnknown
+            return(Status)
+          }
+        }
+      }
+    }
+    
+    
+    #6
+    if(Status == 0){
+      #### A Section
+      # Yet list of fire years and diff to intervals
+      fint = int_list[IntervalList>0]
+      fint = diff(fint)
+      IntervalStatus = is_WithinThreshold
+      # overburnt tally
+      overburnt = 0
+      for(this_int in fint){
+        #7
+        # print(this_int)
+        if(this_int < MinThresh){
+          #print("Less than threshhold")
+          # 8
+          if(IntervalStatus == is_WithinThreshold){
+            IntervalStatus = is_Vulnerable
+            #print("IS Set to vulnerable")
+            next
+          }else{
+            IntervalStatus = is_TooFreq
+            overburnt = overburnt + 1
+            #print("IS set to too frequently")
+            next
+          }
+        }else if(this_int > 2 * MinThresh){
+          #print("Interval within threshold")
+          IntervalStatus = is_WithinThreshold
+          next
+        }else if(IntervalStatus %in% c(is_WithinThreshold,is_Vulnerable)){
+          #print("Interval within threshold (poss vuln)")
+          IntervalStatus = is_WithinThreshold
+        }
+        
+        
+      }
+    } else{
+      IntervalStatus = is_WithinThreshold
+    }
+    
+    
+    ## A section
+    # 11
+    # fix TSF
+    if(is.na(TSF)){TSF = TSFF}
+    if(IntervalStatus == is_TooFreq){
+      # 12
+      if(TSF > 2 * MinThresh){
+        Status = statusWithinThreshold
+        return(Status)
+      } else {
+        Status = statusTooFrequentlyBurnt
+        return(Status)
+      }
+    }else if(TSF < MinThresh){
+      Status = statusVulnerable #13
+      return(Status)
+    }else if(TSF > MaxThresh){
+      Status = statusLongUnburnt #14
+      return(Status)
+    } else{
+      Status = statusWithinThreshold
+      return(Status)
+    }
+    if(Status==0){
+      Status = statusUnknown
+    }
+    return(Status)
+  }
+  
+  statusNoFireRegime=1
+  statusTooFrequentlyBurnt = 2
+  statusVulnerable = 3
+  statusLongUnburnt = 4
+  statusUnknown = 9
+  statusWithinThreshold = 5
+  
+  # r_IntervalStatus (eg. within interval)
+  is_WithinThreshold = 1
+  is_Vulnerable = 2
+  is_TooFreq = 3
+  
+  for(j in seq_along(ovec)){
+    # Rasters we need
+    # r_MaxThresh - derived from veg + lookup table
+    # r_MinThresh - derived from veg + lookup table
+    # FireFrequency - from fire frequency raster (number of times burnt)
+    # TSFF - Time Since First Fire value
+    
+    # output rasters:
+    # r_Status (eg. no fire regime, too frequently burnt, vulnerable, long uburnt, unknown)
+    
+    
+    # get vectors
+    MaxThresh = r_vegmax[j]
+    MinThresh = r_vegmin[j]
+    
+    if(is.na(MaxThresh)){
+      ovec[j]=NA
+      next
+    }
+    
+    FireFrequency = r_timesburnt[j]
+    TSF = r_tsl[j]
+    IntervalList = st[j,]
+    
+    # Set base status and intervalstatus
+    
+    
+    
+    
+    ovec[j]=calc_status()
+    ovec[j][ovec[j]==9999]=NA
+  }
+  
+  
+  return(ovec)
+}
+
+
+
 proccell2 = function(i){
   
-  #
-  #i = 2873
-  #
+  
+  
   st = stack(file_list,quick=TRUE)
   r_vegmin = raster(paste0(rast_temp,"/r_vegmin.tif"),values=FALSE)
   r_vegmax= raster(paste0(rast_temp,"/r_vegmax.tif"),values=FALSE)
@@ -606,4 +797,112 @@ zero_raster <- function(x){
   
   #gdal_translate -of GTiff -a_nodata 0 -co COMPRESS=LZW rLastYearBurnt_2018.tif test_lyb.tif
   
+}
+
+
+rx_write=function(file,outfile){
+  require(foreign)
+  require(sp)
+  require(raster)
+  
+  log_it("Define lookup table")
+  rtable = data.frame(ID = c(1,2,3,4,5,6,7,8,9,10),
+                      Status = c("NoFireRegime",
+                                 "TooFrequentlyBurnt",
+                                 "Vulnerable",
+                                 "LongUnburnt",
+                                 "WithinThreshold",
+                                 "Recently Treated",
+                                 "Monitor OFH In the Field",
+                                 "Priority for Assessment and Treatment",
+                                 "Unknown",
+                                 "Priority for Assessment and Treatment"))
+  col_vec = c("#ffffff",
+              "#ffffff","#ff0000","#ff6600","#00ffff","#999999","#99FF99","#226622","#00ff00","#cccccc")
+  
+  log_it("Load input file")
+  tr <- raster(paste0(rast_temp,"/",file))
+  
+  if(exists("mask_tif")){
+    log_it("Mask input file")
+    tr <- tr * mask_tif
+  }
+  
+  log_it("Ratify input file")
+  tr <- ratify(tr)
+  
+  log_it("Get the levels of the raster table (eg. the numbers)")
+  rat <- levels(tr)[[1]]
+  
+  log_it("Join levels with the text status table") 
+  rat <- left_join(rat,rtable)
+  
+  log_it("Insert levels into the raster")
+  levels(tr) <- rat
+  
+  log_it("Insert color table into raster")
+  colortable(tr) <- col_vec
+  
+  # Write ESRI DB
+  
+  log_it("Construct ESRI table")
+  log_it("Retrieve levels from existing raster table")
+  atable = levels(tr)[[1]]
+  names(atable)=c("VALUE","CATEGORY")
+  
+  log_it("Calculating value frequency table")
+  x <- raster::freq(tr)
+  x <- as.data.frame(x)
+  names(x)=c("VALUE","COUNT")
+  x$VALUE = as.numeric(as.character(x$VALUE))
+  
+  log_it("Joining frequency table")
+  a2 = left_join(atable,x)
+  a2$COUNT[is.na(a2$COUNT)]=0
+  a2 = dplyr::select(a2,VALUE,COUNT,CATEGORY)
+  
+  log_it("Writing ESRI DBF")
+  write.dbf(a2,paste0(rast_temp,"/",outfile,".vat.dbf"))
+  
+  # Fix projection
+  log_it("Fix Projection")
+  crs(tr) <- CRS('+init=epsg:3308')
+  
+  log_it("Big Write raster with table")
+  bigWrite(tr,paste0(rast_temp,"/",outfile))
+  
+  log_it("Deleting temp file")
+  unlink(paste0(rast_temp,"/",file))
+  
+  log_it("Cleaning up")
+  x <- NULL
+  a2 <- NULL
+  tr <- NULL
+  atable <- NULL
+  
+  rm(x)
+  rm(a2)
+  rm(tr)
+  rm(atable)
+  
+  gc()
+  
+}
+
+# Insert 3308 projection into TIF output
+esri_output = function(tfile){
+  log_it("Generating ESRI projection")
+  infile = paste0(rast_temp,"/",tfile)
+  tempfile = paste0(rast_temp,"/",tfile,".tmp")
+  gt = Sys.which("gdal_translate")
+  if(gt==""){
+    gt="C:/OSGeo4W64/bin/gdal_translate.exe"
+  }else{
+    gt=paste0(gdal_path,"gdal_translate")
+  }
+  cmd=paste0(gt," ",infile," -a_srs 3308.prj -co COMPRESS=LZW -of GTiff ",tempfile)
+  cout = system(cmd,intern=TRUE)
+  log_it(cout)
+  unlink(infile)
+  file.rename(tempfile,infile)
 }
