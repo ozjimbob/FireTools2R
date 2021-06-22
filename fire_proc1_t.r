@@ -483,14 +483,35 @@ if(length(i_vt_veg)>1){
   v_veg = read_sf(veg_gdb,i_vt_veg)
 }
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#write_sf(v_veg,"mo/veg_01.gpkg")
+print("|||||||||||||||||||||||||||||||||||||||||||||||")
+print(nrow(v_veg))
+#print(nrow(filter(v_veg,Id==656269)))
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 log_it("Projecting and repairing vegetation layer")
 v_veg = st_transform(v_veg,crs=proj_crs)
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#write_sf(v_veg,"mo/veg_02.gpkg")
+print("|||||||||||||||||||||||||||||||||||||||||||||||")
+print(nrow(v_veg))
+#print(nrow(filter(v_veg,Id==656269)))
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 # NEW - remove invalid polygons, rather than buffer to 0?
 v_veg <- remove_invalid_poly(v_veg)
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#write_sf(v_veg,"mo/veg_03.gpkg")
+print("|||||||||||||||||||||||||||||||||||||||||||||||")
+print(nrow(v_veg))
+#print(nrow(filter(v_veg,Id==656269)))
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # Clip veg to region of interest
 log_it("Clipping vegetation layer")
@@ -512,6 +533,14 @@ v_veg = filter(v_veg,st_geometry_type(v_veg) %in% c("POLYGON","MULTIPOLYGON"))
 v_veg = st_cast(v_veg,"POLYGON") # Changed from multipolygon
 log_it("Cleaning vegetation layer complete")
 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#write_sf(v_veg,"mo/veg_04.gpkg")
+print("|||||||||||||||||||||||||||||||||||||||||||||||")
+print(nrow(v_veg))
+#print(nrow(filter(v_veg,Id==656269)))
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 # join fire parameters
 log_it("Reading vegetation-fire LUT")
 v_vegfire_table = st_read(fire_gdb,i_vt_veg_lut) 
@@ -528,8 +557,26 @@ veg_enames = names(v_veg)
 to_remove = intersect(to_remove,veg_enames)
 v_veg = v_veg %>% dplyr::select(-to_remove)
 
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#write_sf(v_veg,"mo/veg_05.gpkg")
+print("|||||||||||||||||||||||||||||||||||||||||||||||")
+print(nrow(v_veg))
+#print(nrow(filter(v_veg,Id==656269)))
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 log_it("Joining vegetation to LUT")
 v_veg = left_join(v_veg,v_vegfire_table,by=f_vegid)
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#write_sf(v_veg,"mo/veg_06.gpkg")
+print("|||||||||||||||||||||||||||||||||||||||||||||||")
+print(nrow(v_veg))
+#print(nrow(filter(v_veg,Id==656269)))
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 log_it("Fixing Missing")
 v_veg[[f_vegmax]][is.na(v_veg[[f_vegmax]])]=0
 v_veg[[f_vegmin]][is.na(v_veg[[f_vegmin]])]=0
