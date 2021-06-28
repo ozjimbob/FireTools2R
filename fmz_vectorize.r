@@ -10,9 +10,13 @@ if(OS=="Windows"){
   r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
   v_fmzout = polygonizer_win(r_fmzout)
 }else{
+  log_it("Linux detected")
   if(rast_temp!="output"){
+    log_it("Non-standard output path")
     v_fmzout = polygonize_by_name(paste0(rast_temp,"/r_fmzout.tif"))
   }else{
+    log_it("Standard output path, passed path:")
+    log_it(paste0(getwd(),"/",rast_temp,"/r_fmzout.tif"))
     v_fmzout = polygonize_by_name(paste0(getwd(),"/",rast_temp,"/r_fmzout.tif"))
   }
 }

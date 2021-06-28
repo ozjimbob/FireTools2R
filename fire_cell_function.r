@@ -569,6 +569,11 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
 polygonize_by_name <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
                         pypath=NULL, readpoly=TRUE, quietish=TRUE) {
   quiet = quietish
+  
+  print(paste0("Pre-normal path: ",x))
+  rastpath <- normalizePath(x)
+  print(paste0("Post-normal path: ",rastpath))
+  
   if (isTRUE(readpoly)) require(rgdal)
   if (is.null(pypath)) {
     pypath <- Sys.which('gdal_polygonize.py')
@@ -586,7 +591,6 @@ polygonize_by_name <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
                                   sep='.')[f.exists])), call.=FALSE)
   } else outshape <- tempfile()
   
-  rastpath <- normalizePath(x)
 
   system2('python', args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"',
                                   pypath, rastpath, gdalformat, outshape)))
