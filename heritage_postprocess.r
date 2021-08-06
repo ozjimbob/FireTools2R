@@ -251,7 +251,7 @@ if(single_year=="timeseries"){
 
 
 if(single_year=="selected"){
-  to_repair <- paste0(rast_temp,"r_vegout_",current_year,".tif")
+  to_repair <- paste0("r_vegout_",current_year,".tif")
   sub <- gsub("vegout","heritage_threshold_status",to_repair)
     print(to_repair)
     rx_write(to_repair,sub)
