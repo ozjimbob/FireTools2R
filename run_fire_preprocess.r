@@ -14,7 +14,12 @@ library(velox)
 library(lwgeom)
 
 source("../config/global_config.r")
-source("../config/config_fire.r")
+
+if (length(args)==0) {
+  source("../config/config_fire.r")
+}else{
+  source(args[1])
+}
 
 
 if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){

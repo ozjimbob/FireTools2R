@@ -11,7 +11,14 @@ library(scales)
 
 # Load config files
 source("../config/global_config.r")
-source("../config/config_summary_fire.r")
+if (length(args)==0) {
+  source("../config/config_summary_fire.r")
+}else{
+  source(args[1])
+}
+
+
+
 
 # Make output folder
 dir.create(rast_temp)

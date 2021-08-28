@@ -14,7 +14,14 @@ library(velox)
 library(lwgeom)
 library(sfheaders)
 source("../config/global_config.r")
-source("../config/config_post.r")
+
+if (length(args)==0) {
+  source("../config/config_post.r")
+}else{
+  source(args[1])
+}
+
+
 
 
 if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){

@@ -11,7 +11,12 @@ library(scales)
 
 # Load config files
 source("../config/global_config.r")
-source("../config/config_summary_heritage.r")
+
+if (length(args)==0) {
+  source("../config/config_summary_heritage.r")
+}else{
+  source(args[1])
+}
 
 
 
