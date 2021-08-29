@@ -11,7 +11,7 @@ library(scales)
 
 # Load config files
 source("../config/global_config.r")
-
+args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
   source("../config/config_summary_heritage.r")
 }else{
