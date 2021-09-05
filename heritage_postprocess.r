@@ -18,50 +18,6 @@ year_list = read_csv(paste0(fire_folder,"/yearlist.csv"))
 file_list = paste0(fire_folder,"/",year_list$year,".tif")
 int_list = year_list$year
 
-if(single_year=="no_timeseries"){
-  
-  # Set up variables
-  log_it("Calculating TSFF")
-  
-  TSFF = current_year-min(int_list)
-  TSFF = as.numeric(TSFF)
-  
-  log_it("Loading template raster")
-  tmprast = raster(paste0(fire_folder,"/rTimeSinceLast.tif"))
-  
-  ###
-  
-  
-  
-  
-  library(future)
-  if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
-    print("Loading future.apply")
-    library("future.apply")
-  }
-  plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
-  options(future.globals.maxSize = +Inf)
-  
-  log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-  o = future_lapply(1:nrow(tmprast),FUN=proccell2_post,future.scheduling=3)
-  log_it("Biodiversity threshold calculation complete")
-  
-  
-  
-  log_it("Rasterizing biodiversity threshold and writing to disk")
-  oul = unlist(o)
-  values(tmprast)=oul
-  o <- NULL
-  oul <- NULL
-  rm(o)
-  rm(oul)
-  gc()
-  
-  
-  bigWrite(tmprast,paste0(rast_temp,"/r_vegout.tif"))
-  
-}
-
 
 if(single_year=="no_timeseries"){
   

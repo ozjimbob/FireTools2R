@@ -62,8 +62,7 @@ rtable = data.frame(ID = c(1,2,3,4,5,9),
                                "WithinThreshold",
                                "Unknown"),
                                levels=c("Unknown",
-                                        "WithinThreshold",
-                                        "LongUnburnt",
+                                        "LongUnburnt","WithinThreshold",
                                  "Vulnerable",
                                  "TooFrequentlyBurnt",
                                  "NoFireRegime")))
@@ -127,7 +126,7 @@ ii <- ii %>% summarise(count=sum(count))
 
 # All veg plot
 cell_size <- res(r)[1] * res(r)[2]
-col_vec = rev(c("#ffffff","#ff0000","#ff6600","#00ffff","#999999","#ffffffff"))
+col_vec = rev(c("#ffffff","#ff0000","#ff6600","#999999","#00ffff","#ffffffff"))
 
 ii$area <- ii$count * cell_size / 10000
 ii <- ii %>% filter(!is.na(as.character(Status)))
