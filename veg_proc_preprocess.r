@@ -39,7 +39,11 @@ bbox = st_bbox(v_thisregion)
 log_it("Creating template raster")
 
 # Load 25m NSW Alignment grid
-align_grid = raster("../config/grid.tif")
+if(!exists("grid_file")){
+  align_grid = raster("../config/grid.tif")
+}else{
+  align_grid = raster(grid_file)
+}
 tmp_extent = extent(bbox[c(1,3,2,4)])
 tmp_extent = alignExtent(tmp_extent,align_grid)
 
