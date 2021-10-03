@@ -26,7 +26,7 @@ dir.create(rast_temp)
 
 # Get list of files and years from the fire input folder
 file_list <- list.files(heritage_folder,pattern="[[:digit:]]?tif$")
-year_list <- substr(file_list,10,13)
+year_list <- substr(file_list,29,32)
 
 
 # Load veg
@@ -90,7 +90,7 @@ for(i in seq_along(year_list)){
 ii <- bind_rows(out)
 
 # Numerical summaries here?
-current_table <- filter(ii,year==current_year)
+current_table <- filter(ii,year==as.numeric(current_year))
 current_table <- filter(current_table, !is.na(Veg))
 current_table$Veg[current_table$Veg=="<NULL>"] = "UNKNOWN"
 current_table$area = current_table$count * (res(r)[1] * res(r)[2])
