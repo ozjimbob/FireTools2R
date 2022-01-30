@@ -28,7 +28,9 @@ dir.create(rast_temp)
 file_list <- list.files(heritage_folder,pattern="[[:digit:]]?tif$")
 year_list <- substr(file_list,29,32)
 
-
+### 
+ # ALT LUT
+#lut <- read_csv("R:/SET/PlantSci/ForestEcology/FireHub/fullstate_100m/lut.csv")
 # Load veg
 veg <- read_sf(paste0(veg_folder,"/","v_vegBase.gpkg"))
 veg_r <- raster(paste0(veg_folder,"/","r_vegcode.tif"))
@@ -37,7 +39,7 @@ veg_r <- raster(paste0(veg_folder,"/","r_vegcode.tif"))
 # Based on input vegetation file
 vc <- values(veg_r)
 vc <- tibble(VEG = vc)
-veg_ns <- veg
+veg_ns <- veg #veg_ns = lut
 st_geometry(veg_ns)<-NULL
 veg_ns <- dplyr::select(veg_ns,VEG,(!!rlang::sym(veg_field)))
 veg_ns[[veg_field]] <- factor(veg_ns[[veg_field]])
@@ -88,6 +90,8 @@ for(i in seq_along(year_list)){
 
 
 ii <- bind_rows(out)
+ii <- filter(ii, !is.na(Veg))
+ii$Veg[ii$Veg=="<NULL>"] = "UNKNOWN"
 
 # Numerical summaries here?
 current_table <- filter(ii,year==as.numeric(current_year))
@@ -126,27 +130,46 @@ ii <- ii %>% summarise(count=sum(count))
 
 # All veg plot
 cell_size <- res(r)[1] * res(r)[2]
+#col_vec = rev(c("#ffffff","#ff0000","#ff6600","#999999","#00ffff","#ffffffff"))
 col_vec = rev(c("#ffffff","#ff0000","#ff6600","#999999","#00ffff","#ffffffff"))
 
 ii$area <- ii$count * cell_size / 10000
 ii <- ii %>% filter(!is.na(as.character(Status)))
 
 rng <- ii  %>% group_by(year) %>% summarise(area = sum(area)) %>% pull(area) %>% max()
-
+ii$Status <- factor(ii$Status,levels=c("Unknown",
+                                "LongUnburnt","WithinThreshold",
+                                "Vulnerable",
+                                "TooFrequentlyBurnt",
+                                "NoFireRegime"))
 
 pl <- ggplot(ii, aes(x=year,fill=Status,y=area)) + 
   geom_bar(stat="identity",position = position_stack(reverse = TRUE)) + 
   theme_cowplot() + 
   labs(x="Year",y="Area (ha)",fill="Heritage Threshold Status") + 
-  scale_fill_manual(values=col_vec) + theme(axis.text.x=element_text(angle = -90, hjust = 0)) + lims(y=c(0,rng))
+  scale_fill_manual(values=col_vec,drop=FALSE) + theme(axis.text.x=element_text(angle = -90, hjust = 0)) + lims(y=c(0,rng))
 pl
 
 ggsave2(paste0(rast_temp,"/heritage_bar_all.png"),pl,width=20,height=10,units="cm",dpi=300,scale=2)
 
+########################
+#########################
+### NUMBERS OF ALL VEG
+
+veg_ss <- veg_table
+veg_ss$area <- veg_ss$count * cell_size / 10000
+current_wide <- veg_ss %>% group_by(year,Status) %>% summarise(area=sum(area))
+current_wide <- pivot_wider(current_wide,id_cols = year,names_from=Status,values_from=area)
+current_wide <- mutate(current_wide, across(everything(), ~replace_na(.x, 0)))
 
 
-###
+write_csv(current_wide,paste0(rast_temp,"/Heritage_area_summary_COMBINED.csv"))
 
+
+
+
+######################
+########################
 
 
 # Filter missing vegetation types

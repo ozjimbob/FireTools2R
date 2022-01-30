@@ -126,6 +126,23 @@ pl
 
 ggsave2(paste0(rast_temp,"/TSF_bar_all.png"),pl,width=20,height=10,units="cm",dpi=300,scale=2)
 
+########################
+#########################
+### NUMBERS OF ALL VEG
+
+#veg_ss <- veg_table
+#veg_ss$area <- veg_ss$count * cell_size / 10000
+#current_wide <- veg_ss %>% group_by(year,Status) %>% summarise(area=sum(area))
+#current_wide <- pivot_wider(current_wide,id_cols = year,names_from=Status,values_from=area)
+#current_wide <- mutate(current_wide, across(everything(), ~replace_na(.x, 0)))
+
+
+#write_csv(current_wide,paste0(rast_temp,"/TSF_area_summary_COMBINED.csv"))
+
+
+
+
+
 # Filter missing vegetation types
 veg_table <- filter(veg_table, !is.na(Veg) & Veg != "<NULL>")
 unq_veg <- unique(veg_table$Veg)
