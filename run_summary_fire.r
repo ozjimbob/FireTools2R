@@ -44,6 +44,7 @@ vc <- tibble(VEG = vc)
 veg_ns <- veg
 st_geometry(veg_ns)<-NULL
 veg_ns <- dplyr::select(veg_ns,VEG,(!!rlang::sym(veg_field)))
+veg_ns[[veg_field]] <- path_sanitize(veg_ns[[veg_field]])
 veg_ns[[veg_field]] <- factor(veg_ns[[veg_field]])
 veg_ns <- distinct(veg_ns)
 veg_ns <- left_join(vc,veg_ns)

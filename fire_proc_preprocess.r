@@ -40,14 +40,20 @@ log_it("Creating template raster")
 
 # Load 25m NSW Alignment grid
 if(!exists("grid_file")){
+  log_it("No Grid File")
   align_grid = raster("../config/grid.tif")
 }else{
+  log_it("Custom Grid File")
   align_grid = raster(grid_file)
 }
+log_it("Getting bbox extent")
 tmp_extent = extent(bbox[c(1,3,2,4)])
+log_it(tmp_extent)
 tmp_extent = alignExtent(tmp_extent,align_grid)
+log_it(tmp_extent)
 
 # Make template raster
+log_it("Generating template raster")
 tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
 # Make mask raster for ROI
