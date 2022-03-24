@@ -1,0 +1,6 @@
+heritage_folder <- "G:/ft_work/ecohealth/ecohealth_kos_30m_heritage"
+veg_folder <- "G:/ft_work/ecohealth/ecohealth_kos_30m_veg"
+rast_temp<-"G:/ft_work/ecohealth/ecohealth_kos_30m_test_summary"
+veg_field<-"NSWFormation"
+current_year<-"2021"
+filter_year <- "1990"
