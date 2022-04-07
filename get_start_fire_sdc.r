@@ -17,9 +17,9 @@ source(args[1])
 dir.create(temp)
 lf <- list.files(temp)
 unlink(lf)
-download.file(fire_url,paste0(temp,"firehistory.zip"))
+download.file(fire_url,paste0(temp,"/firehistory.zip"))
 
-unzip(paste0(temp,"firehistory.zip"),exdir=temp)
+unzip(paste0(temp,"/firehistory.zip"),exdir=temp)
 
 fire_file = list.files(temp,".shp")[1]
 a = read_sf(paste0(temp,"/",fire_file))
