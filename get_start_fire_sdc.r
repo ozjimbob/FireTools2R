@@ -5,6 +5,11 @@ library(tidyverse)
 library(sf)
 
 args = commandArgs(trailingOnly=TRUE)
+
+this_year <- as.numeric(format(Sys.Date(),"%Y"))
+this_month <- as.numeric(format(Sys.Date(),"%m"))
+if(this_month >6){this_year = this_year+1}
+
 source(args[1])
 
 
@@ -29,9 +34,7 @@ a$year <- as.character(a$year)
 write_sf(a,keep)
 
 
-this_year <- as.numeric(format(Sys.Date(),"%Y"))
-this_month <- as.numeric(format(Sys.Date(),"%m"))
-if(this_month >6){this_year = this_year+1}
+
 
 
 passed=TRUE
