@@ -31,7 +31,8 @@ a <- a %>% mutate(year = case_when(month <= 6 ~ year-1,
 a$year[is.na(a$StartDate)] = substr(a$Label,1,4)[is.na(a$StartDate)]
 a$year <- as.character(a$year)
 
-write_sf(a,keep)
+dir.create(keep)
+write_sf(a,fire_gdb)
 
 
 
