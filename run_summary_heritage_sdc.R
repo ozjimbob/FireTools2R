@@ -88,6 +88,7 @@ for(i in seq_along(year_list)){
   
   
   ii <- values(r)
+  ii[ii==9]=6
   ii <- rtable$Status[ii]
   ii <- addNA(ii)
   ii <- tibble(year = this_year, Status = ii, Veg = veg_ns[[veg_field]])
@@ -109,7 +110,7 @@ current_table$area = current_table$count * (res(r)[1] * res(r)[2])
 current_table$area = current_table$area / 10000
 
 current_wide <- pivot_wider(current_table,id_cols = Veg,names_from=Status,values_from=area)
-current_wide <- mutate(current_wide, across(everything(), ~replace_na(.x, 0)))
+current_wide <- mutate(current_wide, across(!contains("Veg"), ~replace_na(.x, 0)))
 vmat = as.matrix(current_wide[1:nrow(current_wide),2:ncol(current_wide)])
 rows = rowSums(vmat)
 cols = colSums(vmat)
@@ -117,11 +118,12 @@ cols = colSums(vmat)
 current_wide$Total = rows
 grand_total = sum(rows)
 newrow <- tibble(Veg="Total",
-                 WithinThreshold = cols[1],
-                 LongUnburnt = cols[2],
-                 Vulnerable = cols[3],
-                 TooFrequentlyBurnt = cols[4],
-                 NoFireRegime = cols[5],
+                 Unknown = cols[1],
+                 WithinThreshold = cols[2],
+                 LongUnburnt = cols[3],
+                 Vulnerable = cols[4],
+                 TooFrequentlyBurnt = cols[5],
+                 NoFireRegime = cols[6],
                  Total = grand_total)
 current_wide <- bind_rows(current_wide,newrow)
 
@@ -129,8 +131,8 @@ write_csv(current_wide,paste0(rast_temp,"/Heritage_current_year_veg_summary.csv"
 
 
 
-ii <- filter(ii,as.character(Status) != "NoFireRegime")
-ii <- droplevels(ii)
+#ii <- filter(ii,as.character(Status) != "NoFireRegime")
+#ii <- droplevels(ii)
 # Make a vegetation table that is unsummarised
 # and strip vegetation from main table
 veg_table <- ii
@@ -139,26 +141,32 @@ ii <- ii %>% summarise(count=sum(count))
 # All veg plot
 cell_size <- res(r)[1] * res(r)[2]
 #col_vec = rev(c("#ffffff","#ff0000","#ff6600","#999999","#00ffff","#ffffffff"))
-col_vec = rev(c("#ffffff","#ff0000","#ff6600","#999999","#00ffff","#ffffffff"))
+col_vec = c("Unknown" = "#ffffff",
+            "TooFrequentlyBurnt" = "#ff0000",
+            "Vulnerable" = "#ff6600",
+            "WithinThreshold" = "#999999",
+            "LongUnburnt" = "#00ffff",
+            "NoFireRegime"="#ffffff")
 
 ii$area <- ii$count * cell_size / 10000
 ii <- ii %>% filter(!is.na(as.character(Status)))
 
 rng <- ii  %>% group_by(year) %>% summarise(area = sum(area)) %>% pull(area) %>% max()
-ii$Status <- factor(ii$Status,levels=c("Unknown",
-                                       "LongUnburnt","WithinThreshold",
+ii$Status <- factor(ii$Status,levels=c("LongUnburnt","WithinThreshold",
                                        "Vulnerable",
                                        "TooFrequentlyBurnt",
-                                       "NoFireRegime"))
+                                       "NoFireRegime","Unknown"))
 
 pl <- ggplot(ii, aes(x=year,fill=Status,y=area)) + 
   geom_bar(stat="identity",position = position_stack(reverse = TRUE)) + 
   theme_cowplot() + 
   labs(x="Year",y="Area (ha)",fill="Heritage Threshold Status") + 
-  scale_fill_manual(values=col_vec,drop=FALSE) + theme(axis.text.x=element_text(angle = -90, hjust = 0)) + lims(y=c(0,rng))
-pl
+  scale_fill_manual(values=col_vec,drop=TRUE) + 
+  theme(axis.text.x=element_text(angle = -90, hjust = 0)) + 
+  lims(y=c(0,rng))
 
-ggsave2(paste0(rast_temp,"/heritage_bar_all.png"),pl,width=20,height=10,units="cm",dpi=300,scale=2)
+
+ggsave2(paste0(rast_temp,"/heritage_bar_all.png"),pl,width=20,height=10,units="cm",dpi=300,scale=2,bg="white")
 
 ########################
 #########################
@@ -168,7 +176,8 @@ veg_ss <- veg_table
 veg_ss$area <- veg_ss$count * cell_size / 10000
 current_wide <- veg_ss %>% group_by(year,Status) %>% summarise(area=sum(area))
 current_wide <- pivot_wider(current_wide,id_cols = year,names_from=Status,values_from=area)
-current_wide <- mutate(current_wide, across(everything(), ~replace_na(.x, 0)))
+current_wide <- mutate(current_wide, across(!contains("Veg"), ~replace_na(.x, 0)),
+                       Total = sum(Unknown,LongUnburnt,WithinThreshold,Vulnerable,TooFrequentlyBurnt,NoFireRegime))
 
 
 write_csv(current_wide,paste0(rast_temp,"/Heritage_area_summary_COMBINED.csv"))
@@ -188,7 +197,10 @@ unq_veg <- unique(veg_table$Veg)
 for(this_veg in unq_veg){
   
   veg_ss <- filter(veg_table,Veg == this_veg)
-  
+  veg_ss$Status <- factor(veg_ss$Status,levels=c("LongUnburnt","WithinThreshold",
+                                         "Vulnerable",
+                                         "TooFrequentlyBurnt",
+                                         "NoFireRegime","Unknown"))
   cell_size <- res(r)[1] * res(r)[2]
   #cc <- gradient_n_pal(colours=c("red","orange","yellow","green","blue"))(seq(0,1,length.out=length(levels(ii$Status))))
   veg_ss$area <- veg_ss$count * cell_size / 10000
@@ -199,10 +211,10 @@ for(this_veg in unq_veg){
     geom_bar(stat="identity",position = position_stack(reverse = TRUE)) + 
     theme_cowplot() + 
     labs(x="Year",y="Area (ha)",fill="Heritage Threshold Status",title=this_veg) + 
-    scale_fill_manual(values=col_vec[2:5]) + theme(axis.text.x=element_text(angle = -90, hjust = 0)) + lims(y=c(0,rng))
-  pl
+    scale_fill_manual(values=col_vec) + theme(axis.text.x=element_text(angle = -90, hjust = 0)) + lims(y=c(0,rng))
+  
   this_veg <- gsub(" ", "_", this_veg)
-  ggsave2(paste0(rast_temp,"/heritage_bar_",this_veg,".png"),pl,width=20,height=10,units="cm",dpi=300,scale=2)
+  ggsave2(paste0(rast_temp,"/heritage_bar_",this_veg,".png"),pl,width=20,height=10,units="cm",bg="white",dpi=300,scale=2)
 }
 
 #######################
@@ -216,7 +228,9 @@ for(this_veg in unq_veg){
   veg_ss$area <- veg_ss$count * cell_size / 10000
   
   current_wide <- pivot_wider(veg_ss,id_cols = year,names_from=Status,values_from=area)
-  current_wide <- mutate(current_wide, across(everything(), ~replace_na(.x, 0)))
+  current_wide <- mutate(current_wide, across(!contains("Veg"), ~replace_na(.x, 0)))
+  current_wide <- ungroup(current_wide)
+  current_wide <- current_wide %>% mutate(Total = rowSums(dplyr::select(., !year), na.rm = TRUE))
   
   
   write_csv(current_wide,paste0(rast_temp,"/Heritage_area_summary_",this_veg,".csv"))
@@ -326,8 +340,10 @@ out_list$class <- factor(out_list$class,levels=c(1,2,3,4,5,9),labels=c("NoFireRe
                                                                    "WithinThreshold",
                                                                    "Unknown"))
 
-write_csv(out_list,paste0(rast_temp,"/spatial_metrics_formation.csv"))
-out_list <- read_csv(paste0(rast_temp,"/spatial_metrics_formation.csv"))
+write_csv(out_list,paste0(rast_temp,"/spatial_metrics_formation_all.csv"))
+write_csv(filter(out_list,is.na(class)),paste0(rast_temp,"/spatial_metrics_formation_landscape.csv"))
+write_csv(filter(out_list,!is.na(class)),paste0(rast_temp,"/spatial_metrics_formation_class.csv"))
+out_list <- read_csv(paste0(rast_temp,"/spatial_metrics_formation_all.csv"))
 
 # Plot landscape statistics for each vegetation class
 
@@ -470,10 +486,10 @@ o$class <- factor(o$class,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime",
                                                                        "WithinThreshold",
                                                                        "Unknown"))
 
-write_csv(o,paste0(rast_temp,"/spatial_metrics.csv"))
-out_list <- read_csv(paste0(rast_temp,"/spatial_metrics.csv"))  
-
-
+write_csv(o,paste0(rast_temp,"/spatial_metrics_all.csv"))
+write_csv(filter(o,is.na(class)),paste0(rast_temp,"/spatial_metrics_landscape.csv"))
+write_csv(filter(o,!is.na(class)),paste0(rast_temp,"/spatial_metrics_class.csv"))
+out_list <- read_csv(paste0(rast_temp,"/spatial_metrics_all.csv"))  
 
 
 # Landscape Contagion Index

@@ -15,8 +15,10 @@ library(lwgeom)
 
 source("../config/global_config.r")
 args = commandArgs(trailingOnly=TRUE)
-if (length(args)==0) {
+if (length(args)==0 && passed==FALSE) {
   source("../config/config_fire.r")
+}else if(passed==TRUE){
+  print("Arguments Passed")
 }else{
   source(args[1])
 }
