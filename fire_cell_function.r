@@ -51,6 +51,208 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 }
 
 
+proccell2_post_sdc = function(i,cyear=0,the_tmprast){
+  
+  if(cyear == 0){
+    st = stack(file_list,quick=TRUE)
+    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
+    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
+    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt.tif"),values=FALSE)
+    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast.tif"),values=FALSE)
+    
+    st = crop(st,the_tmprast)
+    r_tsl = crop(r_tsl,the_tmprast)
+    r_vegmin = crop(r_vegmin,the_tmprast)
+    r_vegmax = crop(r_vegmax,the_tmprast)
+    r_timesburnt = crop(r_timesburnt,the_tmprast)
+  } else {
+    
+    reduced_year = all_years[all_years < cyear]
+    to_keep = which(int_list %in% reduced_year)
+    file_list = file_list[to_keep]
+    int_list = int_list[to_keep]
+    
+    
+    st = stack(file_list,quick=TRUE)
+    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
+    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
+    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
+    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
+    
+    st = crop(st,the_tmprast)
+    r_tsl = crop(r_tsl,the_tmprast)
+    r_vegmin = crop(r_vegmin,the_tmprast)
+    r_vegmax = crop(r_vegmax,the_tmprast)
+    r_timesburnt = crop(r_timesburnt,the_tmprast)
+    
+  }
+  
+  st = getValues(st,row=i)
+  r_vegmax = getValues(r_vegmax,row=i)
+  r_vegmin = getValues(r_vegmin,row=i)
+  r_timesburnt = getValues(r_timesburnt,row=i)
+  r_tsl = getValues(r_tsl,row=i)
+  
+  ovec = rep(NA,length(r_vegmax))
+  
+  calc_status=function(){
+    Status = 0
+    IntervalStatus = 0 # 1 
+    if(MaxThresh == 0 && MinThresh == 0){
+      Status = statusNoFireRegime
+      return(Status)
+    }else{
+      if(is.na(FireFrequency)){
+        FireFrequency = 0
+      }
+      #2
+      if(MaxThresh == 9999 && MinThresh == 9999){
+        # 3
+        # Repair NA in FireFreq
+        
+        if(FireFrequency > 0){
+          Status = statusTooFrequentlyBurnt
+          return(Status)
+        }else{
+          Status = statusVulnerable
+          return(Status)
+        }
+      }else{
+        #4
+        if(FireFrequency == 0){
+          #5
+          if(TSFF > MaxThresh){
+            Status = statusLongUnburnt
+            return(Status)
+          }else{
+            Status = statusUnknown
+            return(Status)
+          }
+        }
+      }
+    }
+    
+    
+    #6
+    if(Status == 0){
+      #### A Section
+      # Yet list of fire years and diff to intervals
+      fint = int_list[IntervalList>0]
+      fint = diff(fint)
+      IntervalStatus = is_WithinThreshold
+      # overburnt tally
+      overburnt = 0
+      for(this_int in fint){
+        #7
+        # print(this_int)
+        if(this_int < MinThresh){
+          #print("Less than threshhold")
+          # 8
+          if(IntervalStatus == is_WithinThreshold){
+            IntervalStatus = is_Vulnerable
+            #print("IS Set to vulnerable")
+            next
+          }else{
+            IntervalStatus = is_TooFreq
+            overburnt = overburnt + 1
+            #print("IS set to too frequently")
+            next
+          }
+        }else if(this_int > 2 * MinThresh){
+          #print("Interval within threshold")
+          IntervalStatus = is_WithinThreshold
+          next
+        }else if(IntervalStatus %in% c(is_WithinThreshold,is_Vulnerable)){
+          #print("Interval within threshold (poss vuln)")
+          IntervalStatus = is_WithinThreshold
+        }
+        
+        
+      }
+    } else{
+      IntervalStatus = is_WithinThreshold
+    }
+    
+    
+    ## A section
+    # 11
+    # fix TSF
+    if(is.na(TSF)){TSF = TSFF}
+    if(IntervalStatus == is_TooFreq){
+      # 12
+      if(TSF > 2 * MinThresh){
+        Status = statusWithinThreshold
+        return(Status)
+      } else {
+        Status = statusTooFrequentlyBurnt
+        return(Status)
+      }
+    }else if(TSF < MinThresh){
+      Status = statusVulnerable #13
+      return(Status)
+    }else if(TSF > MaxThresh){
+      Status = statusLongUnburnt #14
+      return(Status)
+    } else{
+      Status = statusWithinThreshold
+      return(Status)
+    }
+    if(Status==0){
+      Status = statusUnknown
+    }
+    return(Status)
+  }
+  
+  statusNoFireRegime=1
+  statusTooFrequentlyBurnt = 2
+  statusVulnerable = 3
+  statusLongUnburnt = 4
+  statusUnknown = 9
+  statusWithinThreshold = 5
+  
+  # r_IntervalStatus (eg. within interval)
+  is_WithinThreshold = 1
+  is_Vulnerable = 2
+  is_TooFreq = 3
+  
+  for(j in seq_along(ovec)){
+    # Rasters we need
+    # r_MaxThresh - derived from veg + lookup table
+    # r_MinThresh - derived from veg + lookup table
+    # FireFrequency - from fire frequency raster (number of times burnt)
+    # TSFF - Time Since First Fire value
+    
+    # output rasters:
+    # r_Status (eg. no fire regime, too frequently burnt, vulnerable, long uburnt, unknown)
+    
+    
+    # get vectors
+    MaxThresh = r_vegmax[j]
+    MinThresh = r_vegmin[j]
+    
+    if(is.na(MaxThresh)){
+      ovec[j]=NA
+      next
+    }
+    
+    FireFrequency = r_timesburnt[j]
+    TSF = r_tsl[j]
+    IntervalList = st[j,]
+    
+    # Set base status and intervalstatus
+    
+    
+    
+    
+    ovec[j]=calc_status()
+    ovec[j][ovec[j]==9999]=NA
+  }
+  
+  
+  return(ovec)
+}
+
+
 proccell2_post = function(i,cyear=0){
   
   if(cyear == 0){
