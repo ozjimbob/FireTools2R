@@ -60,11 +60,11 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt.tif"),values=FALSE)
     r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast.tif"),values=FALSE)
     
-    st = crop(st,the_tmprast)
-    r_tsl = crop(r_tsl,the_tmprast)
-    r_vegmin = crop(r_vegmin,the_tmprast)
-    r_vegmax = crop(r_vegmax,the_tmprast)
-    r_timesburnt = crop(r_timesburnt,the_tmprast)
+    st = resample(st,the_tmprast,method="ngb")
+    r_tsl = resample(r_tsl,the_tmprast,method="ngb")
+    r_vegmin = resample(r_vegmin,the_tmprast,method="ngb")
+    r_vegmax = resample(r_vegmax,the_tmprast,method="ngb")
+    r_timesburnt = resample(r_timesburnt,the_tmprast,method="ngb")
   } else {
     
     reduced_year = all_years[all_years < cyear]
@@ -79,11 +79,11 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
     r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
     
-    st = crop(st,the_tmprast)
-    r_tsl = crop(r_tsl,the_tmprast)
-    r_vegmin = crop(r_vegmin,the_tmprast)
-    r_vegmax = crop(r_vegmax,the_tmprast)
-    r_timesburnt = crop(r_timesburnt,the_tmprast)
+    st = resample(st,the_tmprast,method="ngb")
+    r_tsl = resample(r_tsl,the_tmprast,method="ngb")
+    r_vegmin = resample(r_vegmin,the_tmprast,method="ngb")
+    r_vegmax = resample(r_vegmax,the_tmprast,method="ngb")
+    r_timesburnt = resample(r_timesburnt,the_tmprast,method="ngb")
     
   }
   
