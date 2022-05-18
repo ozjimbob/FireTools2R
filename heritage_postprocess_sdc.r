@@ -104,12 +104,14 @@ if(single_year=="no_timeseries"){
   
   log_it("Rasterizing biodiversity threshold and writing to disk")
   oul = unlist(o)
-  log_it("Number values in oul: ",length(oul))
-  log_it("Number of values in temprast: ",length(tmprast))
-  log_it("Res of temprast: ",res(tmprast))
-  log_it("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)))
-  log_it("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)))
-  values(tmprast)=oul
+  
+  log_it(paste0("Number values in oul: ",length(oul)))
+  log_it(paste0("Number of values in temprast: ",length(tmprast)))
+  log_it(paste0("Res of temprast: ",res(tmprast)))
+  log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+  log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+ 
+   values(tmprast)=oul
   o <- NULL
   oul <- NULL
   rm(o)
@@ -165,12 +167,14 @@ if(single_year=="timeseries"){
     
     
     log_it("Rasterizing biodiversity threshold and writing to disk")
+    
     oul = unlist(o)
-    log_it("Number values in oul: ",length(oul))
-    log_it("Number of values in temprast: ",length(tmprast))
-    log_it("Res of temprast: ",res(tmprast))
-    log_it("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)))
-    log_it("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)))
+    
+    log_it(paste0("Number values in oul: ",length(oul)))
+    log_it(paste0("Number of values in temprast: ",length(tmprast)))
+    log_it(paste0("Res of temprast: ",res(tmprast)))
+    log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+    log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     
     values(tmprast)=oul
     o <- NULL
@@ -227,15 +231,16 @@ if(single_year=="selected"){
     
     log_it("Biodiversity threshold calculation complete")
     
-    
+    oul = unlist(o)
     
     log_it("Rasterizing biodiversity threshold and writing to disk")
-    log_it("Number values in oul: ",length(oul))
-    log_it("Number of values in temprast: ",length(tmprast))
-    log_it("Res of temprast: ",res(tmprast))
-    log_it("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)))
-    log_it("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)))
-    oul = unlist(o)
+    log_it(paste0("Number values in oul: ",length(oul)))
+    log_it(paste0("Number of values in temprast: ",length(tmprast)))
+    log_it(paste0("Res of temprast: ",res(tmprast)))
+    log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+    log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+    
+
     values(tmprast)=oul
     o <- NULL
     oul <- NULL
