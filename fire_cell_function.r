@@ -54,17 +54,34 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   
   if(cyear == 0){
-    st = stack(file_list,quick=TRUE)
-    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
-    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
-    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt.tif"),values=FALSE)
-    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast.tif"),values=FALSE)
     
-    st = resample(st,the_tmprast,method="ngb")
-    r_tsl = resample(r_tsl,the_tmprast,method="ngb")
-    r_vegmin = resample(r_vegmin,the_tmprast,method="ngb")
-    r_vegmax = resample(r_vegmax,the_tmprast,method="ngb")
-    r_timesburnt = resample(r_timesburnt,the_tmprast,method="ngb")
+    st = stack(file_list,quick=TRUE)
+    fst <- alignExtent(st,the_tmprast)
+    extent(st)<-fst
+    
+    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
+    fst <- alignExtent(r_vegmin,the_tmprast)
+    extent(r_vegmin)<-fst
+    
+    
+    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
+    fst <- alignExtent(r_vegmax,the_tmprast)
+    extent(r_vegmax)<-fst
+    
+    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
+    fst <- alignExtent(r_timesburnt,the_tmprast)
+    extent(r_timesburnt)<-fst
+    
+    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
+    fst <- alignExtent(r_tsl,the_tmprast)
+    extent(r_tsl)<-fst
+    
+    st = crop(st,the_tmprast)
+    r_tsl = crop(r_tsl,the_tmprast)
+    r_vegmin = crop(r_vegmin,the_tmprast)
+    r_vegmax = crop(r_vegmax,the_tmprast)
+    r_timesburnt = crop(r_timesburnt,the_tmprast)
+    
   } else {
     
     reduced_year = all_years[all_years < cyear]
@@ -74,16 +91,31 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     
     st = stack(file_list,quick=TRUE)
-    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
-    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
-    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
-    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
+    fst <- alignExtent(st,the_tmprast)
+    extent(st)<-fst
     
-    st = resample(st,the_tmprast,method="ngb")
-    r_tsl = resample(r_tsl,the_tmprast,method="ngb")
-    r_vegmin = resample(r_vegmin,the_tmprast,method="ngb")
-    r_vegmax = resample(r_vegmax,the_tmprast,method="ngb")
-    r_timesburnt = resample(r_timesburnt,the_tmprast,method="ngb")
+    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
+    fst <- alignExtent(r_vegmin,the_tmprast)
+    extent(r_vegmin)<-fst
+    
+    
+    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
+    fst <- alignExtent(r_vegmax,the_tmprast)
+    extent(r_vegmax)<-fst
+    
+    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
+    fst <- alignExtent(r_timesburnt,the_tmprast)
+    extent(r_timesburnt)<-fst
+    
+    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
+    fst <- alignExtent(r_tsl,the_tmprast)
+    extent(r_tsl)<-fst
+    
+    st = crop(st,the_tmprast)
+    r_tsl = crop(r_tsl,the_tmprast)
+    r_vegmin = crop(r_vegmin,the_tmprast)
+    r_vegmax = crop(r_vegmax,the_tmprast)
+    r_timesburnt = crop(r_timesburnt,the_tmprast)
     
   }
   
