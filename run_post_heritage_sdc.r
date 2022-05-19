@@ -15,6 +15,8 @@ library(fasterize)
 library(velox)
 library(lwgeom)
 library(sfheaders)
+library(terra)
+
 source("../config/global_config.r")
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {

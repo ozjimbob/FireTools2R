@@ -52,35 +52,37 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 
 
 proccell2_post_sdc = function(i,cyear=0,the_tmprast){
-  
+  t_rast = rast(the_tmprast)
   if(cyear == 0){
     
-    st = stack(file_list,quick=TRUE)
-    fst <- alignExtent(st,the_tmprast)
-    extent(st)<-fst
-    
-    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
-    fst <- alignExtent(r_vegmin,the_tmprast)
-    extent(r_vegmin)<-fst
     
     
-    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
-    fst <- alignExtent(r_vegmax,the_tmprast)
-    extent(r_vegmax)<-fst
+    st = terra::rast(file_list)
+    fst <- align(ext(st),t_rast)
+    ext(st)<-fst
     
-    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
-    fst <- alignExtent(r_timesburnt,the_tmprast)
-    extent(r_timesburnt)<-fst
+    r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
+    fst <- align(ext(r_vegmin),t_rast)
+    ext(r_vegmin)<-fst
     
-    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
-    fst <- alignExtent(r_tsl,the_tmprast)
-    extent(r_tsl)<-fst
     
-    st = crop(st,the_tmprast)
-    r_tsl = crop(r_tsl,the_tmprast)
-    r_vegmin = crop(r_vegmin,the_tmprast)
-    r_vegmax = crop(r_vegmax,the_tmprast)
-    r_timesburnt = crop(r_timesburnt,the_tmprast)
+    r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
+    fst <- align(ext(r_vegmax),t_rast)
+    ext(r_vegmax)<-fst
+    
+    r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
+    fst <- align(ext(r_timesburnt),t_rast)
+    ext(r_timesburnt)<-fst
+    
+    r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
+    fst <- align(ext(r_tsl),t_rast)
+    ext(r_tsl)<-fst
+    
+    st = crop(st,t_rast)
+    r_tsl = crop(r_tsl,t_rast)
+    r_vegmin = crop(r_vegmin,t_rast)
+    r_vegmax = crop(r_vegmax,t_rast)
+    r_timesburnt = crop(r_timesburnt,t_rast)
     
   } else {
     
@@ -90,150 +92,44 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     int_list = int_list[to_keep]
     
     
-    st = stack(file_list,quick=TRUE)
-    fst <- alignExtent(st,the_tmprast)
-    extent(st)<-fst
     
-    r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
-    fst <- alignExtent(r_vegmin,the_tmprast)
-    extent(r_vegmin)<-fst
+    st = terra::rast(file_list)
+    fst <- align(ext(st),t_rast)
+    ext(st)<-fst
+    
+    r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
+    fst <- align(ext(r_vegmin),t_rast)
+    ext(r_vegmin)<-fst
     
     
-    r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
-    fst <- alignExtent(r_vegmax,the_tmprast)
-    extent(r_vegmax)<-fst
+    r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
+    fst <- align(ext(r_vegmax),t_rast)
+    ext(r_vegmax)<-fst
     
-    r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
-    fst <- alignExtent(r_timesburnt,the_tmprast)
-    extent(r_timesburnt)<-fst
+    r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
+    fst <- align(ext(r_timesburnt),t_rast)
+    ext(r_timesburnt)<-fst
     
-    r_tsl= raster(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"),values=FALSE)
-    fst <- alignExtent(r_tsl,the_tmprast)
-    extent(r_tsl)<-fst
+    r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
+    fst <- align(ext(r_tsl),t_rast)
+    ext(r_tsl)<-fst
     
-    st = crop(st,the_tmprast)
-    r_tsl = crop(r_tsl,the_tmprast)
-    r_vegmin = crop(r_vegmin,the_tmprast)
-    r_vegmax = crop(r_vegmax,the_tmprast)
-    r_timesburnt = crop(r_timesburnt,the_tmprast)
+    st = crop(st,t_rast)
+    r_tsl = crop(r_tsl,t_rast)
+    r_vegmin = crop(r_vegmin,t_rast)
+    r_vegmax = crop(r_vegmax,t_rast)
+    r_timesburnt = crop(r_timesburnt,t_rast)
     
   }
   
-  st = getValues(st,row=i)
-  r_vegmax = getValues(r_vegmax,row=i)
-  r_vegmin = getValues(r_vegmin,row=i)
-  r_timesburnt = getValues(r_timesburnt,row=i)
-  r_tsl = getValues(r_tsl,row=i)
+  st = terra::values(st,row=i,nrows=1)
+  r_vegmax = terra::values(r_vegmax,row=i,nrows=1)
+  r_vegmin = terra::values(r_vegmin,row=i,nrows=1)
+  r_timesburnt = terra::values(r_timesburnt,row=i,nrows=1)
+  r_tsl = terra::values(r_tsl,row=i,nrows=1)
   
   ovec = rep(NA,length(r_vegmax))
   
-  calc_status=function(){
-    Status = 0
-    IntervalStatus = 0 # 1 
-    if(MaxThresh == 0 && MinThresh == 0){
-      Status = statusNoFireRegime
-      return(Status)
-    }else{
-      if(is.na(FireFrequency)){
-        FireFrequency = 0
-      }
-      #2
-      if(MaxThresh == 9999 && MinThresh == 9999){
-        # 3
-        # Repair NA in FireFreq
-        
-        if(FireFrequency > 0){
-          Status = statusTooFrequentlyBurnt
-          return(Status)
-        }else{
-          Status = statusVulnerable
-          return(Status)
-        }
-      }else{
-        #4
-        if(FireFrequency == 0){
-          #5
-          if(TSFF > MaxThresh){
-            Status = statusLongUnburnt
-            return(Status)
-          }else{
-            Status = statusUnknown
-            return(Status)
-          }
-        }
-      }
-    }
-    
-    
-    #6
-    if(Status == 0){
-      #### A Section
-      # Yet list of fire years and diff to intervals
-      fint = int_list[IntervalList>0]
-      fint = diff(fint)
-      IntervalStatus = is_WithinThreshold
-      # overburnt tally
-      overburnt = 0
-      for(this_int in fint){
-        #7
-        # print(this_int)
-        if(this_int < MinThresh){
-          #print("Less than threshhold")
-          # 8
-          if(IntervalStatus == is_WithinThreshold){
-            IntervalStatus = is_Vulnerable
-            #print("IS Set to vulnerable")
-            next
-          }else{
-            IntervalStatus = is_TooFreq
-            overburnt = overburnt + 1
-            #print("IS set to too frequently")
-            next
-          }
-        }else if(this_int > 2 * MinThresh){
-          #print("Interval within threshold")
-          IntervalStatus = is_WithinThreshold
-          next
-        }else if(IntervalStatus %in% c(is_WithinThreshold,is_Vulnerable)){
-          #print("Interval within threshold (poss vuln)")
-          IntervalStatus = is_WithinThreshold
-        }
-        
-        
-      }
-    } else{
-      IntervalStatus = is_WithinThreshold
-    }
-    
-    
-    ## A section
-    # 11
-    # fix TSF
-    if(is.na(TSF)){TSF = TSFF}
-    if(IntervalStatus == is_TooFreq){
-      # 12
-      if(TSF > 2 * MinThresh){
-        Status = statusWithinThreshold
-        return(Status)
-      } else {
-        Status = statusTooFrequentlyBurnt
-        return(Status)
-      }
-    }else if(TSF < MinThresh){
-      Status = statusVulnerable #13
-      return(Status)
-    }else if(TSF > MaxThresh){
-      Status = statusLongUnburnt #14
-      return(Status)
-    } else{
-      Status = statusWithinThreshold
-      return(Status)
-    }
-    if(Status==0){
-      Status = statusUnknown
-    }
-    return(Status)
-  }
   
   statusNoFireRegime=1
   statusTooFrequentlyBurnt = 2
@@ -276,7 +172,15 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     
     
-    ovec[j]=calc_status()
+    # Run the core status algorithm over this cell
+    ovec[j]<- CalcStatus(MaxThresh,
+                         MinThresh,
+                         FireFrequency,# 
+                         TSFF,
+                         int_list,
+                         as.numeric(IntervalList), ####
+                         TSF) 
+    
     ovec[j][ovec[j]==9999]=NA
   }
   
