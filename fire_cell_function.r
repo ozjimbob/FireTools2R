@@ -52,7 +52,7 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 
 
 proccell2_post_sdc = function(i,cyear=0,the_tmprast){
-  sourceCpp('core.cpp')
+  
   t_rast = rast(the_tmprast)
   if(cyear == 0){
     

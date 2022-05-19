@@ -65,6 +65,9 @@ log_it(tmp_extent)
 log_it("Generating template raster")
 tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
+# Compile functions
+sourceCpp('core.cpp')
+
 
 if(single_year=="no_timeseries"){
   log_it("Single Year = No Timeseries")
