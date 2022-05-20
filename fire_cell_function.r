@@ -130,7 +130,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   r_tsl <- as.numeric(terra::values(r_tsl,row=i,nrows=1))
   r_tsl[is.nan(r_tsl)]=NA
   
-  ovec = rep(NA,length(the_tmprast))
+  ovec = rep(NA,length(r_vegmax))
   
   
   statusNoFireRegime=1
@@ -249,16 +249,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   
   
   for(j in seq_along(ovec)){
-    # Rasters we need
-    # r_MaxThresh - derived from veg + lookup table
-    # r_MinThresh - derived from veg + lookup table
-    # FireFrequency - from fire frequency raster (number of times burnt)
-    # TSFF - Time Since First Fire value
-    
-    # output rasters:
-    # r_Status (eg. no fire regime, too frequently burnt, vulnerable, long uburnt, unknown)
-    
-    
+
     # get vectors
     MaxThresh = as.numeric(r_vegmax[j])
     MinThresh = as.numeric(r_vegmin[j])
