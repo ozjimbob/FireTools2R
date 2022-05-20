@@ -132,7 +132,7 @@ int CalcStatus(int MaxThresh,
         }else if(this_int > 2 * MinThresh){
           IntervalStatus = is_WithinThreshold;
           continue;
-        }else if(IntervalStatus == is_WithinThreshold | IntervalStatus == is_Vulnerable){////////
+        }else if(IntervalStatus == is_WithinThreshold | IntervalStatus == is_Vulnerable){
           IntervalStatus = is_WithinThreshold;
         }
         

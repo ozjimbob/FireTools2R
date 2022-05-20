@@ -123,13 +123,14 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
   }
   
-  st = terra::values(st,row=i,nrows=1)
-  r_vegmax = terra::values(r_vegmax,row=i,nrows=1)
-  r_vegmin = terra::values(r_vegmin,row=i,nrows=1)
-  r_timesburnt = terra::values(r_timesburnt,row=i,nrows=1)
-  r_tsl = terra::values(r_tsl,row=i,nrows=1)
+  st <- terra::values(st,row=i,nrows=1)
+  r_vegmax <- as.numeric(terra::values(r_vegmax,row=i,nrows=1))
+  r_vegmin <- as.numeric(terra::values(r_vegmin,row=i,nrows=1))
+  r_timesburnt <- as.numeric(terra::values(r_timesburnt,row=i,nrows=1))
+  r_tsl <- as.numeric(terra::values(r_tsl,row=i,nrows=1))
+  r_tsl[is.nan(r_tsl)]=NA
   
-  ovec = rep(NA,length(r_vegmax))
+  ovec = rep(NA,length(the_tmprast))
   
   
   statusNoFireRegime=1
@@ -144,6 +145,109 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   is_Vulnerable = 2
   is_TooFreq = 3
   
+  
+  calc_status<-function(){
+    Status <- 0
+    IntervalStatus <- 0 # 1 
+    if(MaxThresh == 0 && MinThresh == 0){
+      Status <- statusNoFireRegime
+      return(Status)
+    }else{
+      if(is.na(FireFrequency)){
+        FireFrequency <- 0
+      }
+      #2
+      if(MaxThresh == 9999 && MinThresh == 9999){
+        # 3
+        # Repair NA in FireFreq
+        
+        if(FireFrequency > 0){
+          Status <- statusTooFrequentlyBurnt
+          return(Status)
+        }else{
+          Status <- statusVulnerable
+          return(Status)
+        }
+      }else{
+        #4
+        if(FireFrequency == 0){
+          #5
+          if(TSFF > MaxThresh){
+            Status <- statusLongUnburnt
+            return(Status)
+          }else{
+            Status <- statusUnknown
+            return(Status)
+          }
+        }
+      }
+    }
+    
+    
+    #6
+    if(Status == 0){
+      #### A Section
+      # Get list of fire years and diff to intervals
+      fint <- int_list[IntervalList>0]
+      fint <- diff(fint)
+      IntervalStatus <- is_WithinThreshold
+      # overburnt tally
+      overburnt <- 0
+      for(this_int in fint){
+        #7
+        if(this_int < MinThresh){
+          # 8
+          if(IntervalStatus == is_WithinThreshold){
+            IntervalStatus <- is_Vulnerable
+            next
+          }else{
+            IntervalStatus <- is_TooFreq
+            overburnt <- overburnt + 1
+            next
+          }
+        }else if(this_int > 2 * MinThresh){
+          IntervalStatus <- is_WithinThreshold
+          next
+        }else if(IntervalStatus %in% c(is_WithinThreshold,is_Vulnerable)){
+          IntervalStatus <- is_WithinThreshold
+        }
+        
+        
+      }
+    } else{
+      IntervalStatus <- is_WithinThreshold
+    }
+    
+    
+    ## A section
+    # 11
+    if(is.na(TSF)){TSF <- TSFF}
+    if(IntervalStatus == is_TooFreq){
+      # 12
+      if(TSF > 2 * MinThresh){
+        Status <- statusWithinThreshold
+        return(Status)
+      } else {
+        Status <- statusTooFrequentlyBurnt
+        return(Status)
+      }
+    }else if(TSF < MinThresh){
+      Status <- statusVulnerable #13
+      return(Status)
+    }else if(TSF > MaxThresh){
+      Status <- statusLongUnburnt #14
+      return(Status)
+    } else{
+      Status <- statusWithinThreshold
+      return(Status)
+    }
+    if(Status==0){
+      Status = statusUnknown
+    }
+    return(Status)
+  }
+  
+  
   for(j in seq_along(ovec)){
     # Rasters we need
     # r_MaxThresh - derived from veg + lookup table
@@ -156,17 +260,17 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     
     # get vectors
-    MaxThresh = r_vegmax[j]
-    MinThresh = r_vegmin[j]
+    MaxThresh = as.numeric(r_vegmax[j])
+    MinThresh = as.numeric(r_vegmin[j])
     
     if(is.na(MaxThresh)){
       ovec[j]=NA
       next
     }
     
-    FireFrequency = r_timesburnt[j]
-    TSF = r_tsl[j]
-    IntervalList = st[j,]
+    FireFrequency = as.numeric(r_timesburnt[j])
+    TSF = as.numeric(r_tsl[j])
+    IntervalList = as.numeric(st[j,])
     
     # Set base status and intervalstatus
     
@@ -174,13 +278,14 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     
     # Run the core status algorithm over this cell
-    ovec[j]<- CalcStatus(MaxThresh,
-                         MinThresh,
-                         FireFrequency,# 
-                         TSFF,
-                         int_list,
-                         as.numeric(IntervalList), ####
-                         TSF) 
+    #ovec[j]<- CalcStatus(MaxThresh,
+     #                    MinThresh,
+     #                    FireFrequency,# 
+     #                    TSFF,
+     #                    int_list,
+     #                    as.numeric(IntervalList), ####
+     #                    TSF) 
+    ovec[j]<-calc_status()
     
     ovec[j][ovec[j]==9999]=NA
   }
