@@ -65,8 +65,25 @@ log_it(tmp_extent)
 log_it("Generating template raster")
 tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
+####### NEW
+####### CROP RASTERS AND WRITE TO OUTPUT
+
+############
+##############
+#############
+
+
+
 # Compile functions
-sourceCpp('core.cpp')
+#sourceCpp('core.cpp')
+
+library(future)
+if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
+  print("Loading future.apply")
+  library("future.apply")
+}
+plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
+options(future.globals.maxSize = +Inf)
 
 
 if(single_year=="no_timeseries"){
@@ -91,16 +108,11 @@ if(single_year=="no_timeseries"){
   
   
   
-  library(future)
-  if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
-    print("Loading future.apply")
-    library("future.apply")
-  }
-  plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
-  options(future.globals.maxSize = +Inf)
+
   
   log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-  o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3,the_tmprast=tmprast)
+  ttemprast = rast(the_tmprast)
+  o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3,the_tmprast=ttemprast)
   log_it("Biodiversity threshold calculation complete")
   
   
@@ -135,8 +147,13 @@ if(single_year=="timeseries"){
   all_years <- all_years[grep(pattern="rNumTimesBurnt_",all_years)]
   all_years <- as.numeric(substr(all_years,16,19))
   
+  if(exists(start_year)){
+    wyear <- which.min(abs(all_years-start_year))
+  }else{
+    wyear <- 2
+  }
   
-  for(year_idx in 2:length(all_years)){
+  for(year_idx in wyear:length(all_years)){
     this_year <- all_years[year_idx]
     log_it(this_year)
     # Set up variables
@@ -153,17 +170,11 @@ if(single_year=="timeseries"){
     
     
     
-    library(future)
-    if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
-      print("Loading future.apply")
-      library("future.apply")
-    }
-    plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
-    options(future.globals.maxSize = +Inf)
+
     
     log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-    
-    o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=tmprast)
+    ttemprast = rast(the_tmprast)
+    o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=ttemprast)
     
     log_it("Biodiversity threshold calculation complete")
     
@@ -173,13 +184,16 @@ if(single_year=="timeseries"){
     
     oul = unlist(o)
     
-    log_it(paste0("Number values in oul: ",length(oul)))
-    log_it(paste0("Number of values in temprast: ",length(tmprast)))
-    log_it(paste0("Res of temprast: ",res(tmprast)))
-    log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
-    log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+    #log_it(paste0("Number values in oul: ",length(oul)))
+    #log_it(paste0("Number of values in temprast: ",length(tmprast)))
+    #log_it(paste0("Res of temprast: ",res(tmprast)))
+    #log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
+    #log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     
     values(tmprast)=oul
+    
+    log_it(paste0("Unique: ",unique(values(tmprast))))
+    
     o <- NULL
     oul <- NULL
     rm(o)
@@ -220,17 +234,10 @@ if(single_year=="selected"){
     
     
     
-    library(future)
-    if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
-      print("Loading future.apply")
-      library("future.apply")
-    }
-    plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
-    options(future.globals.maxSize = +Inf)
-    
+   
     log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-    
-    o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=tmprast)
+    ttemprast = rast(the_tmprast)
+    o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=ttemprast)
     
     log_it("Biodiversity threshold calculation complete")
     

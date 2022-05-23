@@ -28,8 +28,8 @@ getFreeMemoryKB <- function() {
 g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
     paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
-         "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
-         paste0(rast_temp,"/",filename)," ",output)
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
+           paste0(rast_temp,"/",filename)," ",output)
   }else{
     paste0(gdal_rasterize," -a ",attribute," -l ",layer," -of GTiff ",
            "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
@@ -52,39 +52,37 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 
 
 proccell2_post_sdc = function(i,cyear=0,the_tmprast){
+  #terraOptions(memfrac=0.2)
   
-  t_rast = rast(the_tmprast)
   if(cyear == 0){
     
-    
-    
     st = terra::rast(file_list)
-    fst <- align(ext(st),t_rast)
+    fst <- align(ext(st),the_tmprast)
     ext(st)<-fst
     
     r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
-    fst <- align(ext(r_vegmin),t_rast)
+    fst <- align(ext(r_vegmin),the_tmprast)
     ext(r_vegmin)<-fst
     
     
     r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
-    fst <- align(ext(r_vegmax),t_rast)
+    fst <- align(ext(r_vegmax),the_tmprast)
     ext(r_vegmax)<-fst
     
     r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
-    fst <- align(ext(r_timesburnt),t_rast)
+    fst <- align(ext(r_timesburnt),the_tmprast)
     ext(r_timesburnt)<-fst
     
     r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
-    fst <- align(ext(r_tsl),t_rast)
+    fst <- align(ext(r_tsl),the_tmprast)
     ext(r_tsl)<-fst
-    
-    st = crop(st,t_rast)
-    r_tsl = crop(r_tsl,t_rast)
-    r_vegmin = crop(r_vegmin,t_rast)
-    r_vegmax = crop(r_vegmax,t_rast)
-    r_timesburnt = crop(r_timesburnt,t_rast)
-    
+    gc()
+    st = terra::crop(st,the_tmprast)
+    r_tsl = terra::crop(r_tsl,the_tmprast)
+    r_vegmin = terra::crop(r_vegmin,the_tmprast)
+    r_vegmax = terra::crop(r_vegmax,the_tmprast)
+    r_timesburnt = terra::crop(r_timesburnt,the_tmprast)
+    gc()
   } else {
     
     reduced_year = all_years[all_years < cyear]
@@ -95,32 +93,34 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     
     st = terra::rast(file_list)
-    fst <- align(ext(st),t_rast)
+    fst <- align(ext(st),the_tmprast)
     ext(st)<-fst
     
     r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
-    fst <- align(ext(r_vegmin),t_rast)
+    fst <- align(ext(r_vegmin),the_tmprast)
     ext(r_vegmin)<-fst
     
     
     r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
-    fst <- align(ext(r_vegmax),t_rast)
+    fst <- align(ext(r_vegmax),the_tmprast)
     ext(r_vegmax)<-fst
     
     r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
-    fst <- align(ext(r_timesburnt),t_rast)
+    fst <- align(ext(r_timesburnt),the_tmprast)
     ext(r_timesburnt)<-fst
     
     r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
-    fst <- align(ext(r_tsl),t_rast)
+    fst <- align(ext(r_tsl),the_tmprast)
     ext(r_tsl)<-fst
     
-    st = crop(st,t_rast)
-    r_tsl = crop(r_tsl,t_rast)
-    r_vegmin = crop(r_vegmin,t_rast)
-    r_vegmax = crop(r_vegmax,t_rast)
-    r_timesburnt = crop(r_timesburnt,t_rast)
+    gc()
     
+    st = terra::crop(st,the_tmprast)
+    r_tsl = terra::crop(r_tsl,the_tmprast)
+    r_vegmin = terra::crop(r_vegmin,the_tmprast)
+    r_vegmax = terra::crop(r_vegmax,the_tmprast)
+    r_timesburnt = terra::crop(r_timesburnt,the_tmprast)
+    gc()
   }
   
   st <- terra::values(st,row=i,nrows=1)
@@ -129,6 +129,8 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   r_timesburnt <- as.numeric(terra::values(r_timesburnt,row=i,nrows=1))
   r_tsl <- as.numeric(terra::values(r_tsl,row=i,nrows=1))
   r_tsl[is.nan(r_tsl)]=NA
+  
+  gc()
   
   ovec = rep(NA,length(r_vegmax))
   
@@ -248,8 +250,9 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   }
   
   
+  
   for(j in seq_along(ovec)){
-
+    
     # get vectors
     MaxThresh = as.numeric(r_vegmax[j])
     MinThresh = as.numeric(r_vegmin[j])
@@ -270,16 +273,18 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     # Run the core status algorithm over this cell
     #ovec[j]<- CalcStatus(MaxThresh,
-     #                    MinThresh,
-     #                    FireFrequency,# 
-     #                    TSFF,
-     #                    int_list,
-     #                    as.numeric(IntervalList), ####
-     #                    TSF) 
+    #                    MinThresh,
+    #                    FireFrequency,# 
+    #                    TSFF,
+    #                    int_list,
+    #                    as.numeric(IntervalList), ####
+    #                    TSF) 
     ovec[j]<-calc_status()
     
     ovec[j][ovec[j]==9999]=NA
   }
+  
+  
   
   
   return(ovec)
@@ -303,7 +308,7 @@ proccell2_post = function(i,cyear=0){
     
     
     st = stack(file_list,quick=TRUE)
-   
+    
     r_vegmin = raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE)
     r_vegmax= raster(paste0(veg_folder,"/r_vegmax.tif"),values=FALSE)
     r_timesburnt= raster(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"),values=FALSE)
@@ -545,7 +550,7 @@ proccell2 = function(i){
       overburnt = 0
       for(this_int in fint){
         #7
-       # print(this_int)
+        # print(this_int)
         if(this_int < MinThresh){
           #print("Less than threshhold")
           # 8
@@ -641,7 +646,7 @@ proccell2 = function(i){
     IntervalList = st[j,]
     
     # Set base status and intervalstatus
-   
+    
     
     
     
@@ -664,7 +669,7 @@ proccell_fmz = function(i){
   
   op = rep(NA,length(r_fmz))
   
-
+  
   
   op[r_tsf > r_fmz] = 4 # LongUnburnt
   op[r_tsf <= r_fmz] = 5 # WithinThreshold
@@ -702,13 +707,13 @@ calc_timesburnt = function(v){
 tile_win <- function(infile,outdir,pypath=NULL){
   pypath = "C:/OSGeo4W64/bin/gdal2tiles.py"
   system2('C:\\OSGeo4W64\\OSGeo4W.bat',
-        args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"', 
-        pypath, infile, outdir)))
+          args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"', 
+                        pypath, infile, outdir)))
 }
 
 
 polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile', 
-                        pypath=NULL, readpoly=TRUE, quietish=TRUE) {
+                            pypath=NULL, readpoly=TRUE, quietish=TRUE) {
   # x: an R Raster layer, or the file path to a raster file recognised by GDAL
   # outshape: the path to the output shapefile (if NULL, a temporary file will be created)
   # gdalformat: the desired OGR vector format
@@ -726,7 +731,7 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   # if (!file.exists(pypath)) stop("Can't find gdal_polygonize.py on your system.") 
   owd <- getwd()
   on.exit(setwd(owd))
- setwd("C:/OSGeo4W64/bin")
+  setwd("C:/OSGeo4W64/bin")
   if (!is.null(outshape)) {
     outshape <- sub('\\.shp$', '', outshape)
     f.exists <- file.exists(paste(outshape, c('shp', 'shx', 'dbf'), sep='.'))
@@ -748,9 +753,9 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   #system2('python',
   #system2('C:\\OSGeo4W64\\OSGeo4W.bat',
   #        args=(sprintf('"%1$s" "%2$s" -q -f "%3$s.shp"', 
- #                       pypath, rastpath, outshape)))
- # system2(cmd,
- #         args=(sprintf('"%1$s" "%2$s" -q -f "%3$s.shp"', 
+  #                       pypath, rastpath, outshape)))
+  # system2(cmd,
+  #         args=(sprintf('"%1$s" "%2$s" -q -f "%3$s.shp"', 
   #                      pypath, rastpath, outshape)))
   tcmd = paste(cmd,pypath,rastpath,paste0(outshape,".shp"))
   system(tcmd)
@@ -764,7 +769,7 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
 
 ## Define the function
 polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
-                             pypath=NULL, readpoly=TRUE, quietish=TRUE) {
+                        pypath=NULL, readpoly=TRUE, quietish=TRUE) {
   quiet = quietish
   if (isTRUE(readpoly)) require(rgdal)
   if (is.null(pypath)) {
@@ -802,7 +807,7 @@ polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
 }
 
 polygonize_by_name <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
-                        pypath=NULL, readpoly=TRUE, quietish=TRUE) {
+                               pypath=NULL, readpoly=TRUE, quietish=TRUE) {
   quiet = quietish
   
   print(paste0("Pre-normal path: ",x))
@@ -826,7 +831,7 @@ polygonize_by_name <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
                                   sep='.')[f.exists])), call.=FALSE)
   } else outshape <- tempfile()
   
-
+  
   system2('python', args=(sprintf('"%1$s" "%2$s" -q -f "%3$s" "%4$s.shp"',
                                   pypath, rastpath, gdalformat, outshape)))
   
@@ -861,7 +866,7 @@ bigWrite <- function(r,out){
   }
   #log_it("Stop Write")
   s2 <- writeStop(s2)
- # log_it("Write done")
+  # log_it("Write done")
 }
 
 bigWriteBinary <- function(r,out){
@@ -992,7 +997,7 @@ remove_invalid_poly <- function(xx){
       st_geometry(xx)[[fix_list]][[i]]<-NULL
     }
   }
-return(xx)
+  return(xx)
 }
 
 
