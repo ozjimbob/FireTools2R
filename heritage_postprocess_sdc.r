@@ -126,7 +126,7 @@ if(single_year=="no_timeseries"){
   log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
   log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
  
-   values(tmprast)=oul
+  raster::values(tmprast)=oul
   o <- NULL
   oul <- NULL
   rm(o)
@@ -190,7 +190,7 @@ if(single_year=="timeseries"){
     #log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     #log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     
-    values(tmprast)=oul
+    raster::values(tmprast)=oul
     
     log_it(paste0("Unique: ",unique(values(tmprast))))
     
@@ -251,7 +251,7 @@ if(single_year=="selected"){
     log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     
 
-    values(tmprast)=oul
+    raster::values(tmprast)=oul
     o <- NULL
     oul <- NULL
     rm(o)

@@ -52,7 +52,7 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 
 
 proccell2_post_sdc = function(i,cyear=0,the_tmprast){
-  #terraOptions(memfrac=0.2)
+  terraOptions(memfrac=0.1)
   
   if(cyear == 0){
     
@@ -83,6 +83,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     r_vegmax = terra::crop(r_vegmax,the_tmprast)
     r_timesburnt = terra::crop(r_timesburnt,the_tmprast)
     gc()
+    
   } else {
     
     reduced_year = all_years[all_years < cyear]
@@ -279,8 +280,9 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     #                    int_list,
     #                    as.numeric(IntervalList), ####
     #                    TSF) 
+    gc()
     ovec[j]<-calc_status()
-    
+    gc()
     ovec[j][ovec[j]==9999]=NA
   }
   
