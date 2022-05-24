@@ -268,9 +268,10 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     return(Status)
   }
   
-  cat(paste0(Sys.time(),",",i,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
+  cat(paste0(Sys.time(),",",i,",","start,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
   for(j in seq_along(ovec)){
+    cat(paste0(Sys.time(),",",i,",",j,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
     
     # get vectors
     MaxThresh = as.numeric(r_vegmax[j])
@@ -287,15 +288,13 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     IntervalList <- as.numeric(terra::values(st,row=i,col=j,nrows=1,ncol=1))
     #IntervalList = as.numeric(st[j,])
     
-    gc()
     
     ovec[j]<-calc_status()
     
-    gc()
     ovec[j][ovec[j]==9999]=NA
   }
   gc()
-  cat(paste0(Sys.time(),",",i,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
+  cat(paste0(Sys.time(),",",i,",","end,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
   return(ovec)
 }
