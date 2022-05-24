@@ -88,9 +88,9 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     int_list = int_list[to_keep]
     
     
-    st = terra::rast(file_list)
-    r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
-    r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
+    st = terra::rast(new_file_list)
+    r_timesburnt= terra::rast(paste0(temp_fire_dir,"/rNumTimesBurnt_",cyear,".tif"))
+    r_tsl= terra::rast(paste0(temp_fire_dir,"/rTimeSinceLast_",cyear,".tif"))
     r_vegmax <- terra::rast(paste0(rast_temp,"/r_vegmax.tif"))
     r_vegmin <- terra::rast(paste0(rast_temp,"/r_vegmin.tif"))
     

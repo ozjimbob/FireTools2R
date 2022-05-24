@@ -122,8 +122,8 @@ for(ii in 1:length(int_list)){
   r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
   
   log_it("writing")
-  writeRaster(r_tsl,paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
-  writeRaster(r_timesburnt,paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
+  writeRaster(r_tsl,paste0(temp_fire_dir,"/rTimeSinceLast_",this_year,".tif"))
+  writeRaster(r_timesburnt,paste0(temp_fire_dir,"/rNumTimesBurnt_",this_year,".tif"))
   
 }
 
