@@ -166,7 +166,15 @@ for(yr in seq_along(int_list)){
   # Write progressive rasters
   if(yr==1){
     log_it("Year 1 - calculating r_lastb")
-    r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    
+    this_ily <- int_list[yr]
+    ft_apply <- function(x){
+      x*this_ily
+    }
+    
+    #r_lastb = calc(this_year, fun=function(x){ x * int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    r_lastb = calc(this_year, fun=ft_apply,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    
     file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
     log_it("Year 1 - calculating r_timesbunr")
     r_timesburnt = r_lastb
