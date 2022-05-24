@@ -111,7 +111,7 @@ if(single_year=="no_timeseries"){
 
   
   log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-  ttemprast = rast(the_tmprast)
+  ttemprast = rast(tmprast)
   o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3,the_tmprast=ttemprast)
   log_it("Biodiversity threshold calculation complete")
   
@@ -173,7 +173,7 @@ if(single_year=="timeseries"){
 
     
     log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-    ttemprast = rast(the_tmprast)
+    ttemprast = rast(tmprast)
     o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=ttemprast)
     
     log_it("Biodiversity threshold calculation complete")
@@ -236,7 +236,7 @@ if(single_year=="selected"){
     
    
     log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
-    ttemprast = rast(the_tmprast)
+    ttemprast = rast(tmprast)
     o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=ttemprast)
     
     log_it("Biodiversity threshold calculation complete")
