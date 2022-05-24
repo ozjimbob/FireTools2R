@@ -90,9 +90,10 @@ temp_fire_dir = paste0(rast_temp,"/fire")
 dir.create(temp_fire_dir)
 
 
-for(ii in 1:length(year_list)){
+for(ii in 1:length(int_list)){
   
-  this_year = year_list[ii]
+  this_year = int_list[ii]
+  
   log_it(paste0("Cropping year: ",this_year))
   log_it("binary fire")
   this_binary = terra::rast(file_list[ii])
@@ -102,7 +103,7 @@ for(ii in 1:length(year_list)){
   this_binary = terra::crop(this_binary,rast(tmprast))
   
   log_it("writing")
-  bigWriteBinary(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"))
+  writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U")
   
   log_it("times burnt")
   r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
@@ -121,8 +122,8 @@ for(ii in 1:length(year_list)){
   r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
   
   log_it("writing")
-  bigWrite(r_tsl,paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
-  bigWrite(r_timesburnt,paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
+  writeRaster(r_tsl,paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
+  writeRaster(r_timesburnt,paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
   
 }
 
