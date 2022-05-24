@@ -271,7 +271,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   cat(paste0(Sys.time(),",",i,",","start,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
   for(j in seq_along(ovec)){
-    cat(paste0(Sys.time(),",",i,",",j,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
+    #cat(paste0(Sys.time(),",",i,",",j,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
     
     # get vectors
     MaxThresh = as.numeric(r_vegmax[j])
