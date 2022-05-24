@@ -70,15 +70,15 @@ tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
 log_it("Pre-cropping and aligning veg attributes")
 r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
-fst <- align(ext(r_vegmin),rast(the_tmprast))
+fst <- align(ext(r_vegmin),rast(tmprast))
 ext(r_vegmin)<-fst
-r_vegmin = terra::crop(r_vegmin,rast(the_tmprast))
+r_vegmin = terra::crop(r_vegmin,rast(tmprast))
 writeRaster(r_vegmin,paste0(rast_temp,"/r_vegmin.tif"))
 
 r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
-fst <- align(ext(r_vegmax),rast(the_tmprast))
+fst <- align(ext(r_vegmax),rast(tmprast))
 ext(r_vegmax)<-fst
-r_vegmax = terra::crop(r_vegmax,rast(the_tmprast))
+r_vegmax = terra::crop(r_vegmax,rast(tmprast))
 writeRaster(r_vegmax,paste0(rast_temp,"/r_vegmax.tif"))
 
 rm(r_vegmin)
