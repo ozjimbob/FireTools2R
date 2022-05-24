@@ -90,12 +90,12 @@ temp_fire_dir = paste0(rast_temp,"/fire")
 dir.create(temp_fire_dir)
 
 
-for(ii in seq_along(year_list)){
+for(ii in 1:length(year_list)){
   
   this_year = year_list[ii]
   log_it(paste0("Cropping year: ",this_year))
   log_it("binary fire")
-  this_binary = terra::rast(file_list[i])
+  this_binary = terra::rast(file_list[ii])
   fst <- align(ext(this_binary),rast(tmprast))
   ext(this_binary)<-fst
   log_it("cropping")
