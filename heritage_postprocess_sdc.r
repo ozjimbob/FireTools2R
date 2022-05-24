@@ -96,29 +96,29 @@ for(ii in seq_along(year_list)){
   log_it(paste0("Cropping year: ",this_year))
   log_it("binary fire")
   this_binary = terra::rast(file_list[i])
-  fst <- align(ext(this_binary),rast(the_tmprast))
+  fst <- align(ext(this_binary),rast(tmprast))
   ext(this_binary)<-fst
   log_it("cropping")
-  this_binary = terra::crop(this_binary,rast(the_tmprast))
+  this_binary = terra::crop(this_binary,rast(tmprast))
   
   log_it("writing")
   bigWriteBinary(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"))
   
   log_it("times burnt")
   r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
-  fst <- align(ext(r_timesburnt),rast(the_tmprast))
+  fst <- align(ext(r_timesburnt),rast(tmprast))
   ext(r_timesburnt)<-fst
   log_it("times since last")
   r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
-  fst <- align(ext(r_tsl),rast(the_tmprast))
+  fst <- align(ext(r_tsl),rast(tmprast))
   ext(r_tsl)<-fst
   
   gc()
   
   log_it("cropping")
   #st = terra::crop(st,the_tmprast)
-  r_tsl = terra::crop(r_tsl,rast(the_tmprast))
-  r_timesburnt = terra::crop(r_timesburnt,rast(the_tmprast))
+  r_tsl = terra::crop(r_tsl,rast(tmprast))
+  r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
   
   log_it("writing")
   bigWrite(r_tsl,paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
