@@ -120,12 +120,6 @@ if(single_year=="no_timeseries"){
   log_it("Rasterizing biodiversity threshold and writing to disk")
   oul = unlist(o)
   
-  log_it(paste0("Number values in oul: ",length(oul)))
-  log_it(paste0("Number of values in temprast: ",length(tmprast)))
-  log_it(paste0("Res of temprast: ",res(tmprast)))
-  log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
-  log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
- 
   raster::values(tmprast)=oul
   o <- NULL
   oul <- NULL
@@ -192,7 +186,7 @@ if(single_year=="timeseries"){
     
     raster::values(tmprast)=oul
     
-    log_it(paste0("Unique: ",unique(values(tmprast))))
+    #log_it(paste0("Unique: ",unique(values(tmprast))))
     
     o <- NULL
     oul <- NULL
