@@ -111,6 +111,10 @@ if(nrow(v_firex)>0){
 }
 
 int_list = sort(unique(v_fire$numYear))
+##
+int_list = c(int_list,as.character(current_year:(current_year+future_years)))
+int_list<- unique(int_list)
+##
 year_list = as.numeric(substr(int_list,1,4))
 
 log_it("Writing list of fire seasons")
