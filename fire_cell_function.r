@@ -54,6 +54,24 @@ g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
 proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   terraOptions(memfrac=0.1)
   
+  getFreeMemoryKB <- function() {
+    osName <- Sys.info()[["sysname"]]
+    if (osName == "Windows") {
+      x <- system2("wmic", args =  "OS get FreePhysicalMemory /Value", stdout = TRUE)
+      x <- x[grepl("FreePhysicalMemory", x)]
+      x <- gsub("FreePhysicalMemory=", "", x, fixed = TRUE)
+      x <- gsub("\r", "", x, fixed = TRUE)
+      return(as.integer(x)/1000000)
+    } else if (osName == 'Linux') {
+      x <- system2('free', args='-k', stdout=TRUE)
+      x <- strsplit(x[2], " +")[[1]][4]
+      return(as.integer(x)/1000000)
+    } else {
+      stop("Only supported on Windows and Linux")
+    }
+  }
+  
+  
   if(cyear == 0){
     
     st = terra::rast(file_list)
@@ -124,7 +142,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     gc()
   }
   
-  st <- terra::values(st,row=i,nrows=1)
+  #st <- terra::values(st,row=i,nrows=1)
   r_vegmax <- as.numeric(terra::values(r_vegmax,row=i,nrows=1))
   r_vegmin <- as.numeric(terra::values(r_vegmin,row=i,nrows=1))
   r_timesburnt <- as.numeric(terra::values(r_timesburnt,row=i,nrows=1))
@@ -250,7 +268,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     return(Status)
   }
   
-  
+  cat(paste0(Sys.time(),",",i,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
   for(j in seq_along(ovec)){
     
@@ -265,29 +283,19 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     
     FireFrequency = as.numeric(r_timesburnt[j])
     TSF = as.numeric(r_tsl[j])
-    IntervalList = as.numeric(st[j,])
     
-    # Set base status and intervalstatus
+    IntervalList <- as.numeric(terra::values(st,row=i,col=j,nrows=1,ncol=1))
+    #IntervalList = as.numeric(st[j,])
     
-    
-    
-    
-    # Run the core status algorithm over this cell
-    #ovec[j]<- CalcStatus(MaxThresh,
-    #                    MinThresh,
-    #                    FireFrequency,# 
-    #                    TSFF,
-    #                    int_list,
-    #                    as.numeric(IntervalList), ####
-    #                    TSF) 
     gc()
+    
     ovec[j]<-calc_status()
+    
     gc()
     ovec[j][ovec[j]==9999]=NA
   }
-  
-  
-  
+  gc()
+  cat(paste0(Sys.time(),",",i,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
   return(ovec)
 }

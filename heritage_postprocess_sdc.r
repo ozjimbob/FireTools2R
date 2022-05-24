@@ -157,18 +157,11 @@ if(single_year=="timeseries"){
     TSFF = as.numeric(TSFF)
     
     log_it("Loading template raster")
-    #tmprast = raster(paste0(fire_folder,"/rTimeSinceLast.tif"))
-    
-    ###
-    
-    
-    
-    
-
+   
     
     log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
     ttemprast = rast(tmprast)
-    o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=3, cyear=this_year,the_tmprast=ttemprast)
+    o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=1, cyear=this_year,the_tmprast=ttemprast)
     
     log_it("Biodiversity threshold calculation complete")
     
