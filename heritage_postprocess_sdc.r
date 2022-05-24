@@ -68,6 +68,70 @@ tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 ####### NEW
 ####### CROP RASTERS AND WRITE TO OUTPUT
 
+log_it("Pre-cropping and aligning veg attributes")
+r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
+fst <- align(ext(r_vegmin),rast(the_tmprast))
+ext(r_vegmin)<-fst
+r_vegmin = terra::crop(r_vegmin,rast(the_tmprast))
+writeRaster(r_vegmin,paste0(rast_temp,"/r_vegmin.tif"))
+
+r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
+fst <- align(ext(r_vegmax),rast(the_tmprast))
+ext(r_vegmax)<-fst
+r_vegmax = terra::crop(r_vegmax,rast(the_tmprast))
+writeRaster(r_vegmax,paste0(rast_temp,"/r_vegmax.tif"))
+
+rm(r_vegmin)
+rm(r_vegmax)
+
+log_it("Pre-cropping and aligning fire history")
+
+temp_fire_dir = paste0(rast_temp,"/fire")
+dir.create(temp_fire_dir)
+
+
+for(ii in seq_along(year_list)){
+  
+  this_year = year_list[ii]
+  log_it(paste0("Cropping year: ",this_year))
+  log_it("binary fire")
+  this_binary = terra::rast(file_list[i])
+  fst <- align(ext(this_binary),rast(the_tmprast))
+  ext(this_binary)<-fst
+  log_it("cropping")
+  this_binary = terra::crop(this_binary,rast(the_tmprast))
+  
+  log_it("writing")
+  bigWriteBinary(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"))
+  
+  log_it("times burnt")
+  r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
+  fst <- align(ext(r_timesburnt),rast(the_tmprast))
+  ext(r_timesburnt)<-fst
+  log_it("times since last")
+  r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
+  fst <- align(ext(r_tsl),rast(the_tmprast))
+  ext(r_tsl)<-fst
+  
+  gc()
+  
+  log_it("cropping")
+  #st = terra::crop(st,the_tmprast)
+  r_tsl = terra::crop(r_tsl,rast(the_tmprast))
+  r_timesburnt = terra::crop(r_timesburnt,rast(the_tmprast))
+  
+  log_it("writing")
+  bigWrite(r_tsl,paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
+  bigWrite(r_timesburnt,paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
+  
+}
+
+new_file_list = paste0(temp_fire_dir,"/",year_list$year,".tif")
+
+
+gc()
+
+
 ############
 ##############
 #############

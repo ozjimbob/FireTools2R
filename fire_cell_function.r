@@ -75,71 +75,25 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   if(cyear == 0){
     
     st = terra::rast(file_list)
-    fst <- align(ext(st),the_tmprast)
-    ext(st)<-fst
-    
-    r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
-    fst <- align(ext(r_vegmin),the_tmprast)
-    ext(r_vegmin)<-fst
-    
-    
-    r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
-    fst <- align(ext(r_vegmax),the_tmprast)
-    ext(r_vegmax)<-fst
-    
     r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
-    fst <- align(ext(r_timesburnt),the_tmprast)
-    ext(r_timesburnt)<-fst
-    
     r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
-    fst <- align(ext(r_tsl),the_tmprast)
-    ext(r_tsl)<-fst
-    gc()
-    st = terra::crop(st,the_tmprast)
-    r_tsl = terra::crop(r_tsl,the_tmprast)
-    r_vegmin = terra::crop(r_vegmin,the_tmprast)
-    r_vegmax = terra::crop(r_vegmax,the_tmprast)
-    r_timesburnt = terra::crop(r_timesburnt,the_tmprast)
-    gc()
+    r_vegmax <- terra::rast(paste0(rast_temp,"/r_vegmax.tif"))
+    r_vegmin <- terra::rast(paste0(rast_temp,"/r_vegmin.tif"))
     
   } else {
     
     reduced_year = all_years[all_years < cyear]
     to_keep = which(int_list %in% reduced_year)
-    file_list = file_list[to_keep]
+    new_file_list = new_file_list[to_keep]
     int_list = int_list[to_keep]
     
     
-    
     st = terra::rast(file_list)
-    fst <- align(ext(st),the_tmprast)
-    ext(st)<-fst
-    
-    r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
-    fst <- align(ext(r_vegmin),the_tmprast)
-    ext(r_vegmin)<-fst
-    
-    
-    r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
-    fst <- align(ext(r_vegmax),the_tmprast)
-    ext(r_vegmax)<-fst
-    
     r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",cyear,".tif"))
-    fst <- align(ext(r_timesburnt),the_tmprast)
-    ext(r_timesburnt)<-fst
-    
     r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",cyear,".tif"))
-    fst <- align(ext(r_tsl),the_tmprast)
-    ext(r_tsl)<-fst
+    r_vegmax <- terra::rast(paste0(rast_temp,"/r_vegmax.tif"))
+    r_vegmin <- terra::rast(paste0(rast_temp,"/r_vegmin.tif"))
     
-    gc()
-    
-    st = terra::crop(st,the_tmprast)
-    r_tsl = terra::crop(r_tsl,the_tmprast)
-    r_vegmin = terra::crop(r_vegmin,the_tmprast)
-    r_vegmax = terra::crop(r_vegmax,the_tmprast)
-    r_timesburnt = terra::crop(r_timesburnt,the_tmprast)
-    gc()
   }
   
   #st <- terra::values(st,row=i,nrows=1)
