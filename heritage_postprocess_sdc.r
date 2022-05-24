@@ -147,7 +147,7 @@ if(single_year=="timeseries"){
   all_years <- all_years[grep(pattern="rNumTimesBurnt_",all_years)]
   all_years <- as.numeric(substr(all_years,16,19))
   
-  if(exists(start_year)){
+  if(exists("start_year")){
     wyear <- which.min(abs(all_years-start_year))
   }else{
     wyear <- 2
