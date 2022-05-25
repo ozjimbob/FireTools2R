@@ -167,7 +167,7 @@ for(yr in seq_along(int_list)){
   if(yr==1){
     log_it("Year 1 - calculating r_lastb")
     
-    this_ily <- int_list[yr]
+    this_ily <- as.numeric(int_list[yr])
     ft_apply <- function(x,na.rm=FALSE,...){
       x*this_ily
     }
@@ -176,14 +176,14 @@ for(yr in seq_along(int_list)){
     log_it(print(this_year))
     
     #r_lastb = calc(this_year, fun=function(x,na.rm=FALSE,...){ x * this_ily},forcefun=TRUE,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
-    #r_lastb = raster::calc(this_year, fun=ft_apply,forcefun=TRUE,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    r_lastb = raster::calc(this_year, fun=ft_apply,forcefun=TRUE,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
     
     ### ALTERNATIVE
-    r_lastb = this_year * this_ily
-    writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
-    rm(r_lastb)
-    gc()
-    r_lastb <- raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+    #r_lastb = this_year * this_ily
+    #writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    #rm(r_lastb)
+    #gc()
+    #r_lastb <- raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
     #######
     
     file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
