@@ -114,6 +114,7 @@ int_list = sort(unique(v_fire$numYear))
 ##
 int_list = c(int_list,as.character(current_year:(current_year+future_years)))
 int_list<- unique(int_list)
+int_list <- as.numeric(int_list)
 ##
 year_list = as.numeric(substr(int_list,1,4))
 
@@ -162,6 +163,8 @@ for(yr in seq_along(int_list)){
     this_year <- tmprast
     raster::values(this_year)<-0
   }
+  
+  
   
   # Write progressive rasters
   if(yr==1){
