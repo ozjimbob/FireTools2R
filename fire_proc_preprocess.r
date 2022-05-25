@@ -205,7 +205,7 @@ for(yr in seq_along(int_list)){
   }# We now have two temp files
   log_it("Adding to stack")
   log_it("New maximum")
-  r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
+  r_lastb = max(stack(this_year* as.numeric(int_list[yr]),r_lastb),na.rm=TRUE) # Four temp files
   log_it("Adding to count")
   log_it("Writing intermediate rasters")
   #print(plot(r_lastb))
