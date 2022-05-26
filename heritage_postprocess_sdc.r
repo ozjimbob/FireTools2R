@@ -94,16 +94,20 @@ for(ii in 1:length(int_list)){
   
   this_year = int_list[ii]
   
-  log_it(paste0("Cropping year: ",this_year))
-  log_it("binary fire")
-  this_binary = terra::rast(file_list[ii])
-  fst <- align(ext(this_binary),rast(tmprast))
-  ext(this_binary)<-fst
-  log_it("cropping")
-  this_binary = terra::crop(this_binary,rast(tmprast))
+  # We may have one less year than interval if current year has no fire
+  if(file.exists(file_list[ii])){
+    log_it(paste0("Cropping year: ",this_year))
+    log_it("binary fire")
+    this_binary = terra::rast(file_list[ii])
+    fst <- align(ext(this_binary),rast(tmprast))
+    ext(this_binary)<-fst
+    log_it("cropping")
+    this_binary = terra::crop(this_binary,rast(tmprast))
+    
+    log_it("writing")
+    writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U",overwrite=TRUE)
+  }
   
-  log_it("writing")
-  writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U",overwrite=TRUE)
   
   log_it("times burnt")
   r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
