@@ -14,7 +14,9 @@ library(velox)
 library(lwgeom)
 library(sfheaders)
 source("../config/global_config.r")
+
 args = commandArgs(trailingOnly=TRUE)
+
 if (length(args)==0) {
   source("../config/config_veg.r")
 }else{

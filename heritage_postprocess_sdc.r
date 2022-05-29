@@ -323,7 +323,11 @@ if(single_year=="selected"){
 
 
 log_it("Biodiversity threshold write complete")
+log_it("clearing temporary rasters")
 
+unlink(paste0(rast_temp,"/r_vegmax.tif"))
+unlink(paste0(rast_temp,"/r_vegmin.tif"))
+unlink(paste0(rast_temp,"/test"), recursive=TRUE)
 
 log_it("Writing raster tables")
 
