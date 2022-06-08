@@ -69,20 +69,6 @@ fesm_statewide[fesm_statewide %in% c(40,50)]=20
 
 fesm_overlay <- fesm_statewide + rast(template_r)
 
-# Outputs
-# Fesm classes:
-# 0 = unburnt
-# 10 = Low
-# 20 = High
-
-# Heritage outputs
-# 1 = NoFireRegime
-# 2 = TooFrequentlyBurnt
-# 3 = Vulnerable
-# 4 = LongUnburnt
-# 5 = Within Threshold
-# 9 = Unknown
-
 fesm_table = data.frame(ID = c(0,
                            1,2,3,4,5,9,
                            11,12,13,14,15,19,
