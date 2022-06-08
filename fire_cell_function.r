@@ -37,6 +37,17 @@ g_rasterize <- function(layer,filename,output,attribute="",otype="Int32"){
   }
 }
 
+g_rasterize_raw <- function(layer,filename,output,attribute="",otype="Int32"){
+  if(attribute==""){
+    paste0(gdal_rasterize," -burn 1 -l ",layer," -of GTiff ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
+           filename," ",output)
+  }else{
+    paste0(gdal_rasterize," -a ",attribute," -l ",layer," -of GTiff ",
+           "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot ",otype," -co COMPRESS=PACKBITS -co TILED=TRUE -optim VECTOR -q ",
+           filename," ",output)
+  }
+}
 
 g_polygonize <- function(layer,filename,output,attribute="",otype="Int32"){
   if(attribute==""){
@@ -224,6 +235,9 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
   
   cat(paste0(Sys.time(),",",i,",","start,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
+  #### NEW METHOD - 
+  ThisIntervalList <- terra::values(st,row=i,nrows=1)
+  
   for(j in seq_along(ovec)){
     #cat(paste0(Sys.time(),",",i,",",j,",",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
     
@@ -239,8 +253,9 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     FireFrequency = as.numeric(r_timesburnt[j])
     TSF = as.numeric(r_tsl[j])
     
-    IntervalList <- as.numeric(terra::values(st,row=i,col=j,nrows=1,ncol=1))
-    #IntervalList = as.numeric(st[j,])
+    #### OLD METHOD
+    #IntervalList <- as.numeric(terra::values(st,row=i,col=j,nrows=1,ncol=1))
+    IntervalList <- as.numeric(ThisIntervalList[j,])
     
     
     ovec[j]<-calc_status()
