@@ -347,14 +347,22 @@ if(single_year=="timeseries"){
     esri_output(sub[i])
     gc()
   }
+  log_it("Creating map dir")
   dir.create(paste0(rast_temp,"/maps"))
+  log_it("Looping through years")
+  log_it(wyear)
+  log_it(all_years)
+  log_it("Looping")
   for(year_idx in wyear:length(all_years)){
+    log_it(year_idx)
     r = rast(paste0(rast_temp,"/r_heritage_threshold_status_",all_years[year_idx],".tif"))
+    log_it("writing")
     png(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".tif"),type="cairo-png",width=1000,height=1300)
-    plot(r,plg=list(title=all_years[year_idx], title.cex=1.25))
+    print(plot(r,plg=list(title=all_years[year_idx], title.cex=1.25)))
     dev.off()
+    log_it("Done")
   }
-  
+  log_it("Finished maps")
 }
 
 
