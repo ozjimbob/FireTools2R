@@ -357,8 +357,9 @@ if(single_year=="timeseries"){
     log_it(year_idx)
     r = rast(paste0(rast_temp,"/r_heritage_threshold_status_",all_years[year_idx],".tif"))
     log_it("writing")
-    png(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".tif"),type="cairo-png",width=1000,height=1300)
-    print(plot(r,plg=list(title=all_years[year_idx], title.cex=1.25)))
+    log_it(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".png"))
+    png(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".png"),antialias="subpixel",width=1000,height=1300,bg="white")
+    plot(r,plg=list(title=all_years[year_idx], title.cex=1.25))
     dev.off()
     log_it("Done")
   }
