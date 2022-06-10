@@ -339,6 +339,8 @@ file.rename(paste0(rast_temp,"/r_vegform.tif"),paste0(rast_temp,"/veg/r_vegform.
 #unlink(paste0(rast_temp,"/r_vegmax.tif"))
 #unlink(paste0(rast_temp,"/r_vegmin.tif"))
 unlink(paste0(rast_temp,"/test"), recursive=TRUE)
+# GDAL setting makes aux files with raster, remove
+unlink(paste0(rast_temp,"/*.aux.xml"))
 
 log_it("Writing raster tables")
 
@@ -348,9 +350,11 @@ if(single_year=="no_timeseries"){
   gc()
 }
 
+
+
 ## Write maps
 if(single_year=="timeseries"){
-  to_repair <- list.files(rast_temp,pattern=".tif")
+  #to_repair <- list.files(rast_temp,pattern=".tif")
   sub <- gsub("vegout","heritage_threshold_status",to_repair)
   for(i in seq_along(to_repair)){
     print(to_repair[i])
