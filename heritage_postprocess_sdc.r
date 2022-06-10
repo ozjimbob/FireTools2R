@@ -45,7 +45,7 @@ write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
 log_it("Finished writing region template")
 
 bbox = st_bbox(v_thisregion)
-
+v_vr_mask <- vect(paste0(rast_temp,"/v_region.gpkg"))
 
 # Load 25m NSW Alignment grid
 if(!exists("grid_file")){
@@ -73,18 +73,22 @@ r_vegmin = terra::rast(paste0(veg_folder,"/r_vegmin.tif"))
 fst <- align(ext(r_vegmin),rast(tmprast))
 ext(r_vegmin)<-fst
 r_vegmin = terra::crop(r_vegmin,rast(tmprast))
+## MASK
+r_vegmin = mask(r_vegmin,v_vr_mask)
 writeRaster(r_vegmin,paste0(rast_temp,"/r_vegmin.tif"))
 
 r_vegmax= terra::rast(paste0(veg_folder,"/r_vegmax.tif"))
 fst <- align(ext(r_vegmax),rast(tmprast))
 ext(r_vegmax)<-fst
 r_vegmax = terra::crop(r_vegmax,rast(tmprast))
+r_vegmax = mask(r_vegmax,v_vr_mask)
 writeRaster(r_vegmax,paste0(rast_temp,"/r_vegmax.tif"))
 
 r_vegform= terra::rast(paste0(veg_folder,"/r_vegform.tif"))
 fst <- align(ext(r_vegform),rast(tmprast))
 ext(r_vegform)<-fst
 r_vegform = terra::crop(r_vegform,rast(tmprast))
+r_vegform = mask(r_vegform,v_vr_mask)
 writeRaster(r_vegform,paste0(rast_temp,"/r_vegform.tif"))
 
 file.copy(paste0(veg_folder,"/veg_lut.csv"),paste0(rast_temp,"/veg_lut.csv"))
