@@ -354,7 +354,7 @@ if(single_year=="no_timeseries"){
 
 ## Write maps
 if(single_year=="timeseries"){
-  #to_repair <- list.files(rast_temp,pattern=".tif")
+  to_repair <- list.files(rast_temp,pattern=".tif")
   sub <- gsub("vegout","heritage_threshold_status",to_repair)
   for(i in seq_along(to_repair)){
     print(to_repair[i])
