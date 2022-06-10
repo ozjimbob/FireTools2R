@@ -82,8 +82,8 @@ r_vegmax = terra::crop(r_vegmax,rast(tmprast))
 writeRaster(r_vegmax,paste0(rast_temp,"/r_vegmax.tif"))
 
 r_vegform= terra::rast(paste0(veg_folder,"/r_vegform.tif"))
-fst <- r_vegform(ext(r_vegform),rast(tmprast))
-ext(r_vegmax)<-fst
+fst <- align(ext(r_vegform),rast(tmprast))
+ext(r_vegform)<-fst
 r_vegform = terra::crop(r_vegform,rast(tmprast))
 writeRaster(r_vegform,paste0(rast_temp,"/r_vegform.tif"))
 
