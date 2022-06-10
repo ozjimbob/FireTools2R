@@ -331,8 +331,13 @@ if(single_year=="selected"){
 log_it("Biodiversity threshold write complete")
 log_it("clearing temporary rasters")
 
-unlink(paste0(rast_temp,"/r_vegmax.tif"))
-unlink(paste0(rast_temp,"/r_vegmin.tif"))
+dir.create(paste0(rast_temp,"/veg"))
+file.rename(paste0(rast_temp,"/r_vegmax.tif"),paste0(rast_temp,"/veg/r_vegmax.tif"))
+file.rename(paste0(rast_temp,"/r_vegmin.tif"),paste0(rast_temp,"/veg/r_vegmin.tif"))
+file.rename(paste0(rast_temp,"/r_vegform.tif"),paste0(rast_temp,"/veg/r_vegform.tif"))
+
+#unlink(paste0(rast_temp,"/r_vegmax.tif"))
+#unlink(paste0(rast_temp,"/r_vegmin.tif"))
 unlink(paste0(rast_temp,"/test"), recursive=TRUE)
 
 log_it("Writing raster tables")
