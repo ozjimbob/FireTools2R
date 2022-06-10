@@ -233,7 +233,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     return(Status)
   }
   
-  cat(paste0(Sys.time(),",",i,",","start,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
+  #cat(paste0(Sys.time(),",",i,",","start,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
   
   #### NEW METHOD - 
   ThisIntervalList <- terra::values(st,row=i,nrows=1)

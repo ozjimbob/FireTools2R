@@ -81,6 +81,19 @@ ext(r_vegmax)<-fst
 r_vegmax = terra::crop(r_vegmax,rast(tmprast))
 writeRaster(r_vegmax,paste0(rast_temp,"/r_vegmax.tif"))
 
+r_vegform= terra::rast(paste0(veg_folder,"/r_vegform.tif"))
+fst <- r_vegform(ext(r_vegform),rast(tmprast))
+ext(r_vegmax)<-fst
+r_vegform = terra::crop(r_vegform,rast(tmprast))
+writeRaster(r_vegform,paste0(rast_temp,"/r_vegform.tif"))
+
+file.copy(paste0(veg_folder,"/veg_lut.csv"),paste0(rast_temp,"/veg_lut.csv"))
+file.copy(paste0(veg_folder,"/form_lut.csv"),paste0(rast_temp,"/form_lut.csv"))
+
+### Also do veg form code
+
+
+
 rm(r_vegmin)
 rm(r_vegmax)
 
@@ -240,11 +253,6 @@ if(single_year=="timeseries"){
     
     oul = unlist(o)
     
-    #log_it(paste0("Number values in oul: ",length(oul)))
-    #log_it(paste0("Number of values in temprast: ",length(tmprast)))
-    #log_it(paste0("Res of temprast: ",res(tmprast)))
-    #log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
-    #log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     
     raster::values(tmprast)=oul
     
@@ -299,12 +307,6 @@ if(single_year=="selected"){
     
     oul = unlist(o)
     
-    log_it("Rasterizing biodiversity threshold and writing to disk")
-    log_it(paste0("Number values in oul: ",length(oul)))
-    log_it(paste0("Number of values in temprast: ",length(tmprast)))
-    log_it(paste0("Res of temprast: ",res(tmprast)))
-    log_it(paste0("Res of raw input: ",res(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
-    log_it(paste0("extent of raw input: ",extent(raster(paste0(veg_folder,"/r_vegmin.tif"),values=FALSE))))
     
 
     raster::values(tmprast)=oul
@@ -358,7 +360,7 @@ if(single_year=="timeseries"){
     r = rast(paste0(rast_temp,"/r_heritage_threshold_status_",all_years[year_idx],".tif"))
     log_it("writing")
     log_it(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".png"))
-    png(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".png"),antialias="subpixel",width=1000,height=1300,bg="white")
+    bitmap(paste0(rast_temp,"/maps/map_heritage_",all_years[year_idx],".png"),width=1000,height=1300,units="px")
     plot(r,plg=list(title=all_years[year_idx], title.cex=1.25))
     dev.off()
     log_it("Done")
