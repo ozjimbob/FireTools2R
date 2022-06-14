@@ -358,8 +358,8 @@ if(single_year=="timeseries"){
   sub <- gsub("vegout","heritage_threshold_status",to_repair)
   for(i in seq_along(to_repair)){
     print(to_repair[i])
-    rx_write(to_repair[i],sub[i],bigwrite=FALSE)
-    esri_output(sub[i])
+    rx_write_terra(to_repair[i],sub[i],bigwrite=FALSE)
+    #esri_output(sub[i])
     gc()
   }
   log_it("Creating map dir")

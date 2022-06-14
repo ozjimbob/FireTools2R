@@ -1212,6 +1212,7 @@ rx_write=function(file,outfile,bigwrite=TRUE){
     tr <- tr * mask_tif
   }
   
+  
   log_it("Ratify input file")
   tr <- ratify(tr)
   
@@ -1273,6 +1274,90 @@ rx_write=function(file,outfile,bigwrite=TRUE){
   rm(a2)
   rm(tr)
   rm(atable)
+  
+  gc()
+  
+}
+
+rx_write_terra=function(file,outfile){
+  require(foreign)
+  require(sp)
+  require(terra)
+  
+  log_it("Define lookup table")
+  rtable = data.frame(ID = c(1,2,3,4,5,9),
+                      Status = c("NoFireRegime",
+                                 "TooFrequentlyBurnt",
+                                 "Vulnerable",
+                                 "LongUnburnt",
+                                 "WithinThreshold",
+                                 "Unknown"))
+  coltable = data.frame(ID = c(1,2,3,4,5,9),
+                      Status = c("#ffffff","#ff0000","#ff6600","#00ffff","#999999","#cccccc"))
+  
+
+  log_it("Load input file")
+  tr <- rast(paste0(rast_temp,"/",file))
+  
+  if(exists("mask_tif")){
+    log_it("Mask input file")
+    tr <- tr * mask_tif
+  }
+  
+  
+  #log_it("Ratify input file")
+  #tr <- ratify(tr)
+  
+  #log_it("Get the levels of the raster table (eg. the numbers)")
+  #rat <- levels(tr)[[1]]
+  
+  #log_it("Join levels with the text status table") 
+  #rat <- left_join(rat,rtable)
+  
+  log_it("Insert levels into the raster")
+  #levels(tr) <- rat
+  
+  levels(tr)<-rtable
+  
+  
+  log_it("Insert color table into raster")
+  coltab(tr) <- coltable
+  
+  # Write ESRI DB
+  
+  #log_it("Construct ESRI table")
+  #log_it("Retrieve levels from existing raster table")
+  #atable = levels(tr)[[1]]
+  #names(atable)=c("VALUE","CATEGORY")
+  
+  #log_it("Calculating value frequency table")
+  #x <- raster::freq(tr)
+  #x <- as.data.frame(x)
+  #names(x)=c("VALUE","COUNT")
+  #x$VALUE = as.numeric(as.character(x$VALUE))
+  
+  #log_it("Joining frequency table")
+  #a2 = left_join(atable,x)
+  #a2$COUNT[is.na(a2$COUNT)]=0
+  #a2 = dplyr::select(a2,VALUE,COUNT,CATEGORY)
+  
+  #log_it("Writing ESRI DBF")
+  #write.dbf(a2,paste0(rast_temp,"/",outfile,".vat.dbf"))
+  
+  # Fix projection
+  #log_it("Fix Projection")
+  #crs(tr) <- CRS('+init=epsg:3308')
+  
+  log_it("Big Write raster with table")
+  
+  
+  terra::writeRaster(tr,paste0(rast_temp,"/",outfile))
+  
+  
+  log_it("Deleting temp file")
+  unlink(paste0(rast_temp,"/",file))
+  
+  log_it("Cleaning up")
   
   gc()
   
