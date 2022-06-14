@@ -1295,8 +1295,8 @@ rx_write_terra=function(file,outfile){
   
   
 
-  coltable = data.frame(ID = c(0,1,2,3,4,5,9),
-                        Status = c("white","white","#ff0000","#ff6600","#00ffff","#999999","white","white","white","#cccccc"))
+  
+  ColStatus = c("white","white","#ff0000","#ff6600","#00ffff","#999999","white","white","white","#cccccc")
   
   log_it("Load input file")
   tr <- rast(paste0(rast_temp,"/",file))
@@ -1323,7 +1323,7 @@ rx_write_terra=function(file,outfile){
   
   
   log_it("Insert color table into raster")
-  coltab(tr) <- coltable$Status
+  coltab(tr) <- ColStatus
   
   # Write ESRI DB
   
