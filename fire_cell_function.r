@@ -1184,7 +1184,7 @@ zero_raster <- function(x){
 }
 
 
-rx_write=function(file,outfile){
+rx_write=function(file,outfile,bigwrite=TRUE){
   require(foreign)
   require(sp)
   require(raster)
@@ -1253,7 +1253,12 @@ rx_write=function(file,outfile){
   crs(tr) <- CRS('+init=epsg:3308')
   
   log_it("Big Write raster with table")
-  bigWrite(tr,paste0(rast_temp,"/",outfile))
+  
+  if(bigwrite==TRUE){
+    bigWrite(tr,paste0(rast_temp,"/",outfile))
+  }else{
+    writeRaster(tr,paste0(rast_temp,"/",outfile))
+  }
   
   log_it("Deleting temp file")
   unlink(paste0(rast_temp,"/",file))
