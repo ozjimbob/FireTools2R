@@ -106,10 +106,10 @@ log_it("Pre-cropping and aligning fire history")
 temp_fire_dir = paste0(rast_temp,"/fire")
 dir.create(temp_fire_dir)
 
-
-for(ii in 1:length(int_list)){
+full_list <- min(int_list):max(int_list)
+for(ii in 1:length(full_list)){
   
-  this_year = int_list[ii]
+  this_year = full_list[ii]
   
   # We may have one less year than interval if current year has no fire
   if(file.exists(file_list[ii])){

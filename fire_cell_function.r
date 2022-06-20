@@ -263,8 +263,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     ovec[j][ovec[j]==9999]=NA
   }
   gc()
-  cat(paste0(Sys.time(),",",i,",","end,",getFreeMemoryKB(),"\n"),file="/home/gwilliamson/test_submission/statewide_prep/out.csv",append=TRUE)
-  
+ 
   return(ovec)
 }
 

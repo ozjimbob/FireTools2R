@@ -2,6 +2,15 @@
 
 # Summary statistics - Heritage
 
+#############
+#####
+#### crosstab() form x threshold
+#### as.data.frame() the crosstab
+#### repeat by year
+#### replace vegform and status via look-up table
+####
+
+
 ## NSW Test
 library(tidyverse)
 library(sf)
@@ -9,9 +18,12 @@ library(raster)
 library(cowplot)
 library(scales)
 library(fs)
+library(terra)
 
 # Load config files
 source("../config/global_config.r")
+
+
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
   source("../config/config_summary_heritage.r")
@@ -42,11 +54,20 @@ if(!is.null(filter_year)){
 #lut <- read_csv("R:/SET/PlantSci/ForestEcology/FireHub/fullstate_100m/lut.csv")
 # Load veg
 veg <- read_sf(paste0(veg_folder,"/","v_vegBase.gpkg"))
-veg_r <- raster(paste0(veg_folder,"/","r_vegcode.tif"))
+veg_r <- rast(paste0(veg_folder,"/","r_vegcode.tif"))
+
+####################
+### CLIP TO TEMPLATE
+### Should shift this to heritage postproces, generate standard formation raster from statewide formation raster?
+template <- rast(paste0(heritage_folder,"/",file_list[1]))
+veg_r <- project(veg_r,template,method="near")
+writeRaster(veg_r,paste0(rast_temp,"/veg_code.tif"))
+veg_r <- raster(paste0(rast_temp,"/veg_code.tif"))
+####################
 
 # Join ad create lookup table for vegetation names
 # Based on input vegetation file
-vc <- values(veg_r)
+vc <- raster::values(veg_r)
 vc <- tibble(VEG = vc)
 veg_ns <- veg #veg_ns = lut
 st_geometry(veg_ns)<-NULL
@@ -247,6 +268,7 @@ for(this_veg in unq_veg){
 
 library(landscapemetrics)
 
+
 veg <- read_sf(paste0(veg_folder,"/","v_vegBase.gpkg"))
 veg <- dplyr::select(veg,VEG,(!!rlang::sym(veg_field)))
 veg[[veg_field]] = toupper(path_sanitize(veg[[veg_field]]))
@@ -268,9 +290,13 @@ gc()
 
 out_list = list()
 
+######
+### CONVERT TO TERRA - need real data.
+
 for(j in seq_along(unq_veg)){
   this_veg <- unq_veg[j]
   print(paste0("Processing: ",this_veg))
+  
   this_veg_overlay <- filter(veg,toupper(!!rlang::sym(veg_field))==this_veg)
   template_r <- raster(paste0(heritage_folder,"/",file_list[1]))
   values(template_r) <- 1
@@ -297,21 +323,17 @@ for(j in seq_along(unq_veg)){
     output_class <- calculate_lsm(this_file,
                                   level = "class",
                                   classes_max = length(unique(raster::values(this_file))),
-                                  full_name=TRUE)
+                                  full_name=TRUE,metric = c("area", 'contag', 'np', 'enn'))
     
     output_landscape <- calculate_lsm(this_file,
                                       level = "landscape",
                                       classes_max = length(unique(raster::values(this_file))),
-                                      full_name=TRUE)
+                                      full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
     
-    output_landscape <- filter(output_landscape, function_name %in% c("lsm_l_contag",
-                                                                      "lsm_l_area_mn",
-                                                                      "lsm_l_np"))
+
     output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
     
-    output_class <- filter(output_class,function_name %in% c("lsm_c_enn_mn",
-                                                             "lsm_c_area_mn",
-                                                             "lsm_c_np"))
+ 
     
     output_class <- output_class %>% dplyr::select(name,class,value,function_name)
     
@@ -356,84 +378,7 @@ out_list <- read_csv(paste0(rast_temp,"/spatial_metrics_formation_all.csv"))
 # lsm_c_area_mn
 # lsm_c_np
 
-
-new_col_vec = c(Vulnerable="#ff6600",TooFrequentlyBurnt="#ff0000",LongUnburnt="#00ffff",WithinThreshold="#999999")
-
-
-# Landscape Contagion Index
-out_list$Year <- as.numeric(out_list$Year)
-frac <- out_list %>% 
-  filter(function_name=="lsm_l_contag") %>% 
-  ggplot(aes(x=Year,y=value)) + geom_line() + theme_cowplot() +
-  labs(y="Contagion Index",title="Landscape Contagion Index")  + facet_wrap(.~Veg,labeller = labeller(Veg = label_wrap_gen(10)))
-#frac
-ggsave2(paste0(rast_temp,"/heritage_lsi_landscape_contagion_formation.png"),frac,bg="white",width=10,height=16,units="cm",dpi=300,scale=2,type="cairo-png")
-
-
-
-# Landscape Mean Patch Area
-frac <- out_list %>% 
-  filter(function_name=="lsm_l_area_mn") %>% 
-  ggplot(aes(x=Year,y=value)) + geom_line() + theme_cowplot() +
-  labs(y="Mean Patch Area",title="Landscape Mean Patch Area")  + facet_wrap(.~Veg,labeller = labeller(Veg = label_wrap_gen(10)))
-#frac
-ggsave2(paste0(rast_temp,"/heritage_lsi_landscape_area_formation.png"),frac,bg="white",width=10,height=16,units="cm",dpi=300,scale=2,type="cairo-png")
-
-
-# Number of Patches
-frac <- out_list %>% 
-  filter(function_name=="lsm_l_np") %>% 
-  ggplot(aes(x=Year,y=value)) + geom_line() + theme_cowplot() +
-  labs(y="Number of Patches",title="Landscape Number of Patches")  + facet_wrap(.~Veg,labeller = labeller(Veg = label_wrap_gen(10)))
-#frac
-ggsave2(paste0(rast_temp,"/heritage_lsi_landscape_np_formation.png"),frac,bg="white",width=10,height=16,units="cm",dpi=300,scale=2,type="cairo-png")
-
-
-
-
-out_list <- filter(out_list,!is.na(class))
-
-
-###### CLASS
-# enn index by class
-contigi     <- out_list %>% 
-  filter(function_name=="lsm_c_enn_mn") %>% 
-  ggplot(aes(x=Year,y=value,col=class, group=class)) + geom_line() + theme_cowplot() +
-  scale_color_manual(values=new_col_vec) +
-  labs(y="Euclidean Nearest Neighbour Distance",title="Class Euclidean Nearest Neighbour Distance", col="Status") + 
-  facet_wrap(.~Veg,labeller = labeller(Veg = label_wrap_gen(10)))
-ggsave2(paste0(rast_temp,"/heritage_lsi_class_enn_formation.png"),contigi,bg="white",width=16,height=16,units="cm",dpi=300,scale=2)
-
-
-
-# Mean Area index by class
-contigi     <- out_list %>% 
-  filter(function_name=="lsm_c_area_mn") %>% 
-  ggplot(aes(x=Year,y=value,col=class, group=class)) + geom_line() + theme_cowplot() +
-  scale_color_manual(values=new_col_vec) +
-  labs(y="Mean Patch Area",title="Class Mean Patch Area", col="Status") + 
-  facet_wrap(.~Veg,labeller = labeller(Veg = label_wrap_gen(10)))
-ggsave2(paste0(rast_temp,"/heritage_lsi_class_area_formation.png"),contigi,bg="white",width=16,height=16,units="cm",dpi=300,scale=2)
-
-
-
-
-# Number of Patches by class
-contigi     <- out_list %>% 
-  filter(function_name=="lsm_c_np") %>% 
-  ggplot(aes(x=Year,y=value,col=class, group=class)) + geom_line() + theme_cowplot() +
-  scale_color_manual(values=new_col_vec) +
-  labs(y="Number of Patches",title="Class Number of Patches", col="Status") + 
-  facet_wrap(.~Veg,labeller = labeller(Veg = label_wrap_gen(10)))
-ggsave2(paste0(rast_temp,"/heritage_lsi_class_np_formation.png"),contigi,bg="white",width=16,height=16,units="cm",dpi=300,scale=2)
-
-
-### Now whole-of-landscape ####
-############### ###############
-
-
 out_list = list()
-
 
 do_year = function(i){
    this_year = year_list[i]
@@ -452,22 +397,17 @@ do_year = function(i){
     output_class <- calculate_lsm(this_file,
                                   level = "class",
                                   classes_max = length(unique(raster::values(this_file))),
-                                  full_name=TRUE)
+                                  full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
     
     output_landscape <- calculate_lsm(this_file,
                                       level = "landscape",
                                       classes_max = length(unique(raster::values(this_file))),
-                                      full_name=TRUE)
+                                      full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
     
-    output_landscape <- filter(output_landscape, function_name %in% c("lsm_l_contag",
-                                                                      "lsm_l_area_mn",
-                                                                      "lsm_l_np"))
+
     output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
     
-    output_class <- filter(output_class,function_name %in% c("lsm_c_enn_mn",
-                                                             "lsm_c_area_mn",
-                                                             "lsm_c_np"))
-    
+
     output_class <- output_class %>% dplyr::select(name,class,value,function_name)
     
     output_landscape$Year <- this_year
@@ -491,68 +431,4 @@ o$class <- factor(o$class,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime",
 write_csv(o,paste0(rast_temp,"/spatial_metrics_all.csv"))
 write_csv(filter(o,is.na(class)),paste0(rast_temp,"/spatial_metrics_landscape.csv"))
 write_csv(filter(o,!is.na(class)),paste0(rast_temp,"/spatial_metrics_class.csv"))
-out_list <- read_csv(paste0(rast_temp,"/spatial_metrics_all.csv"))  
 
-
-# Landscape Contagion Index
-out_list$Year <- as.numeric(out_list$Year)
-frac <- out_list %>% 
-  filter(function_name=="lsm_l_contag") %>% 
-  ggplot(aes(x=Year,y=value)) + geom_line() + theme_cowplot() +
-  labs(y="Contagion Index",title="Landscape Contagion Index") 
-#frac
-ggsave2(paste0(rast_temp,"/heritage_lsi_landscape_contagion.png"),frac,bg="white",width=7,height=7,units="cm",dpi=300,scale=2,type="cairo-png")
-
-
-
-# Landscape Mean Patch Area
-frac <- out_list %>% 
-  filter(function_name=="lsm_l_area_mn") %>% 
-  ggplot(aes(x=Year,y=value)) + geom_line() + theme_cowplot() +
-  labs(y="Mean Patch Area",title="Landscape Mean Patch Area") 
-#frac
-ggsave2(paste0(rast_temp,"/heritage_lsi_landscape_area.png"),frac,bg="white",width=7,height=7,units="cm",dpi=300,scale=2,type="cairo-png")
-
-
-# Number of Patches
-frac <- out_list %>% 
-  filter(function_name=="lsm_l_np") %>% 
-  ggplot(aes(x=Year,y=value)) + geom_line() + theme_cowplot() +
-  labs(y="Number of Patches",title="Landscape Number of Patches")  
-#frac
-ggsave2(paste0(rast_temp,"/heritage_lsi_landscape_np.png"),frac,bg="white",width=7,height=7,units="cm",dpi=300,scale=2,type="cairo-png")
-
-
-
-
-out_list <- filter(out_list,!is.na(class))
-
-###### CLASS
-# enn index by class
-contigi     <- out_list %>% 
-  filter(function_name=="lsm_c_enn_mn") %>% 
-  ggplot(aes(x=Year,y=value,col=class, group=class)) + geom_line() + theme_cowplot() +
-  scale_color_manual(values=new_col_vec) +
-  labs(y="Euclidean Nearest Neighbour Distance",title="Class Euclidean Nearest Neighbour Distance", col="Status") 
-ggsave2(paste0(rast_temp,"/heritage_lsi_class_enn.png"),contigi,bg="white",width=10,height=7,units="cm",dpi=300,scale=2)
-
-
-
-# Mean Area index by class
-contigi     <- out_list %>% 
-  filter(function_name=="lsm_c_area_mn") %>% 
-  ggplot(aes(x=Year,y=value,col=class, group=class)) + geom_line() + theme_cowplot() +
-  scale_color_manual(values=new_col_vec) +
-  labs(y="Mean Patch Area",title="Class Mean Patch Area", col="Status")
-ggsave2(paste0(rast_temp,"/heritage_lsi_class_area.png"),contigi,bg="white",width=10,height=7,units="cm",dpi=300,scale=2)
-
-
-
-
-# Number of Patches by class
-contigi     <- out_list %>% 
-  filter(function_name=="lsm_c_np") %>% 
-  ggplot(aes(x=Year,y=value,col=class, group=class)) + geom_line() + theme_cowplot() +
-  scale_color_manual(values=new_col_vec) +
-  labs(y="Number of Patches",title="Class Number of Patches", col="Status")
-ggsave2(paste0(rast_temp,"/heritage_lsi_class_np.png"),contigi,bg="white",width=10,height=7,units="cm",dpi=300,scale=2)
