@@ -127,7 +127,7 @@ for(this_form in form_list){
 # Overall metrics
 lm_year <- function(i){
   this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
-  this_yr[this_yr==1]=NA
+
   output_class <- calculate_lsm(this_yr,
                                 level = "class",
                                 classes_max = length(unique(raster::values(this_file))),
@@ -154,7 +154,10 @@ lm_year <- function(i){
 
 lm_all <- future_map_dfr(seq_along(year_list),lm_year)
 
-write_csv(lm_all,paste0(rast_temp,"/summary/landscape_metrics_all.csv"))
+lm_all$class   <- factor(lm_all$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
+                                                                      "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
+
+write_csv(lm_all,paste0(rast_temp,"/metrics/landscape_metrics_all.csv"))
 
 ### By formation - mask with terra
 
@@ -168,7 +171,7 @@ out_lm_form <- list()
 
 lm_year_form <- function(i){
   this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
-  this_yr[this_yr==1]=NA
+
   this_yr = this_yr * rast(paste0(rast_temp,"/veg/this_mask.tif"))
   output_class <- calculate_lsm(this_yr,
                                 level = "class",
@@ -209,7 +212,11 @@ for(i in seq_along(unq_form_list)){
 }
 
 out_lm_form<- bind_rows(out_lm_form)
-write_csv(out_lm_form,paste0(rast_temp,"/summary/landscape_metrics_formation.csv"))
+
+out_lm_form$class   <- factor(out_lm_form$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
+                                                                      "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
+
+write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
 
 ## FESM OVERLAY
 dir.create(paste0(rast_temp,"/fesm_overlay"))
@@ -256,4 +263,8 @@ col_table = data.frame(ID = c(0,
                                   "white","white","#4d0306","#4a2603","#065240","#4d4d4d","white","white","white","#49384f"))
 coltab(fesm_overlay) <- col_table$Status
 
-terra::writeRaster(fesm_overlay,paste0(rast_temp,"/fesm_overlay/fesm_overlay.tif"))
+bitmap(paste0(rast_temp,"/fesm_overlay/fesm_overlay.png"),width=1000,height=1300,units="px")
+plot(fesm_overlay)
+dev.off()
+
+terra::writeRaster(fesm_overlay,paste0(rast_temp,"/fesm_overlay/fesm_overlay.tif"),overwrite=TRUE)
