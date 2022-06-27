@@ -58,7 +58,7 @@ pl <- ggplot(aa, aes(x=layer,fill=value ,y=count)) +
   theme(axis.text.x=element_text(angle = -90, hjust = 0)) + 
   lims(y=c(0,rng))
 
-ggsave2(paste0(rast_temp,"/summary/area_ALL.png"),pl,width=1000,height=800,units="px",bg="white",scale=3)
+ggsave2(paste0(rast_temp,"/summary/area_ALL.pdf"),pl,width=1000,height=800,units="px",bg="white",scale=3)
 
 names(aa)<- c("Year","Status","Area")
 aa <- aa %>% pivot_wider(id_cols=c("Year"),names_from="Status",values_from = "Area")
@@ -112,7 +112,7 @@ for(this_form in form_list){
     theme(axis.text.x=element_text(angle = -90, hjust = 0)) + 
     lims(y=c(0,rng))
   short_name <- path_sanitize(this_form)
-  ggsave2(paste0(rast_temp,"/summary/area_",short_name,".png"),pl,width=1000,height=800,units="px",bg="white",scale=3)
+  ggsave2(paste0(rast_temp,"/summary/area_",short_name,".pdf"),pl,width=1000,height=800,units="px",bg="white",scale=3)
   
   
   this_smr <- this_smr %>% pivot_wider(id_cols=c("Year"),names_from="Status",values_from = "Area")
