@@ -231,7 +231,7 @@ fesm_statewide = terra::crop(fesm_statewide,this_heritage)
 
 fesm_statewide = mask(fesm_statewide,vect(paste0(rast_temp,"/v_region.gpkg")))
 
-writeRaster(fesm_statewide,paste0(rast_temp,"/fesm_overlay/fesm_clip.tif"))
+writeRaster(fesm_statewide,paste0(rast_temp,"/fesm_overlay/fesm_clip.tif"),overwrite=TRUE)
 fesm_statewide <- rast(paste0(rast_temp,"/fesm_overlay/fesm_clip.tif")) * 10
 
 fesm_statewide[is.nan(fesm_statewide)]=0
