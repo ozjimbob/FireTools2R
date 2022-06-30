@@ -10,10 +10,19 @@ library(furrr)
 
 # Load config files
 source("../config/global_config.r")
-plan(multisession, workers = clustNo)
+
+
+
 
 args <- commandArgs(trailingOnly=TRUE)
 source(args[1])
+
+if(exists("sCPU")){
+  clustNo <- sCPU
+}
+
+
+plan(multisession, workers = clustNo)
 
 # Make output folkders
 dir.create(paste0(rast_temp,"/summary"))
