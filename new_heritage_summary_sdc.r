@@ -130,7 +130,7 @@ for(this_form in form_list){
   write_csv(this_smr,paste0(rast_temp,"/summary/area_",short_name,".csv"))
 }                     
 
-
+gc()
 ### LANDSCAPE METRIC
 
 # Overall metrics
@@ -167,7 +167,7 @@ lm_all$class   <- factor(lm_all$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireReg
                                                                       "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
 
 write_csv(lm_all,paste0(rast_temp,"/metrics/landscape_metrics_all.csv"))
-
+rm(lm_all)
 ### By formation - mask with terra
 
 gc()
@@ -226,6 +226,8 @@ out_lm_form$class   <- factor(out_lm_form$class ,levels=c(1,2,3,4,5,9),labels=c(
                                                                       "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
 
 write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
+rm(out_lm_form)
+gc()
 
 ## FESM OVERLAY
 dir.create(paste0(rast_temp,"/fesm_overlay"))
