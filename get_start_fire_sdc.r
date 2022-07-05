@@ -42,4 +42,5 @@ passed=TRUE
 #cat(str,file=paste0(temp,"fire_config.r"))
 
 source("run_fire_preprocess.r")
-
+fl <- list.files(temp)
+unlink(fl)
