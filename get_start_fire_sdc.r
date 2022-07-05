@@ -23,10 +23,8 @@ unzip(paste0(temp,"/firehistory.zip"),exdir=temp)
 
 fire_file = list.files(temp,".shp")[1]
 a = read_sf(paste0(temp,"/",fire_file))
-a$year = as.numeric(substr(a$StartDate,1,4))
-a$month = as.numeric(substr(a$StartDate,6,7))
-a <- a %>% mutate(year = case_when(month <= 6 ~ year-1,
-                                   month >6 ~ year))
+a$year = as.numeric(substr(a$Label,1,4))
+
 
 a$year[is.na(a$StartDate)] = substr(a$Label,1,4)[is.na(a$StartDate)]
 a$year <- as.character(a$year)
