@@ -15,7 +15,11 @@ library(Rcpp)
 ### Load rasters
 log_it("Loading year list")
 year_list = read_csv(paste0(fire_folder,"/yearlist.csv"))
+if(exists("history_start_year")){
+  year_list <- filter(year_list,year >= history_start_year)
+}
 file_list = paste0(fire_folder,"/",year_list$year,".tif")
+
 int_list = year_list$year
 log_it(int_list)
 
