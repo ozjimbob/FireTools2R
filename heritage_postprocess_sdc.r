@@ -16,11 +16,14 @@ library(Rcpp)
 log_it("Loading year list")
 year_list = read_csv(paste0(fire_folder,"/yearlist.csv"))
 if(exists("history_start_year")){
-  year_list <- filter(year_list,year >= history_start_year)
+  log_it(paste0("History start year found: ",history_start_year))
+  year_list <- dplyr::filter(year_list,year >= history_start_year)
 }
 file_list = paste0(fire_folder,"/",year_list$year,".tif")
-
+log_it("File list:")
+log_it(file_list)
 int_list = year_list$year
+log_it("Int list:")
 log_it(int_list)
 
 #### Set up subregion clip and mask for SDC regional processing based on full-state input
@@ -113,6 +116,7 @@ dir.create(temp_fire_dir)
 
 full_list <- min(int_list):max(int_list)
 full_file_list = paste0(fire_folder,"/",full_list,".tif")
+log_it("Full list to crop:")
 log_it(full_list)
 
 for(ii in 1:length(full_list)){
