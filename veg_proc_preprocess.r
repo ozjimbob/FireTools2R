@@ -36,19 +36,22 @@ if(file.exists(paste0(rast_temp,"/v_region.gpkg"))){
 bbox = st_bbox(v_thisregion)
 
 # Generate template raster of this extent and resolution
-log_it("Creating template raster")
+log_it("Loading template raster")
 
-# Load 25m NSW Alignment grid
-if(!exists("grid_file")){
-  align_grid = raster("../config/grid.tif")
-}else{
-  align_grid = raster(grid_file)
-}
-tmp_extent = extent(bbox[c(1,3,2,4)])
-tmp_extent = alignExtent(tmp_extent,align_grid)
+## Load 25m NSW Alignment grid
+##if(!exists("grid_file")){
+##  align_grid = raster("../config/grid.tif")
+##}else{
+##  align_grid = raster(grid_file)
+##}
+##tmp_extent = extent(bbox[c(1,3,2,4)])
+##tmp_extent = alignExtent(tmp_extent,align_grid)
 
 # Make template raster
-tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
+afile <- list.files(fire_folder,full.names = TRUE,pattern=".tif")
+afile <- afile[!str_detect(afile,"xml")]
+tmprast <- raster(afile[1])
+#tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
 rres = res(tmprast)
 
