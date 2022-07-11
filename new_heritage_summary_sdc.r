@@ -144,112 +144,114 @@ for(this_form in form_list){
 
 gc()
 
-log_it("Calculating landscape metrics")
-### LANDSCAPE METRIC
-
-# Overall metrics
-lm_year <- function(i){
-  this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
-
-  output_class <- calculate_lsm(this_yr,
-                                level = "class",
-                                classes_max = length(unique(raster::values(this_file))),
-                                full_name=TRUE,metric = c("area", 'contag', 'np', 'enn'))
+if(calculate_metrics){
+  log_it("Calculating landscape metrics")
+  ### LANDSCAPE METRIC
   
-  output_landscape <- calculate_lsm(this_yr,
-                                    level = "landscape",
-                                    classes_max = length(unique(raster::values(this_file))),
-                                    full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
-  
-  
-  output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
-  
-  
-  
-  output_class <- output_class %>% dplyr::select(name,class,value,function_name)
-  
-  
-  output_landscape$Year <- year_list[i]
-  output_class$Year <- year_list[i]
-  
-  bind_rows(list(output_landscape,output_class))
-}
-
-lm_all <- future_map_dfr(seq_along(year_list),lm_year)
-
-lm_all$class   <- factor(lm_all$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
-                                                                      "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
-log_it("Writing landscapemetrics")
-write_csv(lm_all,paste0(rast_temp,"/metrics/landscape_metrics_all.csv"))
-rm(lm_all)
-### By formation - mask with terra
-
-log_it("Landscape metrics by formation")
-gc()
-form <- rast(paste0(rast_temp,"/veg/r_vegform.tif"))
-form_lut <- read_csv(paste0(rast_temp,"/form_lut.csv"))
-
-unq_form_list <- unique(form)$east_dn
-
-out_lm_form <- list()
-
-lm_year_form <- function(i){
-  this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
-
-  this_yr = this_yr * rast(paste0(rast_temp,"/veg/this_mask.tif"))
-  output_class <- calculate_lsm(this_yr,
-                                level = "class",
-                                classes_max = length(unique(raster::values(this_file))),
-                                full_name=TRUE,metric = c("area", 'contag', 'np', 'enn'))
-  
-  output_landscape <- calculate_lsm(this_yr,
-                                    level = "landscape",
-                                    classes_max = length(unique(raster::values(this_file))),
-                                    full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
-  
-  
-  output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
-  
-  
-  
-  output_class <- output_class %>% dplyr::select(name,class,value,function_name)
-  
-  
-  output_landscape$Year <- year_list[i]
-  output_class$Year <- year_list[i]
-  
-  bind_rows(list(output_landscape,output_class))
-}
-
-
-for(i in seq_along(unq_form_list)){
-  
-  this_form = form_lut$Form[form_lut$FormID==unq_form_list[i]]
-  log_it(paste0("Formation: ",this_form))
-  log_it("Masking")
-  mask_tf = classify(form,rcl=cbind(unq_form_list[i],1),othersNA=TRUE)
-  
-  log_it("Writing mask")
-  writeRaster(mask_tf,paste0(rast_temp,"/veg/this_mask.tif"),overwrite=TRUE)
-  print(this_form)
   # Overall metrics
+  lm_year <- function(i){
+    this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
   
-  log_it("Running Landscape Metrics")
-  lm_tf <- future_map_dfr(seq_along(year_list),lm_year_form,.progress=TRUE)
-  unlink(paste0(rast_temp,"/veg/this_mask.tif"))
-  lm_tf$formation = this_form
-  out_lm_form[[i]]<-lm_tf
+    output_class <- calculate_lsm(this_yr,
+                                  level = "class",
+                                  classes_max = length(unique(raster::values(this_file))),
+                                  full_name=TRUE,metric = c("area", 'contag', 'np', 'enn'))
+    
+    output_landscape <- calculate_lsm(this_yr,
+                                      level = "landscape",
+                                      classes_max = length(unique(raster::values(this_file))),
+                                      full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
+    
+    
+    output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
+    
+    
+    
+    output_class <- output_class %>% dplyr::select(name,class,value,function_name)
+    
+    
+    output_landscape$Year <- year_list[i]
+    output_class$Year <- year_list[i]
+    
+    bind_rows(list(output_landscape,output_class))
+  }
+  
+  lm_all <- future_map_dfr(seq_along(year_list),lm_year)
+  
+  lm_all$class   <- factor(lm_all$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
+                                                                        "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
+  log_it("Writing landscapemetrics")
+  write_csv(lm_all,paste0(rast_temp,"/metrics/landscape_metrics_all.csv"))
+  rm(lm_all)
+  ### By formation - mask with terra
+  
+  log_it("Landscape metrics by formation")
+  gc()
+  form <- rast(paste0(rast_temp,"/veg/r_vegform.tif"))
+  form_lut <- read_csv(paste0(rast_temp,"/form_lut.csv"))
+  
+  unq_form_list <- unique(form)$east_dn
+  
+  out_lm_form <- list()
+  
+  lm_year_form <- function(i){
+    this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
+  
+    this_yr = this_yr * rast(paste0(rast_temp,"/veg/this_mask.tif"))
+    output_class <- calculate_lsm(this_yr,
+                                  level = "class",
+                                  classes_max = length(unique(raster::values(this_file))),
+                                  full_name=TRUE,metric = c("area", 'contag', 'np', 'enn'))
+    
+    output_landscape <- calculate_lsm(this_yr,
+                                      level = "landscape",
+                                      classes_max = length(unique(raster::values(this_file))),
+                                      full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'))
+    
+    
+    output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
+    
+    
+    
+    output_class <- output_class %>% dplyr::select(name,class,value,function_name)
+    
+    
+    output_landscape$Year <- year_list[i]
+    output_class$Year <- year_list[i]
+    
+    bind_rows(list(output_landscape,output_class))
+  }
+  
+  
+  for(i in seq_along(unq_form_list)){
+    
+    this_form = form_lut$Form[form_lut$FormID==unq_form_list[i]]
+    log_it(paste0("Formation: ",this_form))
+    log_it("Masking")
+    mask_tf = classify(form,rcl=cbind(unq_form_list[i],1),othersNA=TRUE)
+    
+    log_it("Writing mask")
+    writeRaster(mask_tf,paste0(rast_temp,"/veg/this_mask.tif"),overwrite=TRUE)
+    print(this_form)
+    # Overall metrics
+    
+    log_it("Running Landscape Metrics")
+    lm_tf <- future_map_dfr(seq_along(year_list),lm_year_form,.progress=TRUE)
+    unlink(paste0(rast_temp,"/veg/this_mask.tif"))
+    lm_tf$formation = this_form
+    out_lm_form[[i]]<-lm_tf
+  }
+  
+  log_it("Writing formation landscape metrics")
+  out_lm_form<- bind_rows(out_lm_form)
+  
+  out_lm_form$class   <- factor(out_lm_form$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
+                                                                        "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
+  
+  write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
+  rm(out_lm_form)
+  gc()
 }
-
-log_it("Writing formation landscape metrics")
-out_lm_form<- bind_rows(out_lm_form)
-
-out_lm_form$class   <- factor(out_lm_form$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
-                                                                      "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
-
-write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
-rm(out_lm_form)
-gc()
 
 ## FESM OVERLAY
 log_it("FESM overlay")
@@ -273,14 +275,21 @@ fesm_statewide[is.nan(fesm_statewide)]=0
 fesm_statewide[fesm_statewide %in% c(20,30)]=10
 fesm_statewide[fesm_statewide %in% c(40,50)]=20
 
+
+
+
 log_it("Mask and overlay")
 fesm_statewide = mask(fesm_statewide,vect(paste0(rast_temp,"/v_region.gpkg")))
 fesm_overlay <- fesm_statewide + this_heritage
 
+rcd <- cbind(c(0,1,2,3,4,5,9,11,12,13,14,15,19,21,22,23,24,25,29),
+             c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18))
+fesm_overlay <- terra::classify(fesm_overlay,rcd)
+
 fesm_table = data.frame(ID = c(0,
-                               1,2,3,4,5,9,
-                               11,12,13,14,15,19,
-                               21,22,23,24,25,29),
+                               1,2,3,4,5,6,
+                               7,8,9,10,11,12,
+                               13,14,15,16,17,18),
                         Status = c("External",
                                    "NoSev_NoFireRegime","NoSev_TooFrequentlyBurnt","NoSev_Vulnerable","NoSev_LongUnburnt","NoSev_WithinThreshold","NoSev_Unknown",
                                    "LowSev_NoFireRegime","LowSev_TooFrequentlyBurnt","LowSev_Vulnerable","LowSev_LongUnburnt","LowSev_WithinThreshold","LowSev_Unknown",
@@ -288,20 +297,22 @@ fesm_table = data.frame(ID = c(0,
 
 levels(fesm_overlay)<-fesm_table
 
-
 col_table = data.frame(ID = c(0,
-                              1,2,3,4,5,6,7,8,9,
-                              10,11,12,13,14,15,16,17,18,19,
-                              20,21,22,23,24,25,26,27,28,29),
+                              1,2,3,4,5,6,
+                              7,8,9,10,11,12,
+                              13,14,15,16,17,18),
                        Status = c("white",
-                                  "white","#e8929e","#c28f5d","#a2dbce","#cdd1d0","white","white","white","#dabfe3",
-                                  "white","white","#962024","#855321","#3a9e87","#919191","white","white","white","#937b9c",
-                                  "white","white","#4d0306","#4a2603","#065240","#4d4d4d","white","white","white","#49384f"))
+                                  "white","#e8929e","#c28f5d","#a2dbce","#cdd1d0","#dabfe3",
+                                  "white","#962024","#855321","#3a9e87","#919191","#937b9c",
+                                  "white","#4d0306","#4a2603","#065240","#4d4d4d","#49384f"))
+
+
+
 coltab(fesm_overlay) <- col_table$Status
 
 log_it("Writing map")
 bitmap(paste0(rast_temp,"/fesm_overlay/fesm_overlay.png"),width=1000,height=1300,units="px")
-plot(fesm_overlay)
+plot(fesm_overlay,legend=FALSE)
 dev.off()
 
 log_it("Writing raster")
