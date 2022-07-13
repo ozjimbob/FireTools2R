@@ -144,7 +144,7 @@ for(this_form in form_list){
 
 gc()
 
-if(calculate_metrics){
+if(exists("calculate_metrics")){
   log_it("Calculating landscape metrics")
   ### LANDSCAPE METRIC
   
