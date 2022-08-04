@@ -2,15 +2,17 @@
 # Read the regions table, filter to region of interest, transform
 log_it("Loading regions")
 v_regions = read_sf(corp_gdb,i_vt_boundary)
-
+log_it(paste0("Number rows:",nrow(v_regions)))
 if(d_spatial_unit != ""){
   log_it(paste0("Filtering region layer to ROI:",d_spatial_unit))
   v_thisregion = filter(v_regions,(!!rlang::sym(f_spatial_unit)) == d_spatial_unit)
   log_it("Filtering fire history to ROI complete")
+  log_it(paste0("Number rows:",nrow(v_thisregion)))
 }else{
   log_it("No filtering of region, creating union")
   v_thisregion = st_union(v_regions)
   log_it("Union complete")
+  log_it(paste0("Number rows:",nrow(v_thisregion)))
 }
 
 log_it("Projecting and repairing region")
@@ -26,6 +28,7 @@ log_it("Finished writing region template")
 
 # Define bounding box of raster
 bbox = st_bbox(v_thisregion)
+log_it(paste0("bounding box:",bbox))
 
 # Generate template raster of this extent and resolution
 log_it("Creating template raster")
@@ -39,6 +42,7 @@ if(!exists("grid_file")){
   align_grid = raster(grid_file)
 }
 tmp_extent = extent(bbox[c(1,3,2,4)])
+log_it(paste0("Extent:",tmp_extent))
 tmp_extent = alignExtent(tmp_extent,align_grid)
 
 # Make template raster
