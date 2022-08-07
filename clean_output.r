@@ -258,6 +258,6 @@ nl = substr(nl,1,6)
 short = which(nchar(nl)<6)
 nl[-short] = paste0(nl[-short],1:length(nl[-short]))
 names(in_file)[1:(length(names(in_file))-1)]=nl
-write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"),delete_dsn=TRUE,delete_layer=TRUE)
+try(write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"),delete_dsn=TRUE,delete_layer=TRUE))
 file.copy("3308.prj",paste0(rast_temp,"/v_vegBase.prj"),overwrite=TRUE)
 
