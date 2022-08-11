@@ -1115,6 +1115,11 @@ tile_linux <- function(infile,pypath=NULL){
 remove_invalid_poly <- function(xx){
   to_fix=c()
   for(i in 1:nrow(xx)){
+    if(st_is_empty(st_geometry(xx)[[i]])){
+      to_fix <- c(to_fix,i)
+      next
+    }
+    
     mn <- min(sapply(st_geometry(xx)[[i]], function(x) nrow(x[[1]])))
     if(mn < 4){
       to_fix <- c(to_fix,i)
@@ -1125,7 +1130,9 @@ remove_invalid_poly <- function(xx){
     aa = st_geometry(xx)[[fix_list]]
     to_remove = c()
     for(i in 1:length(aa)){
+      
       nr <- nrow(aa[[i]][[1]])
+      
       if(nr<4){
         
         to_remove <- c(to_remove,i)

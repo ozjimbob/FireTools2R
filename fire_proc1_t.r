@@ -514,6 +514,7 @@ print(nrow(v_veg))
 
 
 # NEW - remove invalid polygons, rather than buffer to 0?
+v_veg <- v_veg %>% filter( is.na(st_dimension(.)) == FALSE )
 v_veg <- remove_invalid_poly(v_veg)
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
