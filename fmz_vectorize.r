@@ -1,5 +1,4 @@
 # Vectorize and summarise vegetation raster
-
 # Load vegetation raster
 log_it("Loading fire management zone threshold output raster")
 
@@ -30,7 +29,7 @@ v_fmzout = v_fmzout %>% st_cast("MULTIPOLYGON")# %>% group_by(DN) %>% summarise(
 
 
 
-log_it("Repairing biodiversity threshold polygons")
+log_it("Repairing fire management zone threshold polygons")
 v_fmzout = filter(v_fmzout,as.numeric(st_area(v_fmzout))>0)
 
 #v_fmzout = st_make_valid(v_fmzout)
@@ -71,5 +70,4 @@ rm(tmprast)
 v_vegThreshold <- NULL
 rm(v_vegThreshold)
 gc()
-
 

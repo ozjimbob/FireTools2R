@@ -85,6 +85,15 @@ log_it(getFreeMemoryKB())
 
 log_it("Assigning Values")
 oul = unlist(o)
+
+if(sum(!is.na(oul))==0){
+  no_FMZ = TRUE
+  log_it("FMZ Calculation returned no data")
+  oul[1:length(oul)] = 9
+}else{
+  no_FMZ=FALSE
+}
+
 values(tmprast)=oul
 o <- NULL
 oul <- NULL
@@ -93,7 +102,9 @@ rm(oul)
 gc()
 log_it(getFreeMemoryKB())
 log_it("Big Write")
+
 bigWrite(tmprast,paste0(rast_temp,"/r_fmzout.tif"))
+
 log_it(getFreeMemoryKB())
 #s2 <- writeStart(tmprast, filename=paste0(rast_temp,"/r_fmzout.tif"), format='GTiff', overwrite=TRUE)
 #tr <- blockSize(tmprast)
