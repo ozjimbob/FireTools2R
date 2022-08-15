@@ -28,7 +28,9 @@ tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
 # Read fire history table and transform
 log_it("Reading fire management zones, projecting and repairing")
 v_fmz= read_sf(asset_gdb,i_vt_fmz)
-v_fmz = filter(v_fmz,(!!rlang::sym(f_fmz)) == c_sfaz)
+if(c_sfaz != 0){
+  v_fmz = filter(v_fmz,(!!rlang::sym(f_fmz)) == c_sfaz)
+}
 v_fmz = st_transform(v_fmz,crs=proj_crs)
 v_fmz = st_cast(v_fmz,"MULTIPOLYGON") # Multisurface features cause errors
 #v_fmz = st_make_valid(v_fmz) # repair invalid geometries
