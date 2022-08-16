@@ -213,52 +213,65 @@ for(yr in seq_along(int_list)){
     
     rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
     rres = res(tmprast)
-    
+    tr <- terra::rast(tmprast)
     if(nrow(datx)>0){
       
       #cmd = paste0(gdal_rasterize," -burn 1 -l year_fire -of GTiff ",
       #             "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot byte -co COMPRESS=PACKBITS ",
       #            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
       log_it("rasterize this year")
-      cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
-      system(cmd)
+      
+      #cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
+      tbl <- vect(paste0(rast_temp,"/year_fire.gpkg"))
+      
+      r_vfp = terra::rasterize(tbl,tr,field="count",filename=paste0(rast_temp,"/",int_list[yr],".tif"),overwrite=TRUE,wopt=list(datatype="INT1U"))
+      rm(r_vfp)
+      #rm(tr)
+      
+      #system(cmd)
       log_it("Loading this year")
       # Load this year, multiply by year
-      this_year <- raster(paste0(rast_temp,"/",int_list[yr],".tif"))
+      this_year <- terra::rast(paste0(rast_temp,"/",int_list[yr],".tif"))
     }else{
       log_it("NO FIRE FOUND skipping to blank raster.")
-      this_year <- tmprast
-      raster::values(this_year)<-0
+      this_year <- tr
+      terra::values(this_year)<-0
     }
     
     
     if(yr==1){
       log_it("Year 1 - calculating r_lastb")
-      r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+      #r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+      r_lastb = this_year * int_list[yr]
+      writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
       log_it("Year 1 - calculating r_timesbunr")
       #r_timesburnt = calc(this_year,fun = function(x){0},filename=paste0(rast_temp,"/rNumTimesBurnt.tif"),overwrite=TRUE)
-      r_timesburnt = r_lastb
+      r_timesburnt = deepcopy(r_lastb)
       log_it("Zeroing")
-      raster::values(r_timesburnt)=0
+      terra::values(r_timesburnt)=0
       log_it("writing")
-      bigWrite(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
+      terra::writeRaster(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
       log_it("Writing complete")
       gc()
       log_it("Garbage Collected")
     }  else {
       log_it("loading r_lasb")
-      r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+      r_lastb = terra::rast(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
       log_it("loading r_timesbunrt")
-      r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+      r_timesburnt = terra::rast(paste0(rast_temp,"/rNumTimesBurnt.tif"))
     }# We now have two temp files
     log_it("Adding to stack")
     log_it("New maximum")
-    r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
+    st_test <- c(this_year * int_list[yr],r_lastb)
+    r_lastb <- max(st_test,na.rm=TRUE)
+    rm(st_test)
+    gc()
+    # r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
     log_it("Adding to count")
     log_it("Writing intermediate rasters")
     #print(plot(r_lastb))
-    bigWrite(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
-    bigWrite(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
+    writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    writeRaster(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
     log_it("Deleting")
     rm(r_lastb)
     rm(r_timesburnt)
@@ -293,45 +306,6 @@ dat_x = NULL
 rm(dat_x)
 gc()
 
-
-
-# process last year burnt
-#log_it("Processing last burnt raster")
-#st = stack(orast)
-#beginCluster(clustNo)
-#cl=getCluster()
-#clusterExport(cl,"current_year")
-#clusterExport(cl,"year_list")
-#r_lastb<- invisible(clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=2))
-
-#invisible(capture.output(r_lastb<-clusterR(st, calc, args=list(fun=calc_tsl),filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'), overwrite=TRUE,m=4)))
-
-#####
-#####
-#  At this point, experiment with layer-based merging year-by-year
-
-
-#####
-#####
-
-#endCluster()
-
-### Split by extent
-### Multiply by year vec
-### Find maximum year
-### Merge rasters
-### write year into rLastYearBurnt
-#st = stack(orast,quick=TRUE)
-#beginCluster(clustNo)
-#st = st * year_list
-#st = max(st,na.rm=TRUE)
-#endCluster()
-#gc()
-#bigWrite(st,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
-
-#st <- NULL
-#rm(st)
-#gc()
 
 
 #rm(cl)
@@ -459,21 +433,7 @@ gc()
 log_it(system("df -h"))
 
 
-# Write static rasters for current, earliest year
-#log_it("Generating static current and first year rasters")
-#r_this_year = tmprast
-#values(r_this_year) = current_year
-#writeRaster(r_this_year,paste0(rast_temp,"/",'rThisYear.nc'),overwrite=TRUE)
-#r_first_year = tmprast
-#values(r_first_year) = first(int_list)
-#writeRaster(r_first_year,paste0(rast_temp,"/",'rFirstYear.nc'),overwrite=TRUE)
 
-### Vegetation
-# - Rasterize the veg, with numeric code
-# - Convert to max/min frequency rasters
-
-# Load vegetation polygons
-# Read fire history table and transform
 log_it("Reading vegetation layer")
 if(length(i_vt_veg)>1){
   log_it("Merging vegetation layers")
@@ -606,8 +566,17 @@ gc()
 
 # Rasterize
 log_it("Rasterizing vegetation ID")
-cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegcode.tif"),attribute=f_vegid)
-system(cmd)
+
+tbl <- terra::vect(paste0(rast_temp,"/v_vegBase.gpkg"))
+tr <- terra::rast(tmprast)
+r_vfp = terra::rasterize(tbl,tr,field=f_vegid,filename=paste0(rast_temp,"/r_vegcode.tif"),overwrite=TRUE)
+#rm(tbl)
+rm(r_vfp)
+gc()
+
+#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegcode.tif"),attribute=f_vegid)
+
+#system(cmd)
 log_it("Rasterizing vegetation ID Complete")
 
 
@@ -618,8 +587,18 @@ log_it("Rasterizing vegetation ID Complete")
 log_it("Rasterizing vegetation ID complete")
 
 log_it("Rasterizing vegetation minimum interval")
-cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmin.tif"),attribute=f_vegmin)
-system(cmd)
+#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmin.tif"),attribute=f_vegmin)
+
+#tbl <- terra::vect(paste0(rast_temp,"/v_vegBase.gpkg"))
+#tr <- terra::rast(tmprast)
+r_vfp = terra::rasterize(tbl,tr,field=f_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
+#rm(tbl)
+rm(r_vfp)
+gc()
+
+
+
+#system(cmd)
 #r_vegmin = fasterize(v_veg,tmprast,field=f_vegmin)
 #writeRaster(r_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
 #r_vegmin <- NULL
@@ -627,8 +606,10 @@ system(cmd)
 log_it("Rasterizing vegetation minimum interval complete")
 
 log_it("Rasterizing vegetation maximum interval")
-cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmax.tif"),attribute=f_vegmax)
-system(cmd)
+#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmax.tif"),attribute=f_vegmax)
+r_vfp = terra::rasterize(tbl,tr,field=f_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
+rm(r_vfp)
+#system(cmd)
 #r_vegmax = fasterize(v_veg,tmprast,field=f_vegmax)
 #writeRaster(r_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
 #r_vegmax <- NULL
@@ -636,8 +617,10 @@ system(cmd)
 log_it("Rasterizing vegetation maximum interval complete")
 
 log_it("Rasterizing vegetation fire prone")
-cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegfireprone.tif"),attribute=f_vegfireprone)
-system(cmd)
+#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegfireprone.tif"),attribute=f_vegfireprone)
+r_vfp = terra::rasterize(tbl,tr,field=f_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
+rm(r_vfp)
+#system(cmd)
 #r_vegfireprone = fasterize(v_veg,tmprast,field=f_vegfireprone)
 #writeRaster(r_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
 #r_vegfireprone <- NULL
@@ -645,8 +628,12 @@ system(cmd)
 log_it("Rasterizing vegetation fire prone complete")
 
 log_it("Rasterizing vegetation fire advantage")
-cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegadv.tif"),attribute=f_vegadv)
-system(cmd)
+#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegadv.tif"),attribute=f_vegadv)
+#system(cmd)
+r_vfp = terra::rasterize(tbl,tr,field=f_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
+rm(r_vfp)
+rm(tbl)
+rm(tr)
 #r_vegadv = fasterize(v_veg,tmprast,field=f_vegadv)
 #writeRaster(r_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
 #r_vegadv <- NULL

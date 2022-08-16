@@ -43,9 +43,18 @@ if(!exists("d_spatial_unit")){
 
 ## Run file
 log_it("**** Preparing fire history and vegetation rasters")
+if(exists("new_analysis")){
+source("fire_proc1_terra.r")
+  }else{
 source("fire_proc1_t.r")
+}
+
 log_it("**** Processing heritage vegetation thresholds")
-source("proc_veg1.r")
+if(exists("new_analysis")){
+    source("proc_veg1_terra.r")
+  }else{
+    source("proc_veg1.r")
+}
 log_it("**** Vectorizing vegetation")
 source("veg_vectorize.r")
 log_it("**** Processing Fire Management Blocks")
