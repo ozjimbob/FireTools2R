@@ -579,22 +579,50 @@ gc()
 #system(cmd)
 log_it("Rasterizing vegetation ID Complete")
 
+log_it("Load veg rast")
+# Recode
+this_rast <- rast(paste0(rast_temp,"/r_vegcode.tif"))
+lut <- data.frame(VEG = v_vegfire_table[[f_vegid]],
+                  MAX=v_vegfire_table[[f_vegmax]],
+                  MIN=v_vegfire_table[[f_vegmin]],
+                  FP = v_vegfire_table[[f_vegfireprone]],
+                  ADV = v_vegfire_table[[f_vegadv]])
+
+max_mat <- cbind(lut$VEG,lut$MAX)
+min_mat <- cbind(lut$VEG,lut$MIN)
+fp_mat <- cbind(lut$VEG,lut$FP)
+adv_mat <- cbind(lut$VEG,lut$ADV)
+log_it("Rasterizing vegetation maximum interval")
+cc_max <- classify(this_rast,max_mat,others=NA,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
+log_it("Rasterizing vegetation maximum interval complete")
+log_it("Rasterizing vegetation minimum interval")
+cc_max <- classify(this_rast,min_mat,others=NA,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
+log_it("Rasterizing vegetation minimum interval complete")
+log_it("Rasterizing vegetation fire prone")
+cc_max <- classify(this_rast,fp_mat,others=NA,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
+log_it("Rasterizing vegetation fire prone complete")
+log_it("Rasterizing vegetation fire advantage")
+cc_max <- classify(this_rast,adv_mat,others=NA,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
+log_it("Rasterizing vegetation fire advantage complete")
+rm(tbl)
+rm(cc_max)
+gc()
 
 #r_vegcode = fasterize(v_veg,tmprast,field=f_vegid)
 #writeRaster(r_vegcode,paste0(rast_temp,"/r_vegcode.tif"),overwrite=TRUE)
 #r_vegcode <- NULL
 #rm(r_vegcode)
-log_it("Rasterizing vegetation ID complete")
 
-log_it("Rasterizing vegetation minimum interval")
+
+
 #cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmin.tif"),attribute=f_vegmin)
 
 #tbl <- terra::vect(paste0(rast_temp,"/v_vegBase.gpkg"))
 #tr <- terra::rast(tmprast)
-r_vfp = terra::rasterize(tbl,tr,field=f_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
+#r_vfp = terra::rasterize(tbl,tr,field=f_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
 #rm(tbl)
-rm(r_vfp)
-gc()
+#rm(r_vfp)
+#gc()
 
 
 
@@ -603,42 +631,40 @@ gc()
 #writeRaster(r_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
 #r_vegmin <- NULL
 #rm(r_vegmin)
-log_it("Rasterizing vegetation minimum interval complete")
 
-log_it("Rasterizing vegetation maximum interval")
+
+
 #cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmax.tif"),attribute=f_vegmax)
-r_vfp = terra::rasterize(tbl,tr,field=f_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
-rm(r_vfp)
+#r_vfp = terra::rasterize(tbl,tr,field=f_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
+#rm(r_vfp)
 #system(cmd)
 #r_vegmax = fasterize(v_veg,tmprast,field=f_vegmax)
 #writeRaster(r_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
 #r_vegmax <- NULL
 #rm(r_vegmax)
-log_it("Rasterizing vegetation maximum interval complete")
 
-log_it("Rasterizing vegetation fire prone")
+
+#log_it("Rasterizing vegetation fire prone")
 #cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegfireprone.tif"),attribute=f_vegfireprone)
-r_vfp = terra::rasterize(tbl,tr,field=f_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
-rm(r_vfp)
+#r_vfp = terra::rasterize(tbl,tr,field=f_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
+#rm(r_vfp)
 #system(cmd)
 #r_vegfireprone = fasterize(v_veg,tmprast,field=f_vegfireprone)
 #writeRaster(r_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
 #r_vegfireprone <- NULL
 #rm(r_vegfireprone)
-log_it("Rasterizing vegetation fire prone complete")
 
-log_it("Rasterizing vegetation fire advantage")
+
 #cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegadv.tif"),attribute=f_vegadv)
 #system(cmd)
-r_vfp = terra::rasterize(tbl,tr,field=f_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
-rm(r_vfp)
-rm(tbl)
+#r_vfp = terra::rasterize(tbl,tr,field=f_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
+#rm(r_vfp)
+#rm(tbl)
 rm(tr)
 #r_vegadv = fasterize(v_veg,tmprast,field=f_vegadv)
 #writeRaster(r_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
 #r_vegadv <- NULL
 #rm(r_vegadv)
-log_it("Rasterizing vegetation fire advantage complete")
 
 # Clean up
 log_it("Cleaning up memory")
