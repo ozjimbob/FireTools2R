@@ -820,6 +820,27 @@ proccell_fmz = function(i){
 }
 
 
+proccell_fmz_terra = function(i){
+  
+  r_tsf = rast(paste0(rast_temp,"/rTimeSinceLast.tif"))
+  r_fmz = rast(paste0(rast_temp,"/r_fmz.tif"))
+  
+  r_fmz = as.numeric(terra::values(r_fmz,row=i,nrows=1))
+  r_tsf = as.numeric(terra::values(r_tsf,row=i,nrows=1))
+  
+  op = rep(NA,length(r_fmz))
+  
+  
+  
+  op[r_tsf > r_fmz] = 4 # LongUnburnt
+  op[r_tsf <= r_fmz] = 5 # WithinThreshold
+  
+  # Set 0 intervals to NA eg. for mechanical / land management zones
+  op[r_fmz == 0] = NA
+  
+  return(op)
+}
+
 
 ## FUNCTIONS
 # Time Since Last

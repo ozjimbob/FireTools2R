@@ -58,7 +58,14 @@ if(exists("new_analysis")){
 log_it("**** Vectorizing vegetation")
 source("veg_vectorize.r")
 log_it("**** Processing Fire Management Blocks")
-source("proc_fmz.r")
+
+if(exists("new_analysis")){
+  source("proc_fmz_terra.r")
+}else{
+  source("proc_fmz.r")
+}
+
+
 log_it("**** Vectorizing Fire Management Blocks")
 source("fmz_vectorize.r")
 log_it("**** Processing merged vegetation and Fire Management Blocks")
