@@ -31,7 +31,7 @@ log_it("Writing raster tables")
 
 
 mask_tif<-raster(paste0(rast_temp,"/roi_mask.tif"))
-
+mask_tif_t<-rast(paste0(rast_temp,"/roi_mask.tif"))
 rm(v_sfaz)
 gc()
 rm(tm)
@@ -146,26 +146,26 @@ gc()
 log_it("Renaming and masking files")
 
 file.rename(paste0(rast_temp,"/rLastYearBurnt.tif"),paste0(rast_temp,"/r_LastYearBurnt.tif"))
-temp_d = raster(paste0(rast_temp,"/r_LastYearBurnt.tif"))
-temp_d = temp_d * mask_tif
-bigWrite(temp_d,paste0(rast_temp,"/r_LastYearBurnt.tif"))
+temp_d = rast(paste0(rast_temp,"/r_LastYearBurnt.tif"))
+temp_d = temp_d * mask_tif_t
+terra::writeRaster(temp_d,paste0(rast_temp,"/r_LastYearBurnt.tif"))
 esri_output("r_LastYearBurnt.tif")
 rm(temp_d)
 gc()
 
 
 file.rename(paste0(rast_temp,"/rNumTimesBurnt.tif"),paste0(rast_temp,"/r_NumTimesBurnt.tif"))
-temp_d = raster(paste0(rast_temp,"/r_NumTimesBurnt.tif"))
-temp_d = temp_d * mask_tif
-bigWrite(temp_d,paste0(rast_temp,"/r_NumTimesBurnt.tif"))
+temp_d = rast(paste0(rast_temp,"/r_NumTimesBurnt.tif"))
+temp_d = temp_d * mask_tif_t
+terra::writeRaster(temp_d,paste0(rast_temp,"/r_NumTimesBurnt.tif"))
 esri_output("r_NumTimesBurnt.tif")
 rm(temp_d)
 gc()
 
 file.rename(paste0(rast_temp,"/rTimeSinceLast.tif"),paste0(rast_temp,"/r_TimeSinceLast.tif"))
-temp_d = raster(paste0(rast_temp,"/r_TimeSinceLast.tif"))
-temp_d = temp_d * mask_tif
-bigWrite(temp_d,paste0(rast_temp,"/r_TimeSinceLast.tif"))
+temp_d = rast(paste0(rast_temp,"/r_TimeSinceLast.tif"))
+temp_d = temp_d * mask_tif_t
+terra::writeRaster(temp_d,paste0(rast_temp,"/r_TimeSinceLast.tif"))
 esri_output("r_TimeSinceLast.tif")
 rm(temp_d)
 gc()
@@ -200,43 +200,43 @@ log_it("Writing Shapefile version")
 
 ## Shapefile test
 log_it("Writing v_fmz_sfaz_threshold_status")
-in_file = read_sf(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_fmz_sfaz_threshold_status.shp"))
+in_file = vect(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_fmz_sfaz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_fmz_sfaz_threshold_status.prj"),overwrite=TRUE)
 
 log_it("Writing v_fmz_threshold_status")
-in_file = read_sf(paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_fmz_threshold_status.shp"))
+in_file = vect(paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_fmz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_fmz_threshold_status.prj"),overwrite=TRUE)
 
 log_it("Writing v_heritage_fmz_threshold_status")
-in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_threshold_status.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_threshold_status.shp"))
+in_file = vect(paste0(rast_temp,"/v_heritage_fmz_threshold_status.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_heritage_fmz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_threshold_status.prj"),overwrite=TRUE)
 
 log_it("Writing v_heritage_threshold_status")
-in_file = read_sf(paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_heritage_threshold_status.shp"))
+in_file = vect(paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_heritage_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_threshold_status.prj"),overwrite=TRUE)
 
 log_it("Writing v_heritage_fmz_sfaz_threshold_status.shp")
-in_file = read_sf(paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.shp"))
+in_file = vect(paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.prj"),overwrite=TRUE)
 
 log_it("Writing v_region")
-in_file = read_sf(paste0(rast_temp,"/v_region.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_region.shp"))
+in_file = vect(paste0(rast_temp,"/v_region.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_region.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_region.prj"),overwrite=TRUE)
 
 log_it("Writing v_tsl")
-in_file = read_sf(paste0(rast_temp,"/v_tsl.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_tsl.shp"))
+in_file = vect(paste0(rast_temp,"/v_tsl.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_tsl.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_tsl.prj"),overwrite=TRUE)
 
 log_it("Writing v_timesburnt.shp")
-in_file = read_sf(paste0(rast_temp,"/v_timesburnt.gpkg"))
-write_sf(in_file,paste0(rast_temp,"/v_timesburnt.shp"))
+in_file = vect(paste0(rast_temp,"/v_timesburnt.gpkg"))
+writeVector(in_file,paste0(rast_temp,"/v_timesburnt.shp"))
 file.copy("3308.prj",paste0(rast_temp,"/v_timesburnt.prj"),overwrite=TRUE)
 
 log_it("Writing v_tsl_sfaz")
