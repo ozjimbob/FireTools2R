@@ -40,6 +40,7 @@ if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
 }
 plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
+gc()
 
 log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
 o = future_lapply(1:nrow(tmprast),FUN=proccell2_terra,future.scheduling=1)

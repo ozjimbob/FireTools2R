@@ -1151,13 +1151,17 @@ remove_invalid_poly <- function(xx){
     aa = st_geometry(xx)[[fix_list]]
     to_remove = c()
     for(i in 1:length(aa)){
+      if(st_is_empty(aa[[i]])){
+        to_remove <- c(to_remove,i)
+      }else{
       
       nr <- nrow(aa[[i]][[1]])
       
       if(nr<4){
         
         to_remove <- c(to_remove,i)
-      }
+      }}
+      
     }
     to_remove <- rev(to_remove)
     for(i in to_remove){
