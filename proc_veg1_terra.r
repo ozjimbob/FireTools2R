@@ -57,9 +57,11 @@ rm(o)
 rm(oul)
 gc()
 
+ttemprast = terra::rast(tmprast)
 
 
-
-bigWrite(tmprast,paste0(rast_temp,"/r_vegout.tif"))
+writeRaster(ttemprast,paste0(rast_temp,"/r_vegout.tif"))
+rm(ttemprast)
+gc()
 log_it("Biodiversity threshold write complete")
 

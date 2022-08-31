@@ -459,9 +459,12 @@ proccell2_post = function(i,cyear=0){
 
 
 
+  
 proccell2_terra = function(i){
   
-    st = terra::rast(file_list)
+  terraOptions(memfrac=0.1)
+  
+  st = terra::rast(file_list)
   r_vegmin = terra::rast(paste0(rast_temp,"/r_vegmin.tif"))
   r_vegmax= terra::rast(paste0(rast_temp,"/r_vegmax.tif"))
   r_timesburnt= terra::rast(paste0(rast_temp,"/rNumTimesBurnt.tif"))
@@ -478,6 +481,7 @@ proccell2_terra = function(i){
   gc()
   
   ovec = rep(NA,length(r_vegmax))
+  
   calc_status<-function(){
     Status <- 0
     IntervalStatus <- 0 # 1 
@@ -616,7 +620,7 @@ proccell2_terra = function(i){
     ovec[j]=calc_status()
     ovec[j][ovec[j]==9999]=NA
   }
-  
+  gc()
   
   return(ovec)
 }
