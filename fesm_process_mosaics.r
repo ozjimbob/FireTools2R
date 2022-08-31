@@ -61,5 +61,6 @@ print("Launching processing")
 o = future_lapply(1:nrow(do_table),FUN=proc_year,future.scheduling=3)
 print("Done")
 
+system(paste0("gdalbuildvrt -r nearest -srcnodata 0 ",out,"/fesm_overlay.vrt ",out,"/fesm*.tif"))
 
 #grid <- raster("G:/ft_work/ecohealth/ecohealth_royal_30m_veg/r_vegcode.tif")
