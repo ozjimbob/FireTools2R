@@ -7,6 +7,9 @@ library(doParallel)
 
 source("../config/global_config.r")
 
+args = commandArgs(trailingOnly=TRUE)
+source(args[1])
+
 if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
   library(future.apply)
 }
