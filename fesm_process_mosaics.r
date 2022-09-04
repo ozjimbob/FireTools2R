@@ -11,10 +11,10 @@ if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
   library(future.apply)
 }
 print("making output dir")
-out <- "/mnt/scratch_lustre/FireTools/Inputs/statewide_fesm"
+out <- output_dir
 dir.create(out)
 print("reading table")
-do_table <- read_csv("/home/gwilliamson/test_submission/statewide_prep/FESM.csv")
+do_table <- read_csv(fesm_table)
 
 #r <- raster("G:/ft_work/fesm/mosaics/cvmsre_NSW_20202021_ag1l0.img")
 
