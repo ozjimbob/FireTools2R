@@ -144,6 +144,9 @@ for(this_form in form_list){
 
 gc()
 
+
+
+
 if(exists("calculate_metrics")){
   log_it("Calculating landscape metrics")
   ### LANDSCAPE METRIC
@@ -317,3 +320,89 @@ dev.off()
 
 log_it("Writing raster")
 terra::writeRaster(fesm_overlay,paste0(rast_temp,"/fesm_overlay/fesm_overlay.tif"),overwrite=TRUE)
+
+# Summary - FESM x Heritage Area
+###
+# We now have the FESM overlay in fesm_overlay
+
+
+fesm_overlay <- rast(paste0(rast_temp,"/fesm_overlay/fesm_overlay.tif"))
+log_it("Calculating frequencies")
+aa <- as_tibble(freq(fesm_overlay))
+aa$layer<-current_year
+rres <- res(vv)[1] * res(vv)[2]
+aa$count <- aa$count / rres * 10000
+
+
+col_vec = c("External"="white",
+              "NoSev_NoFireRegime"="white",
+              "NoSev_TooFrequentlyBurnt"="#e8929e",
+              "NoSev_Vulnerable"="#c28f5d",
+              "NoSev_LongUnburnt"="#a2dbce",
+              "NoSev_WithinThreshold"="#cdd1d0",
+              "NoSev_Unknown"="#dabfe3",
+              "LowSev_NoFireRegime"="white",
+              "LowSev_TooFrequentlyBurnt"="#962024",
+              "LowSev_Vulnerable"="#855321",
+              "LowSev_LongUnburnt"="#3a9e87",
+              "LowSev_WithinThreshold"="#919191",
+              "LowSev_Unknown"="#937b9c",
+              "HighSev_NoFireRegime"="white",
+              "HighSev_TooFrequentlyBurnt"="#4d0306",
+              "HighSev_Vulnerable"="#4a2603",
+              "HighSev_LongUnburnt"="#065240",
+              "HighSev_WithinThreshold"="#4d4d4d",
+              "HighSev_Unknown"="#49384f")
+
+aa$value   <- factor(aa$value ,labels=c("External",
+                                        "NoSev_NoFireRegime","NoSev_TooFrequentlyBurnt","NoSev_Vulnerable","NoSev_LongUnburnt","NoSev_WithinThreshold","NoSev_Unknown",
+                                        "LowSev_NoFireRegime","LowSev_TooFrequentlyBurnt","LowSev_Vulnerable","LowSev_LongUnburnt","LowSev_WithinThreshold","LowSev_Unknown",
+                                        "HighSev_NoFireRegime","HighSev_TooFrequentlyBurnt","HighSev_Vulnerable","HighSev_LongUnburnt","HighSev_WithinThreshold","HighSev_Unknown"),
+                     levels=c("External",
+                              "NoSev_NoFireRegime","NoSev_TooFrequentlyBurnt","NoSev_Vulnerable","NoSev_LongUnburnt","NoSev_WithinThreshold","NoSev_Unknown",
+                              "LowSev_NoFireRegime","LowSev_TooFrequentlyBurnt","LowSev_Vulnerable","LowSev_LongUnburnt","LowSev_WithinThreshold","LowSev_Unknown",
+                              "HighSev_NoFireRegime","HighSev_TooFrequentlyBurnt","HighSev_Vulnerable","HighSev_LongUnburnt","HighSev_WithinThreshold","HighSev_Unknown"))
+
+rng <- aa %>% filter(!value %in% c("Unknown","NoFireRegime","External","NoSev_NoFireRegime","LowSev_NoFireRegime","HighSev_NoFireRegime",
+                                   "NoSev_Unknown","LowSev_Unknown","HighSev_Unknown")) %>% summarise(area = sum(count)) %>% pull(area) %>% max()
+
+log_it("Making plot")
+pl <- ggplot(aa, aes(x=value,fill=value ,y=count)) + 
+  geom_bar(stat="identity",position = position_stack(reverse = TRUE)) + 
+  theme_cowplot() + 
+  labs(x="Heritage/FESM Status",y="Area (ha)",fill="Heritage/FESM Status") + 
+  scale_fill_manual(values=col_vec,drop=TRUE) + 
+  theme(axis.text.x=element_text(angle = -90, hjust = 0)) + 
+  lims(y=c(0,rng))
+
+log_it("Saving plot")
+ggsave2(paste0(rast_temp,"/summary/area_ALL_FESM.pdf"),pl,width=1000,height=1000,units="px",bg="white",scale=3)
+
+names(aa)<- c("Year","Status","Area")
+aa <- aa %>% pivot_wider(id_cols=c("Year"),names_from="Status",values_from = "Area")
+
+aa <- aa %>% rowwise() %>% mutate(Total = sum(c_across(!Year)))
+
+log_it("Saving CSV FESMaerial summary")
+write_csv(aa,paste0(rast_temp,"/summary/area_ALL_FESM.csv"))
+
+
+### By formation
+form <- rast(paste0(rast_temp,"/veg/r_vegform.tif"))
+form_lut <- read_csv(paste0(rast_temp,"/form_lut.csv"))
+st <- c(fesm_overlay,form)
+ct <- terra::crosstab(st)
+ct <- as_tibble(ct)
+
+names(ct)[2] = "FormID"
+names(ct)[3]= "Area"
+ct$Area <- ct$Area / rres * 10000
+
+ct$Status <- factor(ct$Status,levels=as.character(fesm_table$ID),labels=fesm_table$Status)
+ct$FormID <- as.numeric(ct$FormID)
+ct <- left_join(ct,form_lut)
+ct$FormID <- NULL
+ct$Year = current_year
+
+write_csv(ct,paste0(rast_temp,"/summary/area_formation_FESM.csv"))
+
