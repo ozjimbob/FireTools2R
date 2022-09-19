@@ -79,8 +79,8 @@ ggsave2(paste0(rast_temp,"/summary/area_ALL.pdf"),pl,width=1000,height=800,units
 names(aa)<- c("Year","Status","Area")
 aa <- aa %>% pivot_wider(id_cols=c("Year"),names_from="Status",values_from = "Area")
 
-aa <- aa %>% rowwise() %>% mutate(Total = sum(c_across(!Year)))
-
+aa <- aa %>% rowwise() %>% mutate(Total = sum(c_across(!Year),na.rm=TRUE))
+aa <- aa %>% replace(is.na(.), 0)
 log_it("Saving CSV aerial summary")
 write_csv(aa,paste0(rast_temp,"/summary/area_ALL.csv"))
 
@@ -97,7 +97,7 @@ crosstab_year <- function(i){
   names(ct)[2] = "FormID"
   names(ct)[3]= "Area"
   ct$Area <- ct$Area / rres * 10000
-  ct$Status <- factor(ct$Status,levels=c("1","2","3","4","5","6"),labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
+  ct$Status <- factor(ct$Status,levels=c("1","2","3","4","5","9"),labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
   ct$FormID <- as.numeric(ct$FormID)
   ct <- left_join(ct,form_lut)
   ct$FormID <- NULL
@@ -138,7 +138,8 @@ for(this_form in form_list){
   
   this_smr <- this_smr %>% pivot_wider(id_cols=c("Year"),names_from="Status",values_from = "Area")
   
-  this_smr <- this_smr %>% rowwise() %>% mutate(Total = sum(c_across(!Year)))
+  this_smr <- this_smr %>% rowwise() %>% mutate(Total = sum(c_across(!Year), na.rm=TRUE))
+  this_smr <- this_smr %>% replace(is.na(.), 0)
   write_csv(this_smr,paste0(rast_temp,"/summary/area_",short_name,".csv"))
 }                     
 
@@ -188,12 +189,16 @@ if(exists("calculate_metrics")){
   rm(lm_all)
   ### By formation - mask with terra
   
+  
+  
+  
+  
   log_it("Landscape metrics by formation")
   gc()
   form <- rast(paste0(rast_temp,"/veg/r_vegform.tif"))
   form_lut <- read_csv(paste0(rast_temp,"/form_lut.csv"))
   
-  unq_form_list <- unique(form)$east_dn
+  unq_form_list <- unique(form)[,1]
   
   out_lm_form <- list()
   
@@ -231,7 +236,15 @@ if(exists("calculate_metrics")){
     this_form = form_lut$Form[form_lut$FormID==unq_form_list[i]]
     log_it(paste0("Formation: ",this_form))
     log_it("Masking")
-    mask_tf = classify(form,rcl=cbind(unq_form_list[i],1),othersNA=TRUE)
+    
+    aa <- showMethods(classify,includeDefs=TRUE,printTo=FALSE)
+    kk <- grep("othersNA",aa)
+    
+    if(length(kk)==0){
+      mask_tf = classify(form,rcl=cbind(unq_form_list[i],1),others=NA)
+    }else{
+      mask_tf = classify(form,rcl=cbind(unq_form_list[i],1),othersNA=TRUE)
+    }
     
     log_it("Writing mask")
     writeRaster(mask_tf,paste0(rast_temp,"/veg/this_mask.tif"),overwrite=TRUE)
@@ -250,7 +263,7 @@ if(exists("calculate_metrics")){
   
   out_lm_form$class   <- factor(out_lm_form$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
                                                                         "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
-  
+  out_lm_form <- filter(out_lm_form,!is.na(class))
   write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
   rm(out_lm_form)
   gc()
