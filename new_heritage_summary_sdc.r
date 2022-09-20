@@ -186,6 +186,9 @@ if(exists("calculate_metrics")){
                                                                         "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
   log_it("Writing landscapemetrics")
   write_csv(lm_all,paste0(rast_temp,"/metrics/landscape_metrics_all.csv"))
+  
+  
+  
   rm(lm_all)
   ### By formation - mask with terra
   
@@ -263,8 +266,15 @@ if(exists("calculate_metrics")){
   
   out_lm_form$class   <- factor(out_lm_form$class ,levels=c(1,2,3,4,5,9),labels=c("NoFireRegime","TooFrequentlyBurnt",
                                                                         "Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
-  out_lm_form <- filter(out_lm_form,!is.na(class))
+  
   write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
+  out_lm_form1 <- filter(out_lm_form,!is.na(class))
+  out_lm_form2 <- filter(out_lm_form,is.na(class))
+  out_lm_form1$class <- NULL
+  write_csv(out_lm_form1,paste0(rast_temp,"/metrics/spatial_metrics_formation_class.csv"))
+  write_csv(out_lm_form2,paste0(rast_temp,"/metrics/spatial_metrics_formation_landscape.csv"))
+  
+  
   rm(out_lm_form)
   gc()
 }
