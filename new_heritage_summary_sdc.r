@@ -429,8 +429,8 @@ ct$Year = current_year
 
 write_csv(ct,paste0(rast_temp,"/summary/area_formation_FESM.csv"))
 
-if(exists("calculate_FESM_metrics")){
-  if(calculate_FESM_metrics){
+if(exists("calculate_FESM_series")){
+  if(calculate_FESM_series){
     source("new_heritage_FESM_summary_sdc.r")
   }
 }
