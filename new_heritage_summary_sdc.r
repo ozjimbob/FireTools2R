@@ -270,8 +270,9 @@ if(exists("calculate_metrics")){
   write_csv(out_lm_form,paste0(rast_temp,"/metrics/landscape_metrics_formation.csv"))
   out_lm_form1 <- filter(out_lm_form,!is.na(class))
   out_lm_form2 <- filter(out_lm_form,is.na(class))
-  out_lm_form1$class <- NULL
+ 
   write_csv(out_lm_form1,paste0(rast_temp,"/metrics/spatial_metrics_formation_class.csv"))
+  out_lm_form1$class <- NULL
   write_csv(out_lm_form2,paste0(rast_temp,"/metrics/spatial_metrics_formation_landscape.csv"))
   
   
