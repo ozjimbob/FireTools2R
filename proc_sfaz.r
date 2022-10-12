@@ -49,18 +49,36 @@ log_it("Repairing SFAZ polygons")
 v_sfaz = st_buffer(v_sfaz,0)
 
 log_it("Writing SFAZ polygons")
+v_sfaz <- st_cast(v_sfaz,"MULTIPOLYGON")
 write_sf(v_sfaz,paste0(rast_temp,"/v_sfaz.gpkg"))
 
 
 
 log_it("Rasterizing SFAZ polygons")
-rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
-rres = res(tmprast)
-#cmd = paste0(gdal_rasterize," -burn 1 -l year_fire -of GTiff ",
-#             "-te ",rex," -tr ",rres[1]," ",rres[2]," -ot byte -co COMPRESS=PACKBITS ",
-#            paste0(rast_temp,"/","year_fire.gpkg")," ",paste0(rast_temp,"/",int_list[yr],".tif"))
-cmd = g_rasterize("v_sfaz","v_sfaz.gpkg",paste0(rast_temp,"/r_fmz.tif"),attribute="")
-system(cmd)
+#rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
+#rres = res(tmprast)
+
+#cmd = g_rasterize("v_sfaz","v_sfaz.gpkg",paste0(rast_temp,"/r_fmz.tif"),attribute="")
+#system(cmd)
+###########
+####
+####
+
+tr <- terra::rast(tmprast)
+vv_sfaz <- vect(paste0(rast_temp,"/v_sfaz.gpkg"))
+vv_sfaz$temp = 1
+
+cmd = terra::rasterize(vv_sfaz,tr,field="temp",filename=paste0(rast_temp,"/r_fmz.tif"),overwrite=TRUE)
+rm(cmd)
+rm(vv_sfaz)
+
+#####
+#######
+#############
+
+
+
+
 unlink(paste0(rast_temp,"/v_sfaz.gpkg"))
 log_it("Finished rasterizing SFAZ layer")
 
@@ -146,30 +164,46 @@ rm(v_thisregion)
 gc()
 
 log_it("Saving SFAZ threshold polygons")
+
+v_tsl_sfaz <- st_cast(v_tsl_sfaz,"MULTIPOLYGON")
+v_tsl_sfaz_c<- st_cast(v_tsl_sfaz_c,"MULTIPOLYGON")
+
 write_sf(v_tsl_sfaz,paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 write_sf(v_tsl_sfaz_c,paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg"))
 log_it("SFAZ thresholds saved. Cleaning up")
 
+
 log_it("Rasterizing SFAZ categories")
 rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
 rres = res(tmprast)
-cmd = g_rasterize("v_tsl_sfaz","v_tsl_sfaz.gpkg",paste0(rast_temp,"/r_tsl_sfaz.tif"),attribute="SFAZStatus")
-system(cmd)
-cmd = g_rasterize("v_sfaz_candidate_blocks","v_sfaz_candidate_blocks.gpkg",paste0(rast_temp,"/v_sfaz_candidate_blocks.tif"),attribute="SFAZStatus")
-system(cmd)
+
+
+
+
+tr <- terra::rast(tmprast)
+cmd = terra::rasterize(vect(paste0(rast_temp,"/v_tsl_sfaz.gpkg")),tr,field="SFAZStatus",filename=paste0(rast_temp,"/r_tsl_sfaz.tif"),overwrite=TRUE)
+cmd = terra::rasterize(vect(paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg")),tr,field="SFAZStatus",filename=paste0(rast_temp,"/v_sfaz_candidate_blocks.tif"),overwrite=TRUE)
+
+rm(cmd)
+
+
+#cmd = g_rasterize("v_tsl_sfaz","v_tsl_sfaz.gpkg",paste0(rast_temp,"/r_tsl_sfaz.tif"),attribute="SFAZStatus")
+#system(cmd)
+#cmd = g_rasterize("v_sfaz_candidate_blocks","v_sfaz_candidate_blocks.gpkg",paste0(rast_temp,"/v_sfaz_candidate_blocks.tif"),attribute="SFAZStatus")
+#system(cmd)
 
 log_it("Loading SFAZ raster")
-r_tsl_sfaz = raster(paste0(rast_temp,"/r_tsl_sfaz.tif"))
+r_tsl_sfaz = rast(paste0(rast_temp,"/r_tsl_sfaz.tif"))
 
 #bigWrite(r_tsl_sfaz,paste0(rast_temp,"/r_tsl_sfaz.tif"))  <-----
 
 log_it("Loading biodiversity and fire zone raster")
-r_fmz_bio = raster(paste0(rast_temp,"/r_fmz_bio_out.tif"))
+r_fmz_bio = rast(paste0(rast_temp,"/r_fmz_bio_out.tif"))
 
 #bigWrite(r_fmz_bio,paste0(rast_temp,"/r_fmz_bio_out.tif"))
 
 log_it("Loading fire zone raster")
-r_fmz = raster(paste0(rast_temp,"/r_fmzout.tif"))
+r_fmz = rast(paste0(rast_temp,"/r_fmzout.tif"))
 
 
 ## Load r_tsl
@@ -181,35 +215,35 @@ log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 
 
-if(old){
-  c_func = function(x,y){ifelse(x==0,y,x)}
-  s = stack(r_tsl_sfaz,r_fmz)
+#if(old){
+#  c_func = function(x,y){ifelse(x==0,y,x)}
+#  s = stack(r_tsl_sfaz,r_fmz)
   
-  invisible(capture.output({
-    beginCluster(clustNo)
-    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
-    if(class(r_comb)=="try-error"){
-      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
-    }
-    endCluster()
-  }))
+#  invisible(capture.output({
+#    beginCluster(clustNo)
+#    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
+#    if(class(r_comb)=="try-error"){
+#      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
+#    }
+#    endCluster()
+#  }))
   
   
-  s <- NULL
-  rm(s)
-}else{
-  r_tsl_sfaz = reclassify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
+#  s <- NULL
+#  rm(s)
+#}else{
+  r_tsl_sfaz = classify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
   r_comb <-cover(r_tsl_sfaz,r_fmz)
-}
+#}
 gc()
 
 
 
 
 log_it("Saving SFAZ - FMZ combined raster")
-bigWrite(r_comb,paste0(rast_temp,"/r_sfaz_fmz_out.tif"))
+writeRaster(r_comb,paste0(rast_temp,"/r_sfaz_fmz_out.tif"),overwrite=TRUE)
 
-
+r_comb <- raster(paste0(rast_temp,"/r_sfaz_fmz_out.tif"))
 #####################
 log_it("Vectorizing SFAZ - FMZ  combined categories")
 
@@ -217,12 +251,13 @@ log_it("Vectorizing SFAZ - FMZ  combined categories")
 log_it("Converting SFAZ - FMZ raster to polygons")
 
 if(OS == "Windows"){
-  v_sfaz_fmz_out = polygonizer_win(r_comb)
+  v_sfaz_fmz_out = polygonizer_terra(r_comb)
 }else{
-  v_sfaz_fmz_out = polygonizer(r_comb)
+  v_sfaz_fmz_out = polygonizer_terra(r_comb)
 }
 
-v_sfaz_fmz_out = st_as_sf(v_sfaz_fmz_out)
+
+#v_sfaz_fmz_out = st_as_sf(v_sfaz_fmz_out)
 st_crs(v_sfaz_fmz_out)=proj_crs
 
 log_it("Dissolving  SFAZ - FMZ  polygons")
@@ -255,6 +290,8 @@ t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,10,NA),
                                    "Priority for Assessment and Treatment",NA))
 
 log_it("Joining  SFAZ - FMZ labels to polygons")
+names(v_sfaz_fmz_out)[1]="DN"
+
 v_sfaz_fmz_out = left_join(v_sfaz_fmz_out,t_threshold)
 v_sfaz_fmz_out$DN = NULL
 
@@ -280,35 +317,35 @@ log_it("Merging SFAZ to combined heritage and FMZ raster")
 log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 
-if(old){
-  c_func = function(x,y){ifelse(x==0,y,x)}
-  s = stack(r_tsl_sfaz,r_fmz_bio)
+#if(old){
+#  c_func = function(x,y){ifelse(x==0,y,x)}
+#  s = stack(r_tsl_sfaz,r_fmz_bio)
+#  
+#  invisible(capture.output({
+#    beginCluster(clustNo)
+#    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
+#    if(class(r_comb)=="try-error"){
+#      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
+#    }
+#    endCluster()
+#  }))
   
-  invisible(capture.output({
-    beginCluster(clustNo)
-    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
-    if(class(r_comb)=="try-error"){
-      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
-    }
-    endCluster()
-  }))
-  
-  s <- NULL
-  rm(s)
-}else{
-  r_tsl_sfaz = reclassify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
+#  s <- NULL
+#  rm(s)
+#}else{
+  r_tsl_sfaz = classify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
   r_comb <-cover(r_tsl_sfaz,r_fmz_bio)
-}
+#}
 gc()
 
 
 
 log_it("Saving SFAZ - FMZ - Heritage combined raster")
-bigWrite(r_comb,paste0(rast_temp,"/r_sfaz_fmz_bio_out.tif"))
+writeRaster(r_comb,paste0(rast_temp,"/r_sfaz_fmz_bio_out.tif"),overwrite=TRUE)
 
 
 
-
+r_comb <- raster(paste0(rast_temp,"/r_sfaz_fmz_bio_out.tif"))
 
 #####################
 log_it("Vectorizing SFAZ - FMZ - Heritage combined categories")
@@ -317,12 +354,15 @@ log_it("Vectorizing SFAZ - FMZ - Heritage combined categories")
 log_it("Converting SFAZ - FMZ - Heritage raster to polygons")
 
 if(OS == "Windows"){
-v_sfaz_all_out = polygonizer_win(r_comb)
+v_sfaz_all_out = polygonizer_terra(r_comb)
 }else{
-  v_sfaz_all_out = polygonizer(r_comb)
+  v_sfaz_all_out = polygonizer_terra(r_comb)
 }
 
-v_sfaz_all_out = st_as_sf(v_sfaz_all_out)
+
+######### <---------------------------------------------
+
+#v_sfaz_all_out = st_as_sf(v_sfaz_all_out)
 st_crs(v_sfaz_all_out)=proj_crs
 
 log_it("Dissolving  SFAZ - FMZ - Heritage polygons")
@@ -355,6 +395,7 @@ t_threshold=tibble(DN=c(1,2,3,4,5,9,6,7,8,10,NA),
                                  "Priority for Assessment and Treatment",NA))
 
 log_it("Joining  SFAZ - FMZ - Heritage labels to polygons")
+names(v_sfaz_all_out)[1] = "DN"
 v_sfaz_all_out = left_join(v_sfaz_all_out,t_threshold)
 v_sfaz_all_out$DN = NULL
 

@@ -9,9 +9,9 @@ library(doParallel)
 
 
 log_it("Loading biodiversity threshold raster")
-r_vegout = raster(paste0(rast_temp,"/r_vegout.tif"))
+r_vegout = rast(paste0(rast_temp,"/r_vegout.tif"))
 log_it("Loading fire management zone threshold raster")
-r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
+r_fmzout = rast(paste0(rast_temp,"/r_fmzout.tif"))
 log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 log_it("Overlaying Rasters")
@@ -40,14 +40,14 @@ gc()
 
 
 log_it("Writing combined biodiversity and fire management zone threshold raster")
-bigWrite(r_comb,paste0(rast_temp,"/r_fmz_bio_out.tif"))
-
+writeRaster(r_comb,paste0(rast_temp,"/r_fmz_bio_out.tif"),overwrite=TRUE)
+r_comb <- raster(paste0(rast_temp,"/r_fmz_bio_out.tif"))
 
 log_it("Converting combined biodiversity and fire management zone threshold raster to polygons")
 if(OS=="Windows"){
-v_fmzbio = polygonizer_win(r_comb)
+v_fmzbio = polygonizer_terra(r_comb)
 }else{
-v_fmzbio = polygonizer(r_comb)
+v_fmzbio = polygonizer_terra(r_comb)
 }
 
 v_fmzbio = st_as_sf(v_fmzbio)
@@ -67,7 +67,7 @@ log_it("Clipping to region of interest")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 #v_fmzbio = st_intersection(v_fmzbio,v_thisregion)
 
-
+names(v_fmzbio)[1]="DN"
 t_threshold=tibble(DN=c(1,2,3,4,5,9,NA),
                    BioStatus = c("NoFireRegime",
                                  "TooFrequentlyBurnt",

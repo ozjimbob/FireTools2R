@@ -180,21 +180,21 @@ file.rename(paste0(rast_temp,"/v_sfaz_fmz_bio_out.gpkg"),paste0(rast_temp,"/v_he
 ## Write tiles
 
 
-if(OS=="Windows"){
-  log_it("Rendering Tiles")
-  tile_win("r_heritage_fmz_sfaz_threshold_status")
-  tile_win("r_heritage_threshold_status")
-  tile_win("r_fmz_threshold_status")
-  tile_win("r_heritage_fmz_threshold_status")
-  tile_win("r_fmz_sfaz_threshold_status")
-}else{
-  log_it("Rendering Tiles")
-  tile_linux("r_heritage_fmz_sfaz_threshold_status")
-  tile_linux("r_heritage_threshold_status")
-  tile_linux("r_fmz_threshold_status")
-  tile_linux("r_heritage_fmz_threshold_status")
-  tile_linux("r_fmz_sfaz_threshold_status")
-}
+#if(OS=="Windows"){
+#  log_it("Rendering Tiles")
+#  tile_win("r_heritage_fmz_sfaz_threshold_status")
+#  tile_win("r_heritage_threshold_status")
+#  tile_win("r_fmz_threshold_status")
+#  tile_win("r_heritage_fmz_threshold_status")
+#  tile_win("r_fmz_sfaz_threshold_status")
+#}else{
+#  log_it("Rendering Tiles")
+#  tile_linux("r_heritage_fmz_sfaz_threshold_status")
+#  tile_linux("r_heritage_threshold_status")
+#  tile_linux("r_fmz_threshold_status")
+#  tile_linux("r_heritage_fmz_threshold_status")
+#  tile_linux("r_fmz_sfaz_threshold_status")
+#}
 
 log_it("Writing Shapefile version")
 

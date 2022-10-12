@@ -931,6 +931,26 @@ polygonizer_win <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
   return(NULL)
 }
 
+polygonizer_terra <- function(x,outshape=NULL,readpoly=TRUE){
+  #if (isTRUE(readpoly)) require(rgdal)
+  x = rast(x)
+  x = as.polygons(x,trunc=TRUE,dissolve=TRUE)
+  x <- disagg(x)
+  x = st_as_sf(x)
+  return(x)
+}
+
+polygonizer_terra_by_name <- function(x,outshape=NULL,readpoly=TRUE){
+  #if (isTRUE(readpoly)) require(rgdal)
+  rastpath <- normalizePath(x)
+  x = rast(x)
+  x = as.polygons(x,trunc=TRUE,dissolve=TRUE)
+  x <- disagg(x)
+  x = st_as_sf(x)
+  return(x)
+}
+
+
 ## Define the function
 polygonizer <- function(x, outshape=NULL, gdalformat = 'ESRI Shapefile',
                         pypath=NULL, readpoly=TRUE, quietish=TRUE) {

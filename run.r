@@ -54,7 +54,8 @@ if(exists("new_analysis")){
     source("proc_veg1_terra.r")
   }else{
     source("proc_veg1.r")
-}
+  }
+
 log_it("**** Vectorizing vegetation")
 source("veg_vectorize.r")
 log_it("**** Processing Fire Management Blocks")
@@ -72,6 +73,7 @@ log_it("**** Processing merged vegetation and Fire Management Blocks")
 source("proc_fmz_veg_merge.r")
 log_it("**** Processing Strategic Fire Advantage Zone Thresholds")
 source("proc_sfaz.r")
+
 log_it("**** Rendering output maps")
 source("render_maps.r")
 

@@ -6,7 +6,7 @@ library(raster)
 #library(spatial.tools)
 library(foreach)
 library(doParallel)
-
+library(terra)
 # Setup
 #source("../config/global_config.r")
 #source("../config/config_linux.r")

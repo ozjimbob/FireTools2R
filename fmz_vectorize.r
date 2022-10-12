@@ -7,20 +7,22 @@ log_it(system("df -h"))
 log_it("Converting fire management zone threshold raster to polygons")
 if(OS=="Windows"){
   r_fmzout = raster(paste0(rast_temp,"/r_fmzout.tif"))
-  v_fmzout = polygonizer_win(r_fmzout)
+  v_fmzout = polygonizer_terra(r_fmzout)
 }else{
+  
   log_it("Linux detected")
   if(rast_temp!="output"){
     log_it("Non-standard output path")
-    v_fmzout = polygonize_by_name(paste0(rast_temp,"/r_fmzout.tif"))
+    v_fmzout = polygonizer_terra_by_name(paste0(rast_temp,"/r_fmzout.tif"))
   }else{
     log_it("Standard output path, passed path:")
     log_it(paste0(getwd(),"/",rast_temp,"/r_fmzout.tif"))
-    v_fmzout = polygonize_by_name(paste0(getwd(),"/",rast_temp,"/r_fmzout.tif"))
+    v_fmzout = polygonizer_terra_by_name(paste0(getwd(),"/",rast_temp,"/r_fmzout.tif"))
   }
 }
 
-v_fmzout = st_as_sf(v_fmzout)
+
+#v_fmzout = st_as_sf(v_fmzout)
 st_crs(v_fmzout)=proj_crs
 
 log_it("Dissolving fire management zone threshold polygons")
@@ -42,7 +44,7 @@ v_fmzout = st_make_valid(v_fmzout)
 v_thisregion = st_buffer(v_thisregion,0)
 
 v_fmzout = st_intersection(v_fmzout,v_thisregion)
-
+names(v_fmzout)[1]="DN"
 
 t_threshold=tibble(DN=c(1,2,3,4,5,9,NA),
                    FMZStatus = c("NoFireRegime",
@@ -53,6 +55,7 @@ t_threshold=tibble(DN=c(1,2,3,4,5,9,NA),
                                  "Unknown",NA))
 
 log_it("Joining threshold labels to polygons")
+
 v_fmzout = left_join(v_fmzout,t_threshold)
 v_fmzout$DN = NULL
 log_it(system("df -h"))
