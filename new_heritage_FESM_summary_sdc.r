@@ -56,6 +56,8 @@ unq_veg_tib <- unq_veg_tib %>% arrange(Form)
 
 ########### PROCESS!!
 out_list = list()
+
+
 for(j in seq_along(unq_veg_tib$FormID)){
   
   this_veg <- unq_veg_tib$Form[j]
@@ -123,9 +125,73 @@ for(j in seq_along(unq_veg_tib$FormID)){
   
 }
 
+j=j+1
+
+
+### Now do one for ALL veg unmasked
+
+  print(paste0("Processing: All"))
+  
+  print("Veg Masking")  
+  template_lr <- rast(file_list[1])
+  #this_veg_overlay <- project(this_veg_overlay,crs(template_lr),method="near")
+  #this_veg_overlay <- resample(this_veg_overlay,template_lr,method="near")
+  
+  terra::values(template_lr) <- 1
+  template_lr <- mask(template_lr,mr)
+  
+  #template_hr <- raster(file_list[length(file_list)])
+  #values(template_hr) <- 1
+  # template_hr <- mask(template_hr,this_veg_overlay)
+  
+  
+  
+  do_year = function(i){
+    
+    
+    this_year = year_list[i]
+    
+    this_file <- rast(file_list[i])
+    
+    print("low")
+    this_file <- project(this_file,template_lr,method="near")
+    this_file <- this_file * template_lr
+    this_file = this_file * maskt
+    
+    
+    print("Calcualte LSM")
+    output_class <- calculate_lsm(this_file,
+                                  level = "class",
+                                  classes_max = length(unique(raster::values(this_file))),
+                                  full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'),
+                                  progress=TRUE)
+    
+    output_landscape <- calculate_lsm(this_file,
+                                      level = "landscape",
+                                      classes_max = length(unique(raster::values(this_file))),
+                                      full_name=TRUE, metric = c("area", 'contag', 'np', 'enn'),
+                                      progress=TRUE)
+    
+    
+    output_landscape <- output_landscape %>% dplyr::select(name,value,function_name)
+    
+    output_class <- output_class %>% dplyr::select(name,class,value,function_name)
+    
+    output_landscape$Year <- this_year
+    output_class$Year <- this_year
+    output_landscape$Veg <- "All"
+    output_class$Veg <- "All"
+    
+    list(output_landscape,output_class)
+  }
+  
+  # Load example raster
+  o = map_df(seq_along(year_list),do_year)
+  o = bind_rows(o)
+  out_list[[j]]=o
+  
 
 out_list = bind_rows(out_list)
-
 
 
 out_list$class <- factor(out_list$class,levels=c(0,1,2,3,4,5),labels=c(c( "Unburnt","Unburnt2",
