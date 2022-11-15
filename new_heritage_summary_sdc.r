@@ -40,11 +40,13 @@ log_it("Template raster")
 rl <- paste0(rast_temp,"/r_heritage_threshold_status_",year_list,".tif")
 vv <- rast(rl)
 
+#vvp = as.polygons(vv[[1]])
+#vva = expanse(vvp)
 log_it("Calculating frequencies")
 aa <- as_tibble(freq(vv))
 aa$layer<-year_list[aa$layer]
 rres <- res(vv)[1] * res(vv)[2]
-aa$count <- aa$count / rres * 10000
+aa$count <- aa$count * rres / 10000
 
 #aa <- read_csv("G:/ft_work/statewide_veg_parks/summary.csv")
 
@@ -96,7 +98,7 @@ crosstab_year <- function(i){
   ct <- as_tibble(ct)
   names(ct)[2] = "FormID"
   names(ct)[3]= "Area"
-  ct$Area <- ct$Area / rres * 10000
+  ct$Area <- ct$Area * rres / 10000
   ct$Status <- factor(ct$Status,levels=c("1","2","3","4","5","9"),labels=c("NoFireRegime","TooFrequentlyBurnt","Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
   ct$FormID <- as.numeric(ct$FormID)
   ct <- left_join(ct,form_lut)
