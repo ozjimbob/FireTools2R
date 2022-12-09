@@ -200,58 +200,79 @@ log_it("Writing Shapefile version")
 
 ## Shapefile test
 log_it("Writing v_fmz_sfaz_threshold_status")
+try({
 in_file = vect(paste0(rast_temp,"/v_fmz_sfaz_threshold_status.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_fmz_sfaz_threshold_status.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_fmz_sfaz_threshold_status.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_fmz_threshold_status")
+try({
 in_file = vect(paste0(rast_temp,"/v_fmz_threshold_status.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_fmz_threshold_status.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_fmz_threshold_status.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_heritage_fmz_threshold_status")
+try({
 in_file = vect(paste0(rast_temp,"/v_heritage_fmz_threshold_status.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_heritage_fmz_threshold_status.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_threshold_status.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_heritage_threshold_status")
+try({
 in_file = vect(paste0(rast_temp,"/v_heritage_threshold_status.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_heritage_threshold_status.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_threshold_status.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_heritage_fmz_sfaz_threshold_status.shp")
+try({
 in_file = vect(paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_heritage_fmz_sfaz_threshold_status.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_region")
+try({
 in_file = vect(paste0(rast_temp,"/v_region.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_region.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_region.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_tsl")
+try({
 in_file = vect(paste0(rast_temp,"/v_tsl.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_tsl.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_tsl.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_timesburnt.shp")
+try({
 in_file = vect(paste0(rast_temp,"/v_timesburnt.gpkg"))
 writeVector(in_file,paste0(rast_temp,"/v_timesburnt.shp"),overwrite=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_timesburnt.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_tsl_sfaz")
+try({
 in_file = read_sf(paste0(rast_temp,"/v_tsl_sfaz.gpkg"))
 in_file = dplyr::select(in_file,TSL,SFAZStatus,SFAZStatusText )
 write_sf(in_file,paste0(rast_temp,"/v_tsl_sfaz.shp"),delete_dsn=TRUE,delete_layer=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_tsl_sfaz.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_sfaz_candidate_blocks")
+try({
 in_file = read_sf(paste0(rast_temp,"/v_sfaz_candidate_blocks.gpkg"))
 in_file = dplyr::select(in_file,TSL,SFAZStatus,SFAZStatusText )
 write_sf(in_file,paste0(rast_temp,"/v_sfaz_candidate_blocks.shp"),delete_dsn=TRUE,delete_layer=TRUE)
 file.copy("3308.prj",paste0(rast_temp,"/v_sfaz_candidate_blocks.prj"),overwrite=TRUE)
+})
 
 log_it("Writing v_vegBase")
+try({
 in_file = read_sf(paste0(rast_temp,"/v_vegBase.gpkg"))
 nl=names(in_file)[1:(length(names(in_file))-1)]
 nl = substr(nl,1,6)
@@ -260,4 +281,4 @@ nl[-short] = paste0(nl[-short],1:length(nl[-short]))
 names(in_file)[1:(length(names(in_file))-1)]=nl
 try(write_sf(in_file,paste0(rast_temp,"/v_vegBase.shp"),delete_dsn=TRUE,delete_layer=TRUE))
 file.copy("3308.prj",paste0(rast_temp,"/v_vegBase.prj"),overwrite=TRUE)
-
+})
