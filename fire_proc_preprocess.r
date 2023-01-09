@@ -74,7 +74,12 @@ v_fire = read_sf(fire_gdb,i_vt_fire_history)
 v_fire = st_transform(v_fire,crs=proj_crs)
 v_fire = st_cast(v_fire,"MULTIPOLYGON") # Multisurface features cause errors
 
-v_fire <- remove_invalid_poly(v_fire)
+v_fire <- try(remove_invalid_poly(v_fire))
+v_fire <- remove_invalid_poly_multi(v_fire)
+zros = which(as.numeric(st_area(v_fire))==0)
+if(length(zros)>0){
+  v_fire <- v_fire[-zros,]
+}
 
 v_fire = st_make_valid(v_fire) # repair invalid geometries
 log_it("Fire history import complete")
