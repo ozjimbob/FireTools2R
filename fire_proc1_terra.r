@@ -521,10 +521,11 @@ names(v_veg)[toupper(names(v_veg))==toupper(f_vegid)] = f_vegid
 
 names(v_vegfire_table)[toupper(names(v_vegfire_table))==toupper(f_vegid)] = f_vegid
 
+
 log_it("Checking and clearing pre-join names")
 to_remove=c(f_vegmin,f_vegmax,f_vegfireprone,f_vegadv)
 veg_enames = names(v_veg)
-to_remove = intersect(to_remove,veg_enames)
+to_remove = intersect(toupper(to_remove),toupper(veg_enames))
 v_veg = v_veg %>% dplyr::select(-to_remove)
 
 
