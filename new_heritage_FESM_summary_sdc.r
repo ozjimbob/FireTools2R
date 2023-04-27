@@ -91,7 +91,7 @@ for(j in seq_along(unq_veg_tib$FormID)){
     this_file <- project(this_file,template_lr,method="near")
     this_file <- this_file * template_lr
     this_file = this_file * maskt
-    
+    this_file[terra::values(this_file)==5]=4
     
     print("Calcualte LSM")
     output_class <- calculate_lsm(this_file,
@@ -157,7 +157,7 @@ j=j+1
     this_file <- project(this_file,template_lr,method="near")
     this_file <- this_file * template_lr
     this_file = this_file * maskt
-    
+    this_file[terra::values(this_file)==5]=4
     
     print("Calcualte LSM")
     output_class <- calculate_lsm(this_file,
@@ -194,11 +194,10 @@ j=j+1
 out_list = bind_rows(out_list)
 
 
-out_list$class <- factor(out_list$class,levels=c(0,1,2,3,4,5),labels=c(c( "Unburnt","Unburnt2",
+out_list$class <- factor(out_list$class,levels=c(0,1,2,3,4),labels=c(c( "Unburnt","Unburnt2",
                                                                           "Low",
                                                                           "Moderate",
-                                                                          "High",
-                                                                          "Severe")))
+                                                                          "Canopy")))
 
 
 write_csv(out_list,paste0(rast_temp,"/spatial_metrics_formation_all.csv"))
