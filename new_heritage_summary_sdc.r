@@ -209,7 +209,9 @@ if(exists("calculate_metrics")){
   
   lm_year_form <- function(i){
     this_yr <- rast(paste0(rast_temp,"/r_heritage_threshold_status_",year_list[i],".tif"))
-  
+    tmp_crs <- crs(rast(paste0(rast_temp,"/veg/this_mask.tif")))
+    crs(this_yr) <- tmp_crs
+    
     this_yr = this_yr * rast(paste0(rast_temp,"/veg/this_mask.tif"))
     output_class <- calculate_lsm(this_yr,
                                   level = "class",

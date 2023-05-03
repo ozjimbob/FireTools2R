@@ -1407,7 +1407,7 @@ rx_write_terra=function(file,outfile){
   
   log_it("Big Write raster with table")
   
-  
+  crs(tr) <- crs(mask_tif)
   terra::writeRaster(tr,paste0(rast_temp,"/",outfile))
   
   
