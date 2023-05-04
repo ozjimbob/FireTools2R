@@ -91,7 +91,9 @@ for(j in seq_along(unq_veg_tib$FormID)){
     this_file <- project(this_file,template_lr,method="near")
     this_file <- this_file * template_lr
     this_file = this_file * maskt
-    this_file[terra::values(this_file)==5]=4
+    rcl_mat <- cbind(c(0,1,2,3,4,5),c(0,1,2,3,4,4))
+    this_file <- classify(this_file,rcl_mat)
+    #terra::values(this_file)[terra::values(this_file)==5]=4
     
     print("Calcualte LSM")
     output_class <- calculate_lsm(this_file,
@@ -157,7 +159,9 @@ j=j+1
     this_file <- project(this_file,template_lr,method="near")
     this_file <- this_file * template_lr
     this_file = this_file * maskt
-    this_file[terra::values(this_file)==5]=4
+    rcl_mat <- cbind(c(0,1,2,3,4,5),c(0,1,2,3,4,4))
+    this_file <- classify(this_file,rcl_mat)
+    #this_file[terra::values(this_file)==5]=4
     
     print("Calcualte LSM")
     output_class <- calculate_lsm(this_file,
