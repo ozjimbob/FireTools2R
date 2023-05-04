@@ -92,7 +92,7 @@ for(j in seq_along(unq_veg_tib$FormID)){
     this_file <- this_file * template_lr
     this_file = this_file * maskt
     rcl_mat <- cbind(c(0,1,2,3,4,5),c(0,1,2,3,4,4))
-    this_file <- classify(this_file,rcl_mat)
+    this_file <- terra::classify(this_file,rcl_mat)
     #terra::values(this_file)[terra::values(this_file)==5]=4
     
     print("Calcualte LSM")
@@ -160,7 +160,7 @@ j=j+1
     this_file <- this_file * template_lr
     this_file = this_file * maskt
     rcl_mat <- cbind(c(0,1,2,3,4,5),c(0,1,2,3,4,4))
-    this_file <- classify(this_file,rcl_mat)
+    this_file <- terra::classify(this_file,rcl_mat)
     #this_file[terra::values(this_file)==5]=4
     
     print("Calcualte LSM")
