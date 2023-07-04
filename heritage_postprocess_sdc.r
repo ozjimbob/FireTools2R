@@ -75,7 +75,7 @@ log_it("Generating template raster")
 tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
 v_vr_mask$flag = 1
-mask_tif = rasterize(v_vr_mask,tmprast,field="flag",paste0(rast_temp,"/roi_mask.tif"),crs=crs(v_vr_mask))
+mask_tif = rasterize(v_vr_mask,rast(tmprast),field="flag",paste0(rast_temp,"/roi_mask.tif"),crs=crs(v_vr_mask))
 
 
 
