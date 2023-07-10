@@ -382,6 +382,7 @@ log_it("Writing v_tsl_sfaz")
 try({
   
   in_file = read_sf(paste0(rast_temp, "/v_tsl_sfaz.gpkg"))
+  in_file <- st_zm(in_file,drop=TRUE, what = "ZM")
   in_file = dplyr::select(in_file, TSL, SFAZStatus, SFAZStatusText)
   names(in_file) =  c("TSL","SFAZSt","SFAZStTx","geom")
   write_sf(
@@ -398,6 +399,7 @@ try({
 log_it("Writing v_sfaz_candidate_blocks")
 try({
   in_file = read_sf(paste0(rast_temp, "/v_sfaz_candidate_blocks.gpkg"))
+  in_file <- st_zm(in_file,drop=TRUE, what = "ZM")
   in_file = dplyr::select(in_file, TSL, SFAZStatus, SFAZStatusText)
   names(in_file) =  c("TSL","SFAZSt","SFAZStTx","geom")
   write_sf(
@@ -414,6 +416,7 @@ try({
 log_it("Writing v_vegBase")
 try({
   in_file = read_sf(paste0(rast_temp, "/v_vegBase.gpkg"))
+  in_file <- st_zm(in_file,drop=TRUE, what = "ZM")
   nl = names(in_file)[1:(length(names(in_file)) - 1)]
   nl = substr(nl, 1, 6)
   short = which(nchar(nl) < 6)
