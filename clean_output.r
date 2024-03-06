@@ -82,20 +82,25 @@ vegcode = vegcode * mask_tif
 log_it("Generating code table")
 codelist = tibble(ID = unique(vegbase[[f_vegid]]))
 codelist$category = ""
+
+log_it("Finding VegText")
 vt = which(substr(names(vegbase), 1, 7) == "VEGTEXT")[1]
+log_it("Looping Codelist")
 for (i in seq_along(codelist$ID)) {
+  log_it(paste0("Veg: ", ID))
   thisveg = filter(vegbase, !!rlang::sym(f_vegid) == codelist$ID[i])
+  log_it(paste0("Assign category: ", as.character(thisveg[1, vt])[1]))
   codelist$category[i] = as.character(thisveg[1, vt])[1]
 }
-
+log_it("CodeList To Dataframe")
 codelist = as.data.frame(codelist)
 
 
-
+log_it("Ratify")
 tr <- ratify(vegcode)
-
+log_it("Assign Levels")
 rat <- levels(tr)[[1]]
-
+log_it("Left Join RAT to Codelist")
 rat <- left_join(rat, codelist)
 rat$category[is.na(rat$category)] = ""
 
