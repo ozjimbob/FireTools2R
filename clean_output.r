@@ -87,7 +87,7 @@ log_it("Finding VegText")
 vt = which(substr(names(vegbase), 1, 7) == "VEGTEXT")[1]
 log_it("Looping Codelist")
 for (i in seq_along(codelist$ID)) {
-  log_it(paste0("Veg: ", ID))
+  log_it(paste0("Veg: ", i))
   thisveg = filter(vegbase, !!rlang::sym(f_vegid) == codelist$ID[i])
   log_it(paste0("Assign category: ", as.character(thisveg[1, vt])[1]))
   codelist$category[i] = as.character(thisveg[1, vt])[1]
