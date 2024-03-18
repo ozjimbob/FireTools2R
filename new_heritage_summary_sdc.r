@@ -24,10 +24,12 @@ log_it = function(strn){
   print(paste0("[FT2] ",Sys.time()," - ",strn))
 }
 
+dir.create(rast_temp)
 log_it("Starting workers.")
 plan(multisession, workers = clustNo)
 
 # Make output folkders
+
 log_it(paste0("Output folder: ",rast_temp))
 dir.create(paste0(rast_temp,"/summary"))
 dir.create(paste0(rast_temp,"/metrics"))
