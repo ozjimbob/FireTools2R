@@ -1,7 +1,7 @@
 # Do bio processing 1
 library(tidyverse)
 library(sf)
-library(velox)
+#library(velox)
 library(raster)
 #library(spatial.tools)
 library(foreach)
@@ -49,6 +49,7 @@ v_thisregion = st_make_valid(v_thisregion)
 log_it("Region projection complete")
 
 log_it("Writing region template")
+v_thisregion <- st_cast(v_thisregion,"MULTIPOLYGON")
 write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
 log_it("Finished writing region template")
 
@@ -75,7 +76,7 @@ log_it("Generating template raster")
 tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
 v_vr_mask$flag = 1
-mask_tif = rasterize(v_vr_mask,rast(tmprast),field="flag",paste0(rast_temp,"/roi_mask.tif"),crs=crs(v_vr_mask))
+mask_tif = terra::rasterize(v_vr_mask,rast(tmprast),field="flag",fun="max",paste0(rast_temp,"/roi_mask.tif"),crs=crs(v_vr_mask))
 
 
 
@@ -128,7 +129,7 @@ log_it(full_list)
 for(ii in 1:length(full_list)){
   
   this_year = full_list[ii]
-  
+  print(this_year)
   # We may have one less year than interval if current year has no fire
   if(file.exists(full_file_list[ii])){
     log_it(paste0("Cropping year: ",this_year))
@@ -253,6 +254,10 @@ if(single_year=="timeseries"){
   
   for(year_idx in wyear:length(all_years)){
     this_year <- all_years[year_idx]
+    ################
+    #if(this_year<=2030){
+    #  print("skip")
+    #  next}
     log_it(this_year)
     # Set up variables
     log_it("Calculating TSFF")
@@ -266,6 +271,16 @@ if(single_year=="timeseries"){
     log_it(paste0("Starting biodiversity threshold function application on ",nrow(tmprast)," slices"))
     ttemprast = rast(tmprast)
     o = future_lapply(1:nrow(tmprast),FUN=proccell2_post_sdc,future.scheduling=1, cyear=this_year,the_tmprast=ttemprast)
+    
+    
+    #o=list()
+    
+    #for(ii in 1:nrow(tmprast)){
+    #  print(ii)
+    #  o[[ii]]=proccell2_post_sdc(ii,cyear=this_year,the_tmprast=ttemprast)
+    #}
+    
+    
     
     log_it("Biodiversity threshold calculation complete")
     
@@ -408,4 +423,4 @@ if(single_year=="selected"){
     esri_output(sub)
     gc()
   }
-  
+   

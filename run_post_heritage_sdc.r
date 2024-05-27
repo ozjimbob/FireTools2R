@@ -12,7 +12,7 @@ library(doParallel)
 #library(mapview)
 
 library(fasterize)
-library(velox)
+#library(velox)
 library(lwgeom)
 library(sfheaders)
 library(terra)

@@ -9,7 +9,7 @@ library(foreach)
 library(doParallel)
 library(mapview)
 library(fasterize)
-library(velox)
+#library(velox)
 library(lwgeom)
 
 

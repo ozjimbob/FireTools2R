@@ -41,7 +41,7 @@ dir.create(rast_temp)
 file_list <- list.files(heritage_folder,pattern="[[:digit:]]?tif$")
 
 year_list <- substr(file_list,29,32)
-if(!is.null(filter_year)){
+if(exists("filter_year")){
   keep = which(as.numeric(year_list)>= as.numeric(filter_year))
   year_list=year_list[keep]
   file_list <- file_list[keep]

@@ -9,7 +9,7 @@ library(raster)
 library(foreach)
 library(doParallel)
 library(fasterize)
-library(velox)
+#library(velox)
 library(lwgeom)
 
 source("../config/global_config.r")

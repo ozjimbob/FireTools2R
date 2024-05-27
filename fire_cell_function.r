@@ -256,6 +256,7 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     #### OLD METHOD
     #IntervalList <- as.numeric(terra::values(st,row=i,col=j,nrows=1,ncol=1))
     IntervalList <- as.numeric(ThisIntervalList[j,])
+    IntervalList[is.na(IntervalList)]=0
     
     
     ovec[j]<-calc_status()

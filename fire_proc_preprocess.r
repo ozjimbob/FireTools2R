@@ -296,6 +296,7 @@ log_it(full_year_list)
 
 log_it("Looping through year list to generate incremental time since last")
 for(this_year in full_year_list){
+#for(this_year in k_year_list){
   log_it(paste0("Year: ",this_year))
   nearest_year = int_list - this_year
   nearest_year = max(nearest_year[!nearest_year > 0]) + this_year

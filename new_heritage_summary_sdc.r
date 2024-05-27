@@ -24,7 +24,7 @@ log_it = function(strn){
   print(paste0("[FT2] ",Sys.time()," - ",strn))
 }
 
-dir.create(rast_temp)
+
 log_it("Starting workers.")
 plan(multisession, workers = clustNo)
 
