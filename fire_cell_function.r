@@ -1307,7 +1307,15 @@ rx_write=function(file,outfile,bigwrite=TRUE){
   
   # Fix projection
   log_it("Fix Projection")
-  crs(tr) <- CRS('+init=epsg:3308')
+  
+  if(proj_crs=="+proj=utm +zone=57 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs"){
+    crs(tr) <- CRS('+init=epsg:28357')
+  }else{
+    crs(tr) <- CRS('+init=epsg:3308')
+  }
+  
+  
+  
   
   log_it("Big Write raster with table")
   
@@ -1432,7 +1440,16 @@ esri_output = function(tfile){
   }else{
     gt=paste0(gdal_path,"gdal_translate")
   }
-  cmd=paste0(gt," ",infile," -a_srs 3308.prj -co COMPRESS=LZW -of GTiff ",tempfile)
+  
+  
+  if(proj_crs=="+proj=utm +zone=57 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs"){
+    pfile <- "28357.prj"
+  }else{
+    pfile <- "3308.prj"
+  }
+  
+  cmd=paste0(gt," ",infile," -a_srs ",pfile," -co COMPRESS=LZW -of GTiff ",tempfile)
+  
   cout = system(cmd,intern=TRUE)
   log_it(cout)
   unlink(infile)

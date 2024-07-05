@@ -245,6 +245,13 @@ file.rename(
 #  tile_linux("r_fmz_sfaz_threshold_status")
 #}
 
+log_it("Setting Proj File")
+proj_file = "3308.prj"
+if(proj_crs=="+proj=utm +zone=57 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs"){
+  proj_file = "28357.prj"
+}
+
+
 log_it("Writing Shapefile version")
 
 ## Shapefile test
@@ -255,7 +262,7 @@ try({
   writeVector(in_file,
               paste0(rast_temp, "/v_fmz_sfaz_threshold_status.shp"),
               overwrite = TRUE)
-  file.copy("3308.prj",
+  file.copy(proj_file,
             paste0(rast_temp, "/v_fmz_sfaz_threshold_status.prj"),
             overwrite = TRUE)
 })
@@ -275,7 +282,7 @@ try({
   writeVector(in_file,
               paste0(rast_temp, "/v_fmz_threshold_status.shp"),
               overwrite = TRUE)
-  file.copy("3308.prj",
+  file.copy(proj_file,
             paste0(rast_temp, "/v_fmz_threshold_status.prj"),
             overwrite = TRUE)
 })
@@ -295,7 +302,7 @@ try({
               paste0(rast_temp, "/v_heritage_fmz_threshold_status.shp"),
               overwrite = TRUE)
   file.copy(
-    "3308.prj",
+    proj_file,
     paste0(rast_temp, "/v_heritage_fmz_threshold_status.prj"),
     overwrite = TRUE
   )
@@ -312,7 +319,7 @@ try({
   writeVector(in_file,
               paste0(rast_temp, "/v_heritage_threshold_status.shp"),
               overwrite = TRUE)
-  file.copy("3308.prj",
+  file.copy(proj_file,
             paste0(rast_temp, "/v_heritage_threshold_status.prj"),
             overwrite = TRUE)
 })
@@ -332,7 +339,7 @@ try({
     overwrite = TRUE
   )
   file.copy(
-    "3308.prj",
+    proj_file,
     paste0(rast_temp, "/v_heritage_fmz_sfaz_threshold_status.prj"),
     overwrite = TRUE
   )
@@ -349,7 +356,7 @@ try({
   }
   writeVector(in_file, paste0(rast_temp, "/v_region.shp"), overwrite =
                 TRUE)
-  file.copy("3308.prj", paste0(rast_temp, "/v_region.prj"), overwrite =
+  file.copy(proj_file, paste0(rast_temp, "/v_region.prj"), overwrite =
               TRUE)
 })
 
@@ -364,7 +371,7 @@ try({
     in_file = vect(read_sf(paste0(rast_temp, "/v_tsl.gpkg")))
   }
   writeVector(in_file, paste0(rast_temp, "/v_tsl.shp"), overwrite = TRUE)
-  file.copy("3308.prj", paste0(rast_temp, "/v_tsl.prj"), overwrite = TRUE)
+  file.copy(proj_file, paste0(rast_temp, "/v_tsl.prj"), overwrite = TRUE)
 })
 
 log_it("Writing v_timesburnt.shp")
@@ -378,7 +385,7 @@ try({
   }
   writeVector(in_file, paste0(rast_temp, "/v_timesburnt.shp"), overwrite =
                 TRUE)
-  file.copy("3308.prj",
+  file.copy(proj_file,
             paste0(rast_temp, "/v_timesburnt.prj"),
             overwrite = TRUE)
 })
@@ -396,7 +403,7 @@ try({
     delete_dsn = TRUE,
     delete_layer = TRUE
   )
-  file.copy("3308.prj",
+  file.copy(proj_file,
             paste0(rast_temp, "/v_tsl_sfaz.prj"),
             overwrite = TRUE)
 })
@@ -413,7 +420,7 @@ try({
     delete_dsn = TRUE,
     delete_layer = TRUE
   )
-  file.copy("3308.prj",
+  file.copy(proj_file,
             paste0(rast_temp, "/v_sfaz_candidate_blocks.prj"),
             overwrite = TRUE)
 })
@@ -435,6 +442,6 @@ try({
     delete_layer = TRUE
   ))
   
-  file.copy("3308.prj", paste0(rast_temp, "/v_vegBase.prj"), overwrite =
+  file.copy(proj_file, paste0(rast_temp, "/v_vegBase.prj"), overwrite =
               TRUE)
 })
