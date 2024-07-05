@@ -4,12 +4,10 @@
 library(tidyverse)
 library(sf)
 library(raster)
-#library(spatial.tools)
 library(foreach)
 library(doParallel)
 library(mapview)
 library(fasterize)
-#library(velox)
 library(lwgeom)
 
 
