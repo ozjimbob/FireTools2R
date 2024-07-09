@@ -36,8 +36,8 @@ log_it("Project background map")
 
 nsw_bg <- crop(nsw_bg,projectRaster(tmprast,crs=nsw_bg))
 nsw_bg <- projectRaster(nsw_bg,crs=tmprast,method="bilinear")
-
-
+nsw_bg[nsw_bg>255]=255
+nsw_bg[nsw_bg<0]=0
 log_it("Plot heritage status map")
 
 log_it("Cropping")
