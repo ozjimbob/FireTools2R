@@ -38,7 +38,8 @@ log_it("Loading region boundary")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 
 #log_it("Clipping fire management zone to ROI")
-v_fmz = st_crop(st_buffer(v_fmz,0),v_thisregion)
+#v_fmz = st_crop(st_buffer(v_fmz,0),v_thisregion)
+v_fmz = st_intersection(v_fmz,v_thisregion)
 #log_it("Clipping  fire management zone complete")
 
 log_it("Extracting SFAZ polygons")
@@ -215,26 +216,10 @@ log_it(paste0("System Memory Available: ",getFreeMemoryKB()))
 
 
 
-#if(old){
-#  c_func = function(x,y){ifelse(x==0,y,x)}
-#  s = stack(r_tsl_sfaz,r_fmz)
-  
-#  invisible(capture.output({
-#    beginCluster(clustNo)
-#    r_comb <- try(clusterR(s,overlay,args=list(fun=c_func)),silent = TRUE)
-#    if(class(r_comb)=="try-error"){
-#      r_comb = overlay(s,fun=function(x,y){ifelse(x==0,y,x)})
-#    }
-#    endCluster()
-#  }))
-  
-  
-#  s <- NULL
-#  rm(s)
-#}else{
+
   r_tsl_sfaz = classify(r_tsl_sfaz, cbind(0, NA), right=FALSE)
   r_comb <-cover(r_tsl_sfaz,r_fmz)
-#}
+
 gc()
 
 
