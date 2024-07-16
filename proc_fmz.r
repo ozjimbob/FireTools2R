@@ -40,7 +40,9 @@ log_it("Loading region boundary")
 v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 
 #log_it("Clipping fire management zone to ROI")
-v_fmz = st_intersection(v_fmz,v_thisregion)
+sub_thisregion = st_as_sfc(v_thisregion)
+
+v_fmz = st_intersection(v_fmz,sub_thisregion)
 #v_fmz = st_crop(st_buffer(v_fmz,0),v_thisregion)
 #log_it("Clipping  fire management zone complete")
 
