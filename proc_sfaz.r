@@ -39,8 +39,12 @@ v_thisregion = read_sf(paste0(rast_temp,"/v_region.gpkg"))
 
 #log_it("Clipping fire management zone to ROI")
 #v_fmz = st_crop(st_buffer(v_fmz,0),v_thisregion)
-sub_thisregion = st_as_sfc(v_thisregion)
-v_fmz = st_intersection(v_fmz,sub_thisregion)
+log_it("Converting region to raw polygon")
+sub_thisregion = st_as_sfc(st_buffer(v_thisregion,0))
+#v_fmz = st_intersection(v_fmz,sub_thisregion)
+log_it("Cropping FMZ to region boundary with correction buffer")
+v_fmz = st_intersection(st_buffer(v_fmz,0),sub_thisregion)
+
 #log_it("Clipping  fire management zone complete")
 
 log_it("Extracting SFAZ polygons")
