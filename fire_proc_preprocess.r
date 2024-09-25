@@ -1,68 +1,81 @@
 
 # Read the regions table, filter to region of interest, transform
 log_it("Loading regions")
+library(terra)
 
 if(file.exists(paste0(rast_temp,"/v_region.gpkg"))){
   log_it("region found")
-  v_thisregion <- read_sf(v_thisregion)
+  v_thisregion <- vect(paste0(rast_temp,"/v_region.gpkg"))
 }else{
-
-  v_regions = read_sf(corp_gdb,i_vt_boundary)
+  
+  v_regions = vect(corp_gdb,layer=i_vt_boundary)
   
   if(d_spatial_unit != ""){
     log_it(paste0("Filtering region layer to ROI:",d_spatial_unit))
-    v_thisregion = filter(v_regions,(!!rlang::sym(f_spatial_unit)) == d_spatial_unit)
+    v_thisregion = filter(corp_gdb,layer=i_vt_boundary,query=paste0("select * from ",i_vt_boundary," where ",f_spatial_unit," = '",d_spatial_unit,"';"))
     log_it("Filtering fire history to ROI complete")
   }else{
-    log_it("No filtering of region, creating union")
-    v_regions$flag=1
-    v_thisregion <- v_regions %>% group_by(flag) %>% summarise()
+    #log_it("No filtering of region, creating union")
+    #v_regions$flag=1
+    v_thisregion <- aggregate(v_regions)
     log_it("Union complete")
   }
   
   
   log_it("Projecting and repairing region")
-  v_thisregion = st_transform(v_thisregion,crs=proj_crs)
-  v_thisregion = st_make_valid(v_thisregion)
+  v_thisregion = terra::project(v_thisregion,proj_crs)
+  #v_thisregion = st_make_valid(v_thisregion)
   log_it("Region projection complete")
   
   log_it("Writing region template")
-  write_sf(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
+  writeVector(v_thisregion,paste0(rast_temp,"/v_region.gpkg"))
   log_it("Finished writing region template")
 }
+
+
+
 #### Create template raster
 
 # Define bounding box of raster
-bbox = st_bbox(v_thisregion)
+bbox = ext(v_thisregion)
 
 # Generate template raster of this extent and resolution
 log_it("Creating template raster")
 
 # Load 25m NSW Alignment grid
+# Load 25m NSW Alignment grid
 if(!exists("grid_file")){
-  log_it("No Grid File")
-  align_grid = raster("../config/grid.tif")
+  align_grid = rast("../config/grid.tif")
 }else{
-  log_it("Custom Grid File")
-  align_grid = raster(grid_file)
+  align_grid = rast(grid_file)
 }
-log_it("Getting bbox extent")
-tmp_extent = extent(bbox[c(1,3,2,4)])
-log_it(tmp_extent)
-tmp_extent = alignExtent(tmp_extent,align_grid)
-log_it(tmp_extent)
+tmp_extent = bbox
+tmp_extent = align(tmp_extent,align_grid)
+
+
+
+#log_it("Getting bbox extent")
+##tmp_extent = extent(bbox[c(1,3,2,4)])
+#log_it(tmp_extent)
+#tmp_extent = alignExtent(tmp_extent,align_grid)
+#log_it(tmp_extent)
 
 # Make template raster
 log_it("Generating template raster")
-tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
+tmprast = rast(tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
+
+#rex = paste(ext(tmprast)[c(1,3,2,4)],collapse=" ")
+#rres = res(tmprast)
+
 
 # Make mask raster for ROI
 v_thisregion$flag = 1
 log_it("Rasterizing ROI Mask")
-mask_tif = fasterize(v_thisregion,tmprast,field="flag")
+mask_tif = rasterize(v_thisregion,tmprast,field="flag")
 log_it("Writing ROI Mask")
-bigWrite(mask_tif,paste0(rast_temp,"/roi_mask.tif"))
+writeRaster(mask_tif,paste0(rast_temp,"/roi_mask.tif"))
 rm(mask_tif)
+#mask_tif=raster(paste0(rast_temp,"/roi_mask.tif"))
 #mask_tif=raster(paste0(rast_temp,"/roi_mask.tif"))
 
 
@@ -152,77 +165,73 @@ for(yr in seq_along(int_list)){
   
   rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
   rres = res(tmprast)
-  
+  tr <- terra::rast(tmprast)
   
   
   # Write year raster to disk
   if(nrow(datx)>0){
     log_it("rasterize this year")
-    cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
-    system(cmd)
-    log_it("Loading this year")
+    
+    
+    tbl <- vect(paste0(rast_temp,"/year_fire.gpkg"))
+    
+    r_vfp = terra::rasterize(tbl,tr,field="count",filename=paste0(rast_temp,"/",int_list[yr],".tif"),overwrite=TRUE,wopt=list(datatype="INT1U"))
+    
+    
+    #cmd = g_rasterize("year_fire","year_fire.gpkg",paste0(rast_temp,"/",int_list[yr],".tif"),otype="byte")
+    
+    #system(cmd)
+    #log_it("Loading this year")
     # Load this year, multiply by year
-    this_year <- raster(paste0(rast_temp,"/",int_list[yr],".tif"))
+    this_year <- terra::rast(paste0(rast_temp,"/",int_list[yr],".tif"))
   }else{
     log_it("NO FIRE FOUND skipping to blank raster.")
-    this_year <- tmprast
-    raster::values(this_year)<-0
+    this_year <- tr
+    terra::values(this_year)<-0
   }
   
   
   
   # Write progressive rasters
-  if(yr==1){
-    log_it("Year 1 - calculating r_lastb")
-    
-    this_ily <- as.numeric(int_list[yr])
-    ft_apply <- function(x,na.rm=FALSE,...){
-      x*this_ily
-    }
-    
-    log_it(paste0("FunIly: ",this_ily))
-    log_it(print(this_year))
-    
-    #r_lastb = calc(this_year, fun=function(x,na.rm=FALSE,...){ x * this_ily},forcefun=TRUE,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
-    r_lastb = raster::calc(this_year, fun=ft_apply,forcefun=TRUE,filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
-    
-    ### ALTERNATIVE
-    #r_lastb = this_year * this_ily
-    #writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
-    #rm(r_lastb)
-    #gc()
-    #r_lastb <- raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
-    #######
-    
-    file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
+  if(yr==1){      log_it("Year 1 - calculating r_lastb")
+    #r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    r_lastb = this_year * int_list[yr]
+    writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
     log_it("Year 1 - calculating r_timesbunr")
-    r_timesburnt = r_lastb
+    #r_timesburnt = calc(this_year,fun = function(x){0},filename=paste0(rast_temp,"/rNumTimesBurnt.tif"),overwrite=TRUE)
+    r_timesburnt = deepcopy(r_lastb)
     log_it("Zeroing")
-    raster::values(r_timesburnt)=0
+    terra::values(r_timesburnt)=0
     log_it("writing")
-    bigWrite(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
-    file.copy(paste0(rast_temp,"/",'rNumTimesBurnt.tif'),paste0(rast_temp,"/",'rNumTimesBurnt_',int_list[yr],'.tif'))
+    terra::writeRaster(r_timesburnt,paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
     log_it("Writing complete")
     gc()
     log_it("Garbage Collected")
   }  else {
     log_it("loading r_lasb")
-    r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+    r_lastb = terra::rast(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
     log_it("loading r_timesbunrt")
-    r_timesburnt = raster(paste0(rast_temp,"/rNumTimesBurnt.tif"))
-  }# We now have two temp files
+    r_timesburnt = terra::rast(paste0(rast_temp,"/rNumTimesBurnt.tif"))
+  }
+  
+  # We now have two temp files
   log_it("Adding to stack")
   log_it("New maximum")
-  r_lastb = max(stack(this_year* as.numeric(int_list[yr]),r_lastb),na.rm=TRUE) # Four temp files
+  st_test <- c(this_year * int_list[yr],r_lastb)
+  r_lastb <- max(st_test,na.rm=TRUE)
+  rm(st_test)
+  gc()
+  #print(plot(r_lastb))
+  
+  
+  
+  
+  # r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
   log_it("Adding to count")
   log_it("Writing intermediate rasters")
   #print(plot(r_lastb))
-  
-  bigWrite(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'))
-  bigWrite(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'))
-  
-  file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
-  file.copy(paste0(rast_temp,"/",'rNumTimesBurnt.tif'),paste0(rast_temp,"/",'rNumTimesBurnt_',int_list[yr],'.tif'))
+  writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+  writeRaster(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
   log_it("Deleting")
   rm(r_lastb)
   rm(r_timesburnt)
@@ -235,6 +244,7 @@ for(yr in seq_along(int_list)){
   
   orast[[yr]]=paste0(rast_temp,"/",int_list[yr],".tif")
 }
+
 
 
 #rm(comp_stack)
@@ -282,13 +292,15 @@ log_it("Last burnt raster complete")
 
 # Write time since last
 log_it("Loading Last Year Burnt raster")
-r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
+r_lastb = rast(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
 log_it("Subtracting")
 r_tsl = current_year - r_lastb
 log_it("Writing main Time Since Last raster")
 # Exclude external
 #log_it("Masking time since last fire raster")
-bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'))
+writeRaster(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'))
+
+
 
 log_it("Generating year list")
 full_year_list = min(int_list):(current_year + future_years)
@@ -303,7 +315,7 @@ for(this_year in full_year_list){
   log_it(paste0("Nearest past year: ",nearest_year))
   log_it(paste0("Past year exists? ", file.exists(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))))
   log_it("Loading file")
-  r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))
+  r_lastb = rast(paste0(rast_temp,"/",'rLastYearBurnt_',nearest_year,'.tif'))
   Sys.sleep(1)
   log_it("File info:")
   log_it(print(r_lastb))
@@ -313,7 +325,7 @@ for(this_year in full_year_list){
   log_it("Subtraction Complete")
   
   log_it("Writing incremental Time Since Last")
-  try(bigWrite(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast_',this_year,'.tif')))
+  try(writeRaster(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast_',this_year,'.tif')))
   Sys.sleep(1)
   log_it("Cleaning up")
   
