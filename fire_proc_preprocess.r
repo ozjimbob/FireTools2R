@@ -223,7 +223,10 @@ for(yr in seq_along(int_list)){
   # We now have two temp files
   log_it("Adding to stack")
   log_it("New maximum")
-  st_test <- c(this_year * int_list[yr],r_lastb)
+  writeRaster(this_year * int_list[yr],paste0(rast_temp,"/temp_ty.tif"),overwrite=TRUE)
+  tyt <- rast(paste0(rast_temp,"/temp_ty.tif"))
+  st_test <- c(tyt,r_lastb)
+  gc()
   r_lastb <- max(st_test,na.rm=TRUE)
   rm(st_test)
   gc()
