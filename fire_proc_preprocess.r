@@ -87,8 +87,11 @@ v_fire = read_sf(fire_gdb,i_vt_fire_history)
 v_fire = st_transform(v_fire,crs=proj_crs)
 v_fire = st_cast(v_fire,"MULTIPOLYGON") # Multisurface features cause errors
 
+v_fire <- filter(v_fire,!st_is_empty(v_fire))
+
 v_fire <- try(remove_invalid_poly(v_fire))
 v_fire <- remove_invalid_poly_multi(v_fire)
+
 zros = which(as.numeric(st_area(v_fire))==0)
 if(length(zros)>0){
   v_fire <- v_fire[-zros,]
@@ -100,7 +103,7 @@ log_it("Fire history import complete")
 
 # Clip fire to region of interest
 log_it("Clipping fire history to ROI")
-v_fire = st_intersection(v_fire,v_thisregion)
+v_fire = st_intersection(v_fire,st_as_sf(v_thisregion))
 log_it("Clipping fire history complete")
 
 # Add numeric year field to fire and a count flag field
@@ -147,9 +150,9 @@ orast = list()
 
 
 log_it(paste0("Rasterizing ",length(int_list)," fire seasons"))
-
+#il2 = int_list[3:(length(int_list))]
 for(yr in seq_along(int_list)){
-
+#for(yr in seq_along(int_list)){
   log_it(int_list[yr])
   if(file.exists(paste0(rast_temp,"/",int_list[yr],".tif"))){
     log_it("Skipping year as it exists from a previous run.")
@@ -163,7 +166,7 @@ for(yr in seq_along(int_list)){
   
   write_sf(datx,paste0(rast_temp,"/","year_fire.gpkg"))
   
-  rex = paste(extent(tmprast)[c(1,3,2,4)],collapse=" ")
+  rex = paste(ext(tmprast)[c(1,3,2,4)],collapse=" ")
   rres = res(tmprast)
   tr <- terra::rast(tmprast)
   
@@ -193,10 +196,13 @@ for(yr in seq_along(int_list)){
   
   
   # Write progressive rasters
-  if(yr==1){      log_it("Year 1 - calculating r_lastb")
+  if(yr==1){      
+    log_it("Year 1 - calculating r_lastb")
     #r_lastb = calc(this_year, fun=function(x){x* int_list[yr]},filename=paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
     r_lastb = this_year * int_list[yr]
     writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
+    
+    file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
     log_it("Year 1 - calculating r_timesbunr")
     #r_timesburnt = calc(this_year,fun = function(x){0},filename=paste0(rast_temp,"/rNumTimesBurnt.tif"),overwrite=TRUE)
     r_timesburnt = deepcopy(r_lastb)
@@ -232,6 +238,10 @@ for(yr in seq_along(int_list)){
   #print(plot(r_lastb))
   writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
   writeRaster(r_timesburnt + this_year,paste0(rast_temp,"/",'rNumTimesBurnt.tif'),overwrite=TRUE)
+  
+  file.copy(paste0(rast_temp,"/",'rLastYearBurnt.tif'),paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
+  file.copy(paste0(rast_temp,"/",'rNumTimesBurnt.tif'),paste0(rast_temp,"/",'rNumTimesBurnt_',int_list[yr],'.tif'))
+  
   log_it("Deleting")
   rm(r_lastb)
   rm(r_timesburnt)
@@ -245,7 +255,7 @@ for(yr in seq_along(int_list)){
   orast[[yr]]=paste0(rast_temp,"/",int_list[yr],".tif")
 }
 
-
+###---##@#
 
 #rm(comp_stack)
 gc()
@@ -279,6 +289,11 @@ log_it("Last burnt zero to NA")
 #writeRaster(r_lastb,paste0(rast_temp,"/",'rLastYearBurnt.tif'),overwrite=TRUE)
 
 zero_raster('rLastYearBurnt.tif')
+
+
+
+
+
 
 for(yr in seq_along(int_list)){
   #r_lastb = raster(paste0(rast_temp,"/",'rLastYearBurnt_',int_list[yr],'.tif'))
