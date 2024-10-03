@@ -11,10 +11,11 @@ library(doParallel)
 
 #library(mapview)
 
-library(fasterize)
+#library(fasterize)###
 #library(velox)
-library(lwgeom)
-library(sfheaders)
+#library(lwgeom)###
+#library(sfheaders)###
+
 library(terra)
 
 source("../config/global_config.r")
