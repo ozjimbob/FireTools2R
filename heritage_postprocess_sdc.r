@@ -187,7 +187,7 @@ if("future.apply" %in% rownames(installed.packages()) | OS=="Windows"){
   print("Loading future.apply")
   library("future.apply")
 }
-plan(tweak(multiprocess, workers = clustNo,gc=TRUE))
+plan(tweak(multisession, workers = clustNo,gc=TRUE))
 options(future.globals.maxSize = +Inf)
 
 
