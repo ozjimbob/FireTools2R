@@ -12,7 +12,7 @@ if(file.exists(paste0(rast_temp,"/v_region.gpkg"))){
   
   if(d_spatial_unit != ""){
     log_it(paste0("Filtering region layer to ROI:",d_spatial_unit))
-    v_thisregion = filter(corp_gdb,layer=i_vt_boundary,query=paste0("select * from ",i_vt_boundary," where ",f_spatial_unit," = '",d_spatial_unit,"';"))
+    v_thisregion = vect(corp_gdb,layer=i_vt_boundary,query=paste0("select * from ",i_vt_boundary," where ",f_spatial_unit," = '",d_spatial_unit,"';"))
     log_it("Filtering fire history to ROI complete")
   }else{
     #log_it("No filtering of region, creating union")
