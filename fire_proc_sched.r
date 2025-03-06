@@ -3,6 +3,13 @@
 log_it("Loading regions")
 library(terra)
 
+print("Region file:")
+print(v_boundary)
+print("Root files:")
+print(list.files("~"))
+print("Input files:")
+print(list.files("~/inputs"))
+
 v_regions <- vect(v_boundary)
 v_thisregion <- v_regions
 
