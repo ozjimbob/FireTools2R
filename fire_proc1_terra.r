@@ -259,13 +259,15 @@ for(yr in seq_along(int_list)){
       r_lastb = terra::rast(paste0(rast_temp,"/",'rLastYearBurnt.tif'))
       log_it("loading r_timesbunrt")
       r_timesburnt = terra::rast(paste0(rast_temp,"/rNumTimesBurnt.tif"))
-    }# We now have two temp files
+    }
+    # We now have two temp files
     log_it("Adding to stack")
     log_it("New maximum")
     st_test <- c(this_year * int_list[yr],r_lastb)
     r_lastb <- max(st_test,na.rm=TRUE)
     rm(st_test)
     gc()
+    
     # r_lastb = max(stack(this_year* int_list[yr],r_lastb),na.rm=TRUE) # Four temp files
     log_it("Adding to count")
     log_it("Writing intermediate rasters")
@@ -283,8 +285,12 @@ for(yr in seq_along(int_list)){
     
   }
   
+  
+  
   orast[[yr]]=paste0(rast_temp,"/",int_list[yr],".tif")
 }
+
+
 
 
 #rm(comp_stack)
@@ -433,6 +439,25 @@ gc()
 log_it(system("df -h"))
 
 
+## CHECK - FESM FILE
+## Downloads merged FESM
+## Saves cropped/resampled version
+## Saves binary 0/1 class version
+## 0 / False = low severity/unknown
+## 1 / True = high severity
+if(exists("sev_process")){
+  fesm_mos <- rast("/vsicurl/http://ft.bushfirehub.org/images/merge_fesm.tif")
+  fesm_mos <- terra::crop(fesm_mos,rast(tmprast))
+  test <- terra::resample(fesm_mos,rast(tmprast),method="near")
+  writeRaster(test,paste0(rast_temp,"/raw_fesm.tif"),gdal="COMPRESS=LZW",overwrite=TRUE)
+  rclmat <- rbind(c(NA,0),c(1,0),c(2,0),c(3,1),c(4,1),c(5,1))
+  test <- classify(test,rclmat)
+  writeRaster(test,paste0(rast_temp,"/binary_fesm.tif"),gdal="COMPRESS=LZW",overwrite=TRUE)
+}
+
+
+
+
 
 log_it("Reading vegetation layer")
 if(length(i_vt_veg)>1){
@@ -451,11 +476,9 @@ if(length(i_vt_veg)>1){
   v_veg = read_sf(veg_gdb,i_vt_veg)
 }
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#write_sf(v_veg,"mo/veg_01.gpkg")
-print("|||||||||||||||||||||||||||||||||||||||||||||||")
+
 print(nrow(v_veg))
-#print(nrow(filter(v_veg,Id==656269)))
+
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -463,24 +486,16 @@ log_it("Projecting and repairing vegetation layer")
 v_veg = st_transform(v_veg,crs=proj_crs)
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#write_sf(v_veg,"mo/veg_02.gpkg")
-print("|||||||||||||||||||||||||||||||||||||||||||||||")
 print(nrow(v_veg))
-#print(nrow(filter(v_veg,Id==656269)))
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 
 
 # NEW - remove invalid polygons, rather than buffer to 0?
 v_veg <- v_veg %>% filter( is.na(st_dimension(.)) == FALSE )
 v_veg <- remove_invalid_poly(v_veg)
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#write_sf(v_veg,"mo/veg_03.gpkg")
-print("|||||||||||||||||||||||||||||||||||||||||||||||")
+
 print(nrow(v_veg))
-#print(nrow(filter(v_veg,Id==656269)))
+
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # Clip veg to region of interest
@@ -523,42 +538,55 @@ names(v_vegfire_table)[toupper(names(v_vegfire_table))==toupper(f_vegid)] = f_ve
 
 
 log_it("Checking and clearing pre-join names")
-to_remove=c(f_vegmin,f_vegmax,f_vegfireprone,f_vegadv)
+
+###
+###  DECISION POINT FOR FESM
+###
+
+
+if(!exists("sev_process")){
+  to_remove=c(f_vegmin,f_vegmax,f_vegfireprone,f_vegadv)
+}else{
+  to_remove=c(f_vegmin,f_vegmax,f_vegfireprone,f_vegadv,f_vegminlow)
+}
+
 veg_enames = names(v_veg)
 to_remove = intersect(toupper(to_remove),toupper(veg_enames))
 v_veg = v_veg %>% dplyr::select(-to_remove)
 
-
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#write_sf(v_veg,"mo/veg_05.gpkg")
 print("|||||||||||||||||||||||||||||||||||||||||||||||")
 print(nrow(v_veg))
-#print(nrow(filter(v_veg,Id==656269)))
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 log_it("Joining vegetation to LUT")
 v_veg = left_join(v_veg,v_vegfire_table,by=f_vegid)
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#write_sf(v_veg,"mo/veg_06.gpkg")
-print("|||||||||||||||||||||||||||||||||||||||||||||||")
+
 print(nrow(v_veg))
-#print(nrow(filter(v_veg,Id==656269)))
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 log_it("Fixing Missing")
-v_veg[[f_vegmax]][is.na(v_veg[[f_vegmax]])]=0
-v_veg[[f_vegmin]][is.na(v_veg[[f_vegmin]])]=0
-v_veg[[f_vegfireprone]][is.na(v_veg[[f_vegfireprone]])]=0
-v_veg[[f_vegadv]][is.na(v_veg[[f_vegadv]])]=0
+
+###
+###  DECISION POINT FOR FESM
+###
+if(!exists("sev_process")){
+  v_veg[[f_vegmax]][is.na(v_veg[[f_vegmax]])]=0
+  v_veg[[f_vegmin]][is.na(v_veg[[f_vegmin]])]=0
+  v_veg[[f_vegfireprone]][is.na(v_veg[[f_vegfireprone]])]=0
+  v_veg[[f_vegadv]][is.na(v_veg[[f_vegadv]])]=0
+}else{
+  v_veg[[f_vegmax]][is.na(v_veg[[f_vegmax]])]=0
+  v_veg[[f_vegmin]][is.na(v_veg[[f_vegmin]])]=0
+  v_veg[[f_vegfireprone]][is.na(v_veg[[f_vegfireprone]])]=0
+  v_veg[[f_vegadv]][is.na(v_veg[[f_vegadv]])]=0
+  v_veg[[f_vegminlow]][is.na(v_veg[[f_vegminlow]])]=0
+}
 
 #### Fill in missing here?
 
 
 log_it("Saving Vegetation polygon layer")
-#v_veg = dplyr::select(v_veg,Code,Description,PWGArea,EstateName,PWGRegion,NSWCommunity,NSWClass,NSWFormation,VegSource,Region,VEG,MAX,MIN,FireProneV,ADV)
 write_sf(v_veg,paste0(rast_temp,"/v_vegBase.gpkg"),quiet = FALSE)
 log_it("Vegetation polygon base saved")
 
@@ -577,97 +605,97 @@ r_vfp = terra::rasterize(tbl,tr,field=f_vegid,filename=paste0(rast_temp,"/r_vegc
 rm(r_vfp)
 gc()
 
-#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegcode.tif"),attribute=f_vegid)
-
 #system(cmd)
 log_it("Rasterizing vegetation ID Complete")
 
 log_it("Load veg rast")
 # Recode
 this_rast <- rast(paste0(rast_temp,"/r_vegcode.tif"))
-lut <- data.frame(VEG = v_vegfire_table[[f_vegid]],
-                  MAX=v_vegfire_table[[f_vegmax]],
-                  MIN=v_vegfire_table[[f_vegmin]],
-                  FP = v_vegfire_table[[f_vegfireprone]],
-                  ADV = v_vegfire_table[[f_vegadv]])
-
-max_mat <- cbind(lut$VEG,lut$MAX)
-min_mat <- cbind(lut$VEG,lut$MIN)
-fp_mat <- cbind(lut$VEG,lut$FP)
-adv_mat <- cbind(lut$VEG,lut$ADV)
-log_it("Rasterizing vegetation maximum interval")
-cc_max <- classify(this_rast,max_mat,others=NA,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
-log_it("Rasterizing vegetation maximum interval complete")
-log_it("Rasterizing vegetation minimum interval")
-cc_max <- classify(this_rast,min_mat,others=NA,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
-log_it("Rasterizing vegetation minimum interval complete")
-log_it("Rasterizing vegetation fire prone")
-cc_max <- classify(this_rast,fp_mat,others=NA,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
-log_it("Rasterizing vegetation fire prone complete")
-log_it("Rasterizing vegetation fire advantage")
-cc_max <- classify(this_rast,adv_mat,others=NA,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
-log_it("Rasterizing vegetation fire advantage complete")
-rm(tbl)
-rm(cc_max)
-gc()
-
-#r_vegcode = fasterize(v_veg,tmprast,field=f_vegid)
-#writeRaster(r_vegcode,paste0(rast_temp,"/r_vegcode.tif"),overwrite=TRUE)
-#r_vegcode <- NULL
-#rm(r_vegcode)
 
 
+####
+#### DECISION POINT FOR FESM PROCESSING
 
-#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmin.tif"),attribute=f_vegmin)
+if(!exists("sev_process")){
 
-#tbl <- terra::vect(paste0(rast_temp,"/v_vegBase.gpkg"))
-#tr <- terra::rast(tmprast)
-#r_vfp = terra::rasterize(tbl,tr,field=f_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
-#rm(tbl)
-#rm(r_vfp)
-#gc()
+  
+  lut <- data.frame(VEG = v_vegfire_table[[f_vegid]],
+                    MAX=v_vegfire_table[[f_vegmax]],
+                    MIN=v_vegfire_table[[f_vegmin]],
+                    FP = v_vegfire_table[[f_vegfireprone]],
+                    ADV = v_vegfire_table[[f_vegadv]])
+  
+  max_mat <- cbind(lut$VEG,lut$MAX)
+  min_mat <- cbind(lut$VEG,lut$MIN)
+  fp_mat <- cbind(lut$VEG,lut$FP)
+  adv_mat <- cbind(lut$VEG,lut$ADV)
+  log_it("Rasterizing vegetation maximum interval")
+  cc_max <- classify(this_rast,max_mat,others=NA,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation maximum interval complete")
+  log_it("Rasterizing vegetation minimum interval")
+  cc_max <- classify(this_rast,min_mat,others=NA,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation minimum interval complete")
+  log_it("Rasterizing vegetation fire prone")
+  cc_max <- classify(this_rast,fp_mat,others=NA,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation fire prone complete")
+  log_it("Rasterizing vegetation fire advantage")
+  cc_max <- classify(this_rast,adv_mat,others=NA,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation fire advantage complete")
+  rm(tbl)
+  rm(cc_max)
+  gc()
+  
+  rm(tr)
+
+}else{
+  lut <- data.frame(VEG = v_vegfire_table[[f_vegid]],
+                    MAX=v_vegfire_table[[f_vegmax]],
+                    MIN=v_vegfire_table[[f_vegmin]],
+                    FP = v_vegfire_table[[f_vegfireprone]],
+                    ADV = v_vegfire_table[[f_vegadv]],
+                    MINLOW = v_vegfire_table[[f_vegminlow]])
+  
+  max_mat <- cbind(lut$VEG,lut$MAX)
+  min_mat <- cbind(lut$VEG,lut$MIN)
+  low_mat <- cbind(lut$VEG,lut$MINLOW)
+  fp_mat <- cbind(lut$VEG,lut$FP)
+  adv_mat <- cbind(lut$VEG,lut$ADV)
+  log_it("Rasterizing vegetation maximum interval")
+  cc_max <- classify(this_rast,max_mat,others=NA,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation maximum interval complete")
+  
+  log_it("Rasterizing vegetation minimum high interval")
+  cc_max <- classify(this_rast,min_mat,others=NA,filename=paste0(rast_temp,"/r_vegmin_high.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation minimum high interval complete")
+  
+  
+  log_it("Rasterizing vegetation minimum low interval")
+  cc_max <- classify(this_rast,low_mat,others=NA,filename=paste0(rast_temp,"/r_vegmin_low.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation minimum low interval complete")
+  
+  # Select From
+  sev_bin <- rast(paste0(rast_temp,"/binary_fesm.tif"))
+  min_high <- rast(paste0(rast_temp,"/r_vegmin_high.tif"))
+  min_low <- rast(paste0(rast_temp,"/r_vegmin_low.tif"))
+  
+  vegmin <- ifel(sev_bin,min_low,min_high,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
+  rm(vegmin)
+  
+  log_it("Rasterizing vegetation fire prone")
+  cc_max <- classify(this_rast,fp_mat,others=NA,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation fire prone complete")
+  log_it("Rasterizing vegetation fire advantage")
+  cc_max <- classify(this_rast,adv_mat,others=NA,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
+  log_it("Rasterizing vegetation fire advantage complete")
+  rm(tbl)
+  rm(cc_max)
+  gc()
+  
+  rm(tr)
+}
 
 
 
-#system(cmd)
-#r_vegmin = fasterize(v_veg,tmprast,field=f_vegmin)
-#writeRaster(r_vegmin,filename=paste0(rast_temp,"/r_vegmin.tif"),overwrite=TRUE)
-#r_vegmin <- NULL
-#rm(r_vegmin)
-
-
-
-#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegmax.tif"),attribute=f_vegmax)
-#r_vfp = terra::rasterize(tbl,tr,field=f_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
-#rm(r_vfp)
-#system(cmd)
-#r_vegmax = fasterize(v_veg,tmprast,field=f_vegmax)
-#writeRaster(r_vegmax,filename=paste0(rast_temp,"/r_vegmax.tif"),overwrite=TRUE)
-#r_vegmax <- NULL
-#rm(r_vegmax)
-
-
-#log_it("Rasterizing vegetation fire prone")
-#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegfireprone.tif"),attribute=f_vegfireprone)
-#r_vfp = terra::rasterize(tbl,tr,field=f_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
-#rm(r_vfp)
-#system(cmd)
-#r_vegfireprone = fasterize(v_veg,tmprast,field=f_vegfireprone)
-#writeRaster(r_vegfireprone,filename=paste0(rast_temp,"/r_vegfireprone.tif"),overwrite=TRUE)
-#r_vegfireprone <- NULL
-#rm(r_vegfireprone)
-
-
-#cmd = g_rasterize("v_vegBase","v_vegBase.gpkg",paste0(rast_temp,"/r_vegadv.tif"),attribute=f_vegadv)
-#system(cmd)
-#r_vfp = terra::rasterize(tbl,tr,field=f_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
-#rm(r_vfp)
-#rm(tbl)
-rm(tr)
-#r_vegadv = fasterize(v_veg,tmprast,field=f_vegadv)
-#writeRaster(r_vegadv,filename=paste0(rast_temp,"/r_vegadv.tif"),overwrite=TRUE)
-#r_vegadv <- NULL
-#rm(r_vegadv)
 
 # Clean up
 log_it("Cleaning up memory")

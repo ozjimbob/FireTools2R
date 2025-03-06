@@ -9,6 +9,8 @@ rm(mask_tif)
 gc()
 bigWrite(r_vegThreshold,paste0(rast_temp,"/r_vegout.tif"))
 
+
+
 log_it("Converting vegetation biodiversity threshold raster to polygons")
 
 #######

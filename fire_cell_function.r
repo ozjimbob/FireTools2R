@@ -558,6 +558,8 @@ proccell2_terra = function(i){
     
     ## A section
     # 11
+    
+    
     if(is.na(TSF)){TSF <- TSFF}
     if(IntervalStatus == is_TooFreq){
       # 12

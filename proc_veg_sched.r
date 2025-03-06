@@ -8,15 +8,13 @@ library(foreach)
 library(doParallel)
 library(terra)
 # Setup
-#source("../config/global_config.r")
-#source("../config/config_linux.r")
-#source("fire_cell_function.r")
 
-### Load rasters
+
 log_it("Loading year list")
 year_list = read_csv(paste0(rast_temp,"/yearlist.csv"))
 file_list = paste0(rast_temp,"/",year_list$year,".tif")
 int_list = year_list$year
+
 
 # Set up variables
 log_it("Calculating TSFF")
@@ -29,8 +27,8 @@ if(v_TSFF == ""){
 log_it("Loading template raster")
 tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
 
-###
-
+file.copy(f_vegmin,paste0(rast_temp,"/r_vegmin.tif"))
+file.copy(f_vegmax,paste0(rast_temp,"/r_vegmax.tif"))
 
 
 library(future)
@@ -50,6 +48,7 @@ o = future_lapply(1:nrow(tmprast),FUN=proccell2_terra,future.scheduling=1)
 log_it("Biodiversity threshold calculation complete")
 
 
+######
 
 log_it("Rasterizing biodiversity threshold and writing to disk")
 oul = unlist(o)
@@ -67,4 +66,6 @@ writeRaster(ttemprast,paste0(rast_temp,"/r_vegout.tif"))
 rm(ttemprast)
 gc()
 log_it("Biodiversity threshold write complete")
+
+
 
