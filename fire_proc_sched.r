@@ -28,7 +28,7 @@ log_it("Creating template raster")
 align_grid = rast(grid_file)
 
 
-tmp_extent = bbox(align_grid)
+#tmp_extent = terra::bbox(align_grid)
 
 # Make template raster
 log_it("Generating template raster")
