@@ -42,7 +42,7 @@ source("fire_proc_sched.r")
 
 
 log_it("**** Processing heritage vegetation thresholds")
-source("proc_veg1_sched.r")
+source("proc_veg_sched.r")
 
 log_it("**** Vectorizing vegetation")
 source("veg_vectorize.r")
