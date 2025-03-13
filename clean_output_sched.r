@@ -33,9 +33,8 @@ file.copy("manifest.txt", paste0(rast_temp, "/MANIFEST.txt"))
 log_it("Writing raster tables")
 
 
-mask_tif <- raster(paste0(rast_temp, "/roi_mask.tif"))
-mask_tif_t <- rast(paste0(rast_temp, "/roi_mask.tif"))
-rm(v_sfaz)
+mask_tif <- raster(paste0(rast_temp, "/roi_mask.tif"))i
+mask_tif_t <- rast(paste0(rast_temp, "/roi_mask.tif"))i
 gc()
 rm(tm)
 rm(stex)
@@ -95,10 +94,10 @@ rm(temp_d)
 gc()
 
 
-file.rename(
-  paste0(rast_temp, "/v_vegout.gpkg"),
-  paste0(rast_temp, "/v_heritage_threshold_status.gpkg")
-)
+#file.rename(
+#  paste0(rast_temp, "/v_vegout.gpkg"),
+#  paste0(rast_temp, "/v_heritage_threshold_status.gpkg")
+#)
 
 log_it("Setting Proj File")
 proj_file = "3308.prj"
@@ -107,25 +106,48 @@ if(proj_crs=="+proj=utm +zone=57 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +uni
 }
 
 
-log_it("Writing Shapefile version")
+#log_it("Writing Shapefile version")
 
 
-log_it("Writing v_heritage_threshold_status")
-try({
-  er = try({
-  in_file = vect(paste0(rast_temp, "/v_heritage_threshold_status.gpkg"))
-  })
-  if(class(er)=="try-error"){
-    in_file = vect(read_sf(paste0(rast_temp, "/v_heritage_threshold_status.gpkg")))
-  }
-  writeVector(in_file,
-              paste0(rast_temp, "/v_heritage_threshold_status.shp"),
-              overwrite = TRUE)
-  file.copy(proj_file,
-            paste0(rast_temp, "/v_heritage_threshold_status.prj"),
-            overwrite = TRUE)
-})
+#log_it("Writing v_heritage_threshold_status")
+#try({
+#  er = try({
+#  in_file = vect(paste0(rast_temp, "/v_heritage_threshold_status.gpkg"))
+#  })
+#  if(class(er)=="try-error"){
+#    in_file = vect(read_sf(paste0(rast_temp, "/v_heritage_threshold_status.gpkg")))
+#  }
+#  writeVector(in_file,
+#              paste0(rast_temp, "/v_heritage_threshold_status.shp"),
+#              overwrite = TRUE)
+#  file.copy(proj_file,
+#            paste0(rast_temp, "/v_heritage_threshold_status.prj"),
+#            overwrite = TRUE)
+#})
 
+#### Summary Tables
+veg_form <- rast(f_vegform)
+formLUT <- read_csv(f_formLUT)
+r_heritage <- rast(paste0(rast_temp, "/r_heritage_threshold_status.tif"))
 
+ctc <- c(veg_form,r_heritage)
+ctab <- crosstab(ctc)
+ctab <- as_tibble(ctab)
+names(ctab)[1] = "ID"
+ctab$ID <- as.numeric(ctab$ID)
+ctab <- left_join(ctab,formLUT)
+ctab$ID <- NULL
 
-
+her_LUT <- tibble(r_heritage_threshold_status=c("1","2","3","4","5"),
+                  bioStatus = c("NoFireRegime",
+                                "TooFrequentlyBurnt",
+                                "Vulnerable",
+                                "LongUnburnt",
+                                "WithinThreshold"))
+ctab <- left_join(ctab,her_LUT)
+ctab$r_heritage_threshold_status <- NULL
+ctab$n <- ctab$n * (as.numeric(ras_res)^2) / 10000
+ctab$Branch <- name
+ctab$AreaHA <- ctab$n
+ctab$n <- NULL
+write_csv(ctab,paste0(rast_temp,"/form_area_summary.csv"))

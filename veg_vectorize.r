@@ -75,3 +75,9 @@ write_sf(v_vegThreshold,paste0(rast_temp,"/v_vegout.gpkg"))
 r_vegThreshold <- NULL
 rm(r_vegThreshold)
 gc()
+
+
+
+
+
+
