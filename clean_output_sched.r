@@ -128,12 +128,18 @@ if(proj_crs=="+proj=utm +zone=57 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +uni
 #### Summary Tables
 veg_form <- rast(f_vegform)
 formLUT <- read_csv(f_formLUT)
+log_it("Vegform Names")
+log_it(names(formLUT))
 r_heritage <- rast(paste0(rast_temp, "/r_heritage_threshold_status.tif"))
 
 ctc <- c(veg_form,r_heritage)
 ctab <- crosstab(ctc)
 ctab <- as_tibble(ctab)
 names(ctab)[1] = "ID"
+
+log_it("ctab Names")
+log_it(names(ctab))
+
 ctab$ID <- as.numeric(ctab$ID)
 ctab <- left_join(ctab,formLUT)
 ctab$ID <- NULL
@@ -144,10 +150,17 @@ her_LUT <- tibble(r_heritage_threshold_status=c("1","2","3","4","5"),
                                 "Vulnerable",
                                 "LongUnburnt",
                                 "WithinThreshold"))
+
+log_it("ctab Names")
+log_it(names(ctab))
+log_it("her_LUT Names")
+log_it(names(her_LUT))
+
 ctab <- left_join(ctab,her_LUT)
 ctab$r_heritage_threshold_status <- NULL
 ctab$n <- ctab$n * (as.numeric(ras_res)^2) / 10000
 ctab$Branch <- name
 ctab$AreaHA <- ctab$n
 ctab$n <- NULL
+log_it("writing csv")
 write_csv(ctab,paste0(rast_temp,"/form_area_summary.csv"))
