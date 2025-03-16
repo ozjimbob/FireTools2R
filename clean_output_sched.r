@@ -33,8 +33,8 @@ file.copy("manifest.txt", paste0(rast_temp, "/MANIFEST.txt"))
 log_it("Writing raster tables")
 
 
-mask_tif <- raster(paste0(rast_temp, "/roi_mask.tif"))i
-mask_tif_t <- rast(paste0(rast_temp, "/roi_mask.tif"))i
+mask_tif <- raster(paste0(rast_temp, "/roi_mask.tif"))
+mask_tif_t <- rast(paste0(rast_temp, "/roi_mask.tif"))
 gc()
 rm(tm)
 rm(stex)
