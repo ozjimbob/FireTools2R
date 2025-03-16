@@ -144,7 +144,7 @@ ctab$ID <- as.numeric(ctab$ID)
 ctab <- left_join(ctab,formLUT)
 ctab$ID <- NULL
 
-her_LUT <- tibble(r_heritage_threshold_status=c("1","2","3","4","5"),
+her_LUT <- tibble(category=c("1","2","3","4","5"),
                   bioStatus = c("NoFireRegime",
                                 "TooFrequentlyBurnt",
                                 "Vulnerable",
@@ -153,6 +153,7 @@ her_LUT <- tibble(r_heritage_threshold_status=c("1","2","3","4","5"),
 
 log_it("ctab Names")
 log_it(names(ctab))
+
 log_it("her_LUT Names")
 log_it(names(her_LUT))
 
