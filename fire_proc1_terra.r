@@ -479,6 +479,19 @@ if(length(i_vt_veg)>1){
 
 print(nrow(v_veg))
 
+####
+# TERRA REPAIR
+write_sf(v_veg,paste0(rast_temp,"/vegtemp1.gpkg"))
+t_veg <- vect(paste0(rast_temp,"/vegtemp1.gpkg"))
+t_veg <- terra::makeValid(t_veg)
+t_veg <- terra::buffer(t_veg,0)
+writeVector(t_veg,paste0(rast_temp,"/vegtemp2.gpkg"))
+unlink(paste0(rast_temp,"/vegtemp1.gpkg"))
+
+v_veg <- read_sf(paste0(rast_temp,"/vegtemp2.gpkg"))
+
+
+
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #x <- st_cast(v_veg, "POLYGON")
 
@@ -486,13 +499,8 @@ log_it("Projecting and repairing vegetation layer")
 v_veg = st_transform(v_veg,crs=proj_crs)
 log_it("Casting to multipolygon")
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
-log_it("Calculating slither area")
-tt=st_area(v_veg)
 
-tt=as.numeric(tt)
-tt=tt>1
-log_it("Remove Slithers")
-v_veg=v_veg[tt,]
+
 log_it("Filter non-2D")
 # NEW - remove invalid polygons, rather than buffer to 0?
 v_veg <- v_veg %>% filter( is.na(st_dimension(.)) == FALSE )
@@ -503,18 +511,6 @@ v_veg <- remove_invalid_poly(v_veg)
 print(nrow(v_veg))
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-# Clip veg to region of interest
-log_it("Clipping vegetation layer")
-
-#v_veg=st_buffer(v_veg,0)
-
-
-#v_veg = st_intersection(v_veg,v_thisregion)
-log_it("Clipping vegetation complete")
-#v_veg = st_make_valid(v_veg) # repair invalid geometries
-log_it("Projecting vegetation complete")
-
 # <-
 
 # Remove empty polygons
@@ -597,6 +593,7 @@ write_sf(v_veg,paste0(rast_temp,"/v_vegBase.gpkg"),quiet = FALSE)
 log_it("Vegetation polygon base saved")
 
 v_veg = NULL
+unlink(paste0(rast_temp,"/vegtemp2.gpkg"))
 rm(v_veg)
 gc()
 
