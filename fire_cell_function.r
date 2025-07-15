@@ -1178,7 +1178,7 @@ remove_invalid_poly <- function(xx){
     aa = st_geometry(xx)[[fix_list]]
     to_remove = c()
     for(i in 1:length(aa)){
-      if(st_is_empty(aa[[i]])){
+      if(st_is_empty(aa[[i]])){   # As polygon wrapper
         to_remove <- c(to_remove,i)
       }else{
       

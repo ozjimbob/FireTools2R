@@ -480,17 +480,23 @@ if(length(i_vt_veg)>1){
 print(nrow(v_veg))
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+#x <- st_cast(v_veg, "POLYGON")
 
 log_it("Projecting and repairing vegetation layer")
 v_veg = st_transform(v_veg,crs=proj_crs)
+log_it("Casting to multipolygon")
 v_veg = st_cast(v_veg,"MULTIPOLYGON") # Multisurface features cause errors
+log_it("Calculating slither area")
+tt=st_area(v_veg)
 
-print(nrow(v_veg))
-
-
+tt=as.numeric(tt)
+tt=tt>1
+log_it("Remove Slithers")
+v_veg=v_veg[tt,]
+log_it("Filter non-2D")
 # NEW - remove invalid polygons, rather than buffer to 0?
 v_veg <- v_veg %>% filter( is.na(st_dimension(.)) == FALSE )
+log_it("Removing Invalid Polygons")
 v_veg <- remove_invalid_poly(v_veg)
 
 
