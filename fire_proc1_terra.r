@@ -481,14 +481,14 @@ print(nrow(v_veg))
 
 ####
 # TERRA REPAIR
-write_sf(v_veg,paste0(rast_temp,"/vegtemp1.gpkg"))
-t_veg <- vect(paste0(rast_temp,"/vegtemp1.gpkg"))
-t_veg <- terra::makeValid(t_veg)
-t_veg <- terra::buffer(t_veg,0)
-writeVector(t_veg,paste0(rast_temp,"/vegtemp2.gpkg"))
-unlink(paste0(rast_temp,"/vegtemp1.gpkg"))
+#write_sf(v_veg,paste0(rast_temp,"/vegtemp1.gpkg"))
+#t_veg <- vect(paste0(rast_temp,"/vegtemp1.gpkg"))
+#t_veg <- terra::makeValid(t_veg)
+#t_veg <- terra::buffer(t_veg,0)
+#writeVector(t_veg,paste0(rast_temp,"/vegtemp2.gpkg"))
+#unlink(paste0(rast_temp,"/vegtemp1.gpkg"))
 
-v_veg <- read_sf(paste0(rast_temp,"/vegtemp2.gpkg"))
+#v_veg <- read_sf(paste0(rast_temp,"/vegtemp2.gpkg"))
 
 
 
@@ -593,7 +593,7 @@ write_sf(v_veg,paste0(rast_temp,"/v_vegBase.gpkg"),quiet = FALSE)
 log_it("Vegetation polygon base saved")
 
 v_veg = NULL
-unlink(paste0(rast_temp,"/vegtemp2.gpkg"))
+#unlink(paste0(rast_temp,"/vegtemp2.gpkg"))
 rm(v_veg)
 gc()
 
