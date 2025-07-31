@@ -76,8 +76,8 @@ log_it("Generating template raster")
 tmprast = raster(ext=tmp_extent, res=c(ras_res,ras_res), crs=proj_crs)
 
 v_vr_mask$flag = 1
-mask_tif = terra::rasterize(v_vr_mask,rast(tmprast),field="flag",fun="max",paste0(rast_temp,"/roi_mask.tif"),crs=crs(v_vr_mask))
-
+mask_tif = terra::rasterize(v_vr_mask,rast(tmprast),field="flag",fun="max",paste0(rast_temp,"/roi_mask.tif"))
+writeRaster(tmprast,paste0(rast_temp,"/template.tif"))
 
 
 ####### NEW
@@ -139,10 +139,16 @@ for(ii in 1:length(full_list)){
     ext(this_binary)<-fst
     log_it("cropping")
     this_binary = terra::crop(this_binary,rast(tmprast))
-    
+    this_binary <- terra::resample(this_binary,rast(tmprast),method="mode") ###################
     log_it("writing")
     writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U",overwrite=TRUE)
-  }
+  }else{
+    log_it(paste0("Faking year:",this_year))
+    this_binary <-tmprast
+    values(this_binary)=0
+    log_it("writing") 
+    writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U",overwrite=TRUE)
+ }
   
   
   log_it("times burnt")
@@ -161,6 +167,8 @@ for(ii in 1:length(full_list)){
   r_tsl = terra::crop(r_tsl,rast(tmprast))
   r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
   
+    r_tsl <- terra::resample(r_tsl,rast(tmprast),method="mode") ###################
+    r_timesburnt <- terra::resample(r_timesburnt,rast(tmprast),method="mode") ###################
   log_it("writing")
   writeRaster(r_tsl,paste0(temp_fire_dir,"/rTimeSinceLast_",this_year,".tif"),overwrite=TRUE)
   writeRaster(r_timesburnt,paste0(temp_fire_dir,"/rNumTimesBurnt_",this_year,".tif"),overwrite=TRUE)
@@ -388,9 +396,10 @@ if(single_year=="no_timeseries"){
 ## Write maps
 if(single_year=="timeseries"){
   to_repair <- list.files(rast_temp,pattern=".tif")
+  to_repair <- to_repair[to_repair != "template.tif"]
   sub <- gsub("vegout","heritage_threshold_status",to_repair)
   for(i in seq_along(to_repair)){
-    print(to_repair[i])
+    log_it(to_repair[i])
     rx_write_terra(to_repair[i],sub[i])
     #esri_output(sub[i])
     gc()
@@ -417,7 +426,8 @@ if(single_year=="timeseries"){
 
 if(single_year=="selected"){
   to_repair <- paste0("r_vegout_",current_year,".tif")
-  sub <- gsub("vegout","heritage_threshold_status",to_repair)
+ 
+   sub <- gsub("vegout","heritage_threshold_status",to_repair)
     print(to_repair)
     rx_write(to_repair,sub)
     esri_output(sub)
