@@ -4,14 +4,20 @@ library(terra)
 log_it("Loading regions")
 
 v_regions = read_sf(corp_gdb,i_vt_boundary)
-
+v_regions= st_zm(v_regions, drop = TRUE, what = "ZM")
 if(d_spatial_unit != ""){
   log_it(paste0("Filtering region layer to ROI:",d_spatial_unit))
   v_thisregion = filter(v_regions,(!!rlang::sym(f_spatial_unit)) == d_spatial_unit)
+  if("sfc" %in% class(v_thisregion)){
+    v_thisregion <- st_as_sf(v_thisregion)
+  }
   log_it("Filtering fire history to ROI complete")
 }else{
   log_it("No filtering of region, creating union")
   v_thisregion = st_union(v_regions)
+  if("sfc" %in% class(v_thisregion)){
+    v_thisregion <- st_as_sf(v_thisregion)
+  }
   log_it("Union complete")
 }
 
