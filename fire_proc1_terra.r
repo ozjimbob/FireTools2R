@@ -343,7 +343,13 @@ log_it("Vectorizing time since last burnt")
 
 if(OS=="Windows"){
   log_it("Windows Polygonizer")
-  v_tsl = polygonizer_win(r_tsl)
+  
+  v_tsl = try(polygonizer_win(r_tsl))
+  
+  if("try-error" %in% class(v_tsl)){
+    v_tsl = polygonizer_terra(r_tsl)
+    names(v_tsl)[1]<-"DN"
+  }
 }else{
   log_it("Linux Polygonizer")
   v_tsl = polygonizer(r_tsl)
@@ -406,7 +412,16 @@ log_it("Vectorizing times burnt")
 
 
 if(OS=="Windows"){
-  v_timesburnt = polygonizer_win(r_timesburnt)
+  #v_timesburnt = polygonizer_win(r_timesburnt)
+  v_timesburnt = try(polygonizer_win(r_timesburnt))
+  
+  if("try-error" %in% class(v_timesburnt)){
+    v_timesburnt = polygonizer_terra(r_timesburnt)
+    names(v_timesburnt)[1]<-"DN"
+  }
+  
+  
+  
 }else{
   v_timesburnt = polygonizer(r_timesburnt)
 }

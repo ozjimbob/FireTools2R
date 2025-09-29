@@ -76,8 +76,11 @@ log_it("Adding labels to vegetation raster")
 
 log_it("Loading vegetation raster and vector")
 vegbase = read_sf(paste0(rast_temp, "/v_vegBase.gpkg"))
+
 vegcode = raster(paste0(rast_temp, "/r_vegcode.tif"))
 vegcode = vegcode * mask_tif
+
+vegbase <- st_drop_geometry(vegbase)
 
 log_it("Generating code table")
 codelist = tibble(ID = unique(vegbase[[f_vegid]]))
@@ -86,6 +89,9 @@ codelist$category = ""
 log_it("Finding VegText")
 vt = which(substr(names(vegbase), 1, 7) == "VEGTEXT")[1]
 log_it("Looping Codelist")
+
+
+
 for (i in seq_along(codelist$ID)) {
   log_it(paste0("Veg: ", i))
   thisveg = filter(vegbase, !!rlang::sym(f_vegid) == codelist$ID[i])
