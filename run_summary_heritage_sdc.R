@@ -53,7 +53,7 @@ if(exists("filter_year")){
 # ALT LUT
 #lut <- read_csv("R:/SET/PlantSci/ForestEcology/FireHub/fullstate_100m/lut.csv")
 # Load veg
-veg <- read_sf(paste0(veg_folder,"/","v_vegBase.gpkg"))
+#veg <- read_sf(paste0(veg_folder,"/","v_vegBase.gpkg"))
 veg_r <- rast(paste0(veg_folder,"/","r_vegcode.tif"))
 
 ####################
@@ -78,7 +78,7 @@ veg_ns <- distinct(veg_ns)
 veg_ns <- left_join(vc,veg_ns)
 veg_ns[[veg_field]]<-toupper(veg_ns[[veg_field]])
 
-rm(veg)
+#rm(veg)
 rm(veg_r)
 gc()
 

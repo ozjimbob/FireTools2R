@@ -15,6 +15,13 @@ library(Rcpp)
 ### Load rasters
 log_it("Loading year list")
 year_list = read_csv(paste0(fire_folder,"/yearlist.csv"))
+
+if(future_years != 0){
+  new_year_list <- tibble(year =(max(year_list)+1):(max(year_list)+future_years) )
+  year_list <- bind_rows(year_list,new_year_list)
+}
+
+
 if(exists("history_start_year")){
   log_it(paste0("History start year found: ",history_start_year))
   year_list <- dplyr::filter(year_list,year >= history_start_year)
@@ -142,36 +149,65 @@ for(ii in 1:length(full_list)){
     this_binary <- terra::resample(this_binary,rast(tmprast),method="mode") ###################
     log_it("writing")
     writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U",overwrite=TRUE)
+    just_processed <- this_year
+    
+    
+    log_it("times burnt")
+    r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
+    fst <- align(ext(r_timesburnt),rast(tmprast))
+    ext(r_timesburnt)<-fst
+    log_it("times since last")
+    r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
+    fst <- align(ext(r_tsl),rast(tmprast))
+    ext(r_tsl)<-fst
+    
+    gc()
+    
+    log_it("cropping")
+    #st = terra::crop(st,the_tmprast)
+    r_tsl = terra::crop(r_tsl,rast(tmprast))
+    r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
+    
+    r_tsl <- terra::resample(r_tsl,rast(tmprast),method="mode") ###################
+    r_timesburnt <- terra::resample(r_timesburnt,rast(tmprast),method="mode") ###################
+    log_it("writing")
+    writeRaster(r_tsl,paste0(temp_fire_dir,"/rTimeSinceLast_",this_year,".tif"),overwrite=TRUE)
+    writeRaster(r_timesburnt,paste0(temp_fire_dir,"/rNumTimesBurnt_",this_year,".tif"),overwrite=TRUE)
+    
+    
   }else{
     log_it(paste0("Faking year:",this_year))
     this_binary <-tmprast
     values(this_binary)=0
     log_it("writing") 
     writeRaster(this_binary,paste0(temp_fire_dir,"/",this_year,".tif"),datatype="INT1U",overwrite=TRUE)
+    
+    
+    log_it("times burnt fake")
+    r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",just_processed,".tif"))
+    fst <- align(ext(r_timesburnt),rast(tmprast))
+    ext(r_timesburnt)<-fst
+    log_it("times since last")
+    r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",just_processed,".tif"))
+    fst <- align(ext(r_tsl),rast(tmprast))
+    ext(r_tsl)<-fst
+    
+    gc()
+    
+    log_it("cropping")
+    #st = terra::crop(st,the_tmprast)
+    r_tsl = terra::crop(r_tsl,rast(tmprast)) + (this_year-just_processed)
+    r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
+    
+    r_tsl <- terra::resample(r_tsl,rast(tmprast),method="mode") ###################
+    r_timesburnt <- terra::resample(r_timesburnt,rast(tmprast),method="mode") ###################
+    log_it("writing")
+    writeRaster(r_tsl,paste0(temp_fire_dir,"/rTimeSinceLast_",this_year,".tif"),overwrite=TRUE)
+    writeRaster(r_timesburnt,paste0(temp_fire_dir,"/rNumTimesBurnt_",this_year,".tif"),overwrite=TRUE)
+    
  }
   
   
-  log_it("times burnt")
-  r_timesburnt= terra::rast(paste0(fire_folder,"/rNumTimesBurnt_",this_year,".tif"))
-  fst <- align(ext(r_timesburnt),rast(tmprast))
-  ext(r_timesburnt)<-fst
-  log_it("times since last")
-  r_tsl= terra::rast(paste0(fire_folder,"/rTimeSinceLast_",this_year,".tif"))
-  fst <- align(ext(r_tsl),rast(tmprast))
-  ext(r_tsl)<-fst
-  
-  gc()
-  
-  log_it("cropping")
-  #st = terra::crop(st,the_tmprast)
-  r_tsl = terra::crop(r_tsl,rast(tmprast))
-  r_timesburnt = terra::crop(r_timesburnt,rast(tmprast))
-  
-    r_tsl <- terra::resample(r_tsl,rast(tmprast),method="mode") ###################
-    r_timesburnt <- terra::resample(r_timesburnt,rast(tmprast),method="mode") ###################
-  log_it("writing")
-  writeRaster(r_tsl,paste0(temp_fire_dir,"/rTimeSinceLast_",this_year,".tif"),overwrite=TRUE)
-  writeRaster(r_timesburnt,paste0(temp_fire_dir,"/rNumTimesBurnt_",this_year,".tif"),overwrite=TRUE)
   
 }
 
@@ -248,8 +284,8 @@ if(single_year=="no_timeseries"){
 
 if(single_year=="timeseries"){
   log_it("Single Year = TimeSeries")
-  all_years <- list.files(fire_folder)
-  
+  #all_years <- list.files(fire_folder)
+  all_years <- list.files(temp_fire_dir)
   
   all_years <- all_years[grep(pattern="rNumTimesBurnt_",all_years)]
   all_years <- as.numeric(substr(all_years,16,19))

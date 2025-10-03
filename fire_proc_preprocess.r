@@ -106,10 +106,17 @@ log_it("Clipping fire history to ROI")
 v_fire = st_intersection(v_fire,st_as_sf(v_thisregion))
 log_it("Clipping fire history complete")
 
+log_it("Adding numeric year")
+
+
 # Add numeric year field to fire and a count flag field
 v_fire$numYear = as.numeric(substr(as.character(v_fire[[f_fireseason]]),1,4))
+
+print(v_fire$numYear)
+
 v_fire$count = 1
 
+log_it("Filtering TSFF")
 # If v_TSFF is defined, subset v_fire to only years including or after this fireseason
 if(v_TSFF != ""){
   v_fire = filter(v_fire,numYear >= as.numeric(v_TSFF))
@@ -122,6 +129,7 @@ if(v_TSFF != ""){
 ##### Make fire count raster
 
 # Get list of seasons, and also numeric years
+log_it("Buffering and repairing")
 v_fire = st_buffer(v_fire,0)
 v_firex = filter(v_fire,st_geometry_type(v_fire)=="GEOMETRYCOLLECTION")
 v_fire= filter(v_fire,!st_geometry_type(v_fire)=="GEOMETRYCOLLECTION")
@@ -130,7 +138,7 @@ if(nrow(v_firex)>0){
   v_firex = st_collection_extract(v_firex, "POLYGON") 
   v_fire = rbind(v_fire,v_firex)
 }
-
+log_it("Get Int List")
 int_list = sort(unique(v_fire$numYear))
 ##
 int_list = c(int_list,as.character(current_year:(current_year+future_years)))
@@ -191,6 +199,7 @@ for(yr in seq_along(int_list)){
     log_it("NO FIRE FOUND skipping to blank raster.")
     this_year <- tr
     terra::values(this_year)<-0
+    terra::writeRaster(this_year,filename=paste0(rast_temp,"/",int_list[yr],".tif"),overwrite=TRUE,wopt=list(datatype="INT1U"))
   }
   
   
