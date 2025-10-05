@@ -98,7 +98,8 @@ proccell2_post_sdc = function(i,cyear=0,the_tmprast){
     new_file_list = new_file_list[to_keep]
     int_list = int_list[to_keep]
     
-    
+    print("Sub File list")
+    print(new_file_list)
     st = terra::rast(new_file_list)
     r_timesburnt= terra::rast(paste0(temp_fire_dir,"/rNumTimesBurnt_",cyear,".tif"))
     r_tsl= terra::rast(paste0(temp_fire_dir,"/rTimeSinceLast_",cyear,".tif"))
