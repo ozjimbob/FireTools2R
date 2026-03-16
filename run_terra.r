@@ -54,6 +54,11 @@ log_it("**** Processing merged vegetation and Fire Management Blocks")
 source("proc_fmz_veg_merge.r")
 log_it("**** Processing Strategic Fire Advantage Zone Thresholds")
 source("proc_sfaz.r")
+
+if(proc_YULU=="Yes"){
+  log_it("**** Processing YULU/YUWT")
+  source("proc_yulu.r")
+}
 log_it("**** Rendering output maps")
 source("render_maps.r")
 
