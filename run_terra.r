@@ -58,7 +58,10 @@ source("proc_sfaz.r")
 if(proc_YULU=="Yes"){
   log_it("**** Processing YULU/YUWT")
   source("proc_yulu.r")
+}else{
+  log_it("**** NO YULU/YUWT Processing")
 }
+
 log_it("**** Rendering output maps")
 source("render_maps.r")
 
