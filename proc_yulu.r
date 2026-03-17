@@ -16,8 +16,11 @@ min <- rast(paste0(rast_temp,"/r_vegmin.tif"))
 
 log_it("Creating 9999 cover mask")
 # Grab a max/min=9999 mask we can use later
-max_9999 <- subst(max,9999,9999,others=NA)
-min_9999 <- subst(min,9999,9999,others=NA)
+#max_9999 <- subst(max,9999,9999,others=NA)
+#min_9999 <- subst(min,9999,9999,others=NA)
+max[max != 9999]=NA
+min[min != 9999]=NA
+
 maxmin_c <- cover(max_9999,min_9999)
 
 # Calculate YearsUntillLongUnburnt (YULU)
