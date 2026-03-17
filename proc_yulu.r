@@ -18,10 +18,13 @@ log_it("Creating 9999 cover mask")
 # Grab a max/min=9999 mask we can use later
 #max_9999 <- subst(max,9999,9999,others=NA)
 #min_9999 <- subst(min,9999,9999,others=NA)
-max[max != 9999]=NA
-min[min != 9999]=NA
+
+max_9999 <- ifel(max==9999,9999,NA)
+min_9999 <- ifel(min==9999,9999,NA)
 
 maxmin_c <- cover(max_9999,min_9999)
+rm(max_9999)
+rm(min_9999)
 
 # Calculate YearsUntillLongUnburnt (YULU)
 
