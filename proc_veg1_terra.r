@@ -52,6 +52,7 @@ log_it("Biodiversity threshold calculation complete")
 
 
 log_it("Rasterizing biodiversity threshold and writing to disk")
+
 oul = unlist(o)
 values(tmprast)=oul
 o <- NULL
@@ -61,8 +62,8 @@ rm(oul)
 gc()
 
 ttemprast = terra::rast(tmprast)
-
-
+#tr <- raster(tmprast)
+#bigWrite(tr,paste0(rast_temp,"/r_vegout.tif"))
 writeRaster(ttemprast,paste0(rast_temp,"/r_vegout.tif"))
 rm(ttemprast)
 gc()

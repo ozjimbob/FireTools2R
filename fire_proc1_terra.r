@@ -352,8 +352,15 @@ if(OS=="Windows"){
   }
 }else{
   log_it("Linux Polygonizer")
-  v_tsl = polygonizer(r_tsl)
+  v_tsl = try(polygonizer(r_tsl))
+  if("try-error" %in% class(v_tsl)){
+    v_tsl = polygonizer_terra(r_tsl)
+    names(v_tsl)[1]<-"DN"
+  }
 }
+
+
+
 log_it(system("df -h"))
 log_it("Converting SP to SF")
 v_tsl = st_as_sf(v_tsl)
@@ -420,10 +427,15 @@ if(OS=="Windows"){
     names(v_timesburnt)[1]<-"DN"
   }
   
-  
-  
 }else{
-  v_timesburnt = polygonizer(r_timesburnt)
+  log_it("Linux Polygonizer")
+  v_timesburnt = try(polygonizer(r_timesburnt))
+  if("try-error" %in% class(v_timesburnt)){
+    v_timesburnt = polygonizer_terra(r_timesburnt)
+    names(v_timesburnt)[1]<-"DN"
+  }
+  
+  
 }
 
 v_timesburnt = st_as_sf(v_timesburnt)
