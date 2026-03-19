@@ -134,7 +134,6 @@ log_it("Write YUWT Shapefile")
 write_sf(v_YUWT,paste0(rast_temp,"/v_YUWT.shp"))
 ### TO DO - LOGGING, SHAPEFILE
 
-rm(v_YULU)
 rm(v_YUWT)
 gc()
 log_it("Done YULU")

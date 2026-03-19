@@ -2,9 +2,9 @@
 library(tidyverse)
 library(sf)
 library(raster)
-library(tmap)
-library(tmaptools)
-library(htmlwidgets)
+#library(tmap)
+#library(tmaptools)
+#library(htmlwidgets)
 
 #source("../config/global_config.r")
 #source("../config/config_linux.r")

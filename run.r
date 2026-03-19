@@ -85,7 +85,7 @@ if(proc_YULU=="Yes"){
 
 
 log_it("**** Rendering output maps")
-source("render_maps.r")
+#source("render_maps.r")
 
 log_it("**** Clean output")
 source("clean_output.r")
