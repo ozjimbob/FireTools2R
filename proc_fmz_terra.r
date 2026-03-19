@@ -1,7 +1,7 @@
 # Calculate fire management zone thresholds
 library(tidyverse)
 library(sf)
-library(velox)
+#library(velox)
 library(raster)
 #library(spatial.tools)
 library(foreach)
