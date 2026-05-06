@@ -451,3 +451,77 @@ try({
   file.copy(proj_file, paste0(rast_temp, "/v_vegBase.prj"), overwrite =
               TRUE)
 })
+
+
+# Create merged YULU output shapefile
+
+if(proc_YULU=="Yes"){
+# Load veg
+  # as a single feature class (both calcs in 1), and for that feature class to include attribute fields for BioStatus, Min, Max, and TSF. 
+  hts <- vect(paste0(rast_temp, "/v_heritage_threshold_status.gpkg"))
+  tsf <- vect(paste0(rast_temp, "/v_tsl.gpkg"))
+  
+  # Union the two layers
+  hts_tsf_o <- union(hts,tsf)
+  
+  # Fill empty NA values with something otherwise aggregate fails
+  hts_tsf_o$BioStatus[is.na(hts_tsf_o$BioStatus)]=""
+  hts_tsf_o$TSL[is.na(hts_tsf_o$TSL)]=9999
+  
+  # Aggregate across those fields
+  hts_tsf_o <- aggregate(hts_tsf_o,by=c("BioStatus","TSL"))
+  hts_tsf_o$agg_n<-NULL
+  # Next - max and min
+  
+  # Load min/max
+  r_min <- rast(paste0(rast_temp, "/r_vegmin.tif"))
+  r_max <- rast(paste0(rast_temp, "/r_vegmax.tif"))
+  r_min <- as.polygons(r_min)
+  r_max <- as.polygons(r_max)
+  names(r_min)<-"MIN"
+  names(r_max)<-"MAX"
+  
+  r_both <- union(r_min,r_max)
+  
+  # Merge to veg state
+  # Union the two layers
+  hts_int <- union(r_both,hts_tsf_o)
+  
+  # remove NAs
+  hts_int$BioStatus[is.na(hts_int$BioStatus)]=""
+  hts_int$TSL[is.na(hts_int$TSL)]=9999
+  hts_int$MAX[is.na(hts_int$MAX)]=9999
+  hts_int$MIN[is.na(hts_int$MIN)]=9999
+  
+  # Aggregate
+  hts_int <- aggregate(hts_int,by=c("BioStatus","TSL","MAX","MIN"))
+  hts_int$agg_n <- NULL
+  
+  
+  # Clear some memory
+  rm(hts_tsf_o)
+  rm(r_min)
+  rm(r_max)
+  rm(hts)
+  rm(tsf)
+  gc()
+  
+  # NExt add YULU etc
+  yulu <- vect(paste0(rast_temp, "/v_YULU.gpkg"))
+  yuwt <- vect(paste0(rast_temp, "/v_YUWT.gpkg"))
+  
+  # Merge them - this will take a while
+  yu_merge <- union(yulu,yuwt)
+  yu_merge <- aggregate(yu_merge,by=c("YULU","YUWT"))
+  yu_merge$agg_n <- NULL
+  
+  
+  rm(yulu)
+  rm(yuwt)
+  gc()
+  
+  # Now merge to main
+  hts_yul <- union(yu_merge,hts_int)
+  writeVector(hts_yul,paste0(rast_temp, "/v_combined_status.gpkg"))
+  writeVector(hts_yul,paste0(rast_temp, "/v_combined_status.shp"))
+}
