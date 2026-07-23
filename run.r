@@ -79,6 +79,7 @@ source("proc_sfaz.r")
 if(proc_YULU=="Yes"){
   log_it("**** Processing YULU/YUWT")
   source("proc_yulu.r")
+  source("tcode_yulu_combine.r")
 }else{
   log_it("**** NO YULU/YUWT Processing")
 }
