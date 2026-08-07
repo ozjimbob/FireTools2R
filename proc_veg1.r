@@ -23,7 +23,7 @@ log_it("Calculating TSFF")
 if(v_TSFF == ""){
   TSFF = current_year-min(int_list)
 }else{
-  TSFF = as.numeric(v_TSFF)
+  TSFF =  current_year-as.numeric(v_TSFF)
 }
 
 log_it("Loading template raster")
