@@ -11,6 +11,7 @@ log_it("Loading source rasters")
 
 hts <- rast(paste0(rast_temp,"/r_vegout.tif"))
 tsl <- rast(paste0(rast_temp,"/rTimeSinceLast.tif"))
+tsl[is.na(tsl)] <- TSFF
 max <- rast(paste0(rast_temp,"/r_vegmax.tif"))
 min <- rast(paste0(rast_temp,"/r_vegmin.tif"))
 
