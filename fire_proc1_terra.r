@@ -86,23 +86,29 @@ v_fire = st_make_valid(v_fire) # repair invalid geometries
 log_it("Fire history import complete")
 
 
-# Clip fire to region of interest
-log_it("Clipping fire history to ROI")
-v_fire = st_intersection(v_fire,v_thisregion)
-log_it("Clipping fire history complete")
-
-# Add numeric year field to fire and a count flag field
 v_fire$numYear = as.numeric(substr(as.character(v_fire[[f_fireseason]]),1,4))
 v_fire$count = 1
 
+# Clip fire to region of interest
+log_it("Clipping fire history to ROI")
+log_it(paste0("Oldest fire pre-clip:",min(v_fire$numYear)))
+v_fire = st_intersection(v_fire,v_thisregion)
+log_it(paste0("Oldest fire post-clip:",min(v_fire$numYear)))
+log_it("Clipping fire history complete")
+
+# Add numeric year field to fire and a count flag field
+
+
 # If v_TSFF is defined, subset v_fire to only years including or after this fireseason
 if(v_TSFF != ""){
+  log_it(paste0("TSFF found defined in config, filtering to keep fires older: ",v_TSFF))
   v_fire = filter(v_fire,numYear >= as.numeric(v_TSFF))
 }
 
-# If v_TSFF is defined, subset v_fire to only years including or after this fireseason
+# If v_TSFilter is defined, subset v_fire to include fires before
 if(exists("v_TSFilter")){
   if(v_TSFilter != ""){
+    log_it(paste0("v_TSFilter found defined in config, filtering to keep fires newer: ",v_TSFilter))
     v_fire = filter(v_fire,numYear < as.numeric(v_TSFilter))
   }
 }

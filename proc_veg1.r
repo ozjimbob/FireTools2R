@@ -22,9 +22,14 @@ int_list = year_list$year
 log_it("Calculating TSFF")
 if(v_TSFF == ""){
   TSFF = current_year-min(int_list)
+  log_it(paste0("TSFF Not defined, derived from int_list:",TSFF))
+  log_it(paste0("(Min int_list=):",min(int_list)))
 }else{
   TSFF =  current_year-as.numeric(v_TSFF)
+  log_it(paste0("Custonm TSFF detected, calculated as:",TSFF))
+  log_it(paste0("(Config-defined year=):",as.numeric(v_TSFF)))
 }
+
 
 log_it("Loading template raster")
 tmprast = raster(paste0(rast_temp,"/rTimeSinceLast.tif"))
