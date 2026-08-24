@@ -40,6 +40,7 @@ f_sfaz_custom = as.numeric(f_sfaz_custom)
 if(!exists("d_spatial_unit")){
   d_spatial_unit=""
 }
+new_analysis=TRUE
 
 ## Run file
 log_it("**** Preparing fire history and vegetation rasters")
