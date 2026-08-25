@@ -45,6 +45,7 @@ new_analysis=TRUE
 ## Run file
 log_it("**** Preparing fire history and vegetation rasters")
 if(exists("new_analysis")){
+  log_it("---> NEW ANALYSIS")
 source("fire_proc1_terra.r")
   }else{
 source("fire_proc1_t.r")
@@ -52,6 +53,7 @@ source("fire_proc1_t.r")
 
 log_it("**** Processing heritage vegetation thresholds")
 if(exists("new_analysis")){
+  log_it("---> NEW ANALYSIS")
     source("proc_veg1_terra.r")
   }else{
     source("proc_veg1.r")
@@ -62,6 +64,7 @@ source("veg_vectorize.r")
 log_it("**** Processing Fire Management Blocks")
 
 if(exists("new_analysis")){
+  log_it("---> NEW ANALYSIS")
   source("proc_fmz_terra.r")
 }else{
   source("proc_fmz.r")

@@ -347,24 +347,29 @@ writeRaster(r_tsl,paste0(rast_temp,"/",'rTimeSinceLast.tif'),overwrite=TRUE)
 log_it("Vectorizing time since last burnt")
 
 
-if(OS=="Windows"){
-  log_it("Windows Polygonizer")
-  
-  v_tsl = try(polygonizer_win(r_tsl))
-  
-  if("try-error" %in% class(v_tsl)){
-    v_tsl = polygonizer_terra(r_tsl)
-    names(v_tsl)[1]<-"DN"
-  }
-}else{
-  log_it("Linux Polygonizer")
-  v_tsl = try(polygonizer(r_tsl))
-  if("try-error" %in% class(v_tsl)){
-    v_tsl = polygonizer_terra(r_tsl)
-    names(v_tsl)[1]<-"DN"
-  }
-}
+# if(OS=="Windows"){
+#   log_it("Windows Polygonizer")
+#   
+#   v_tsl = try(polygonizer_win(r_tsl))
+#   
+#   if("try-error" %in% class(v_tsl)){
+#     log_it("Terra Polygonizer")
+#     v_tsl = polygonizer_terra(r_tsl)
+#     names(v_tsl)[1]<-"DN"
+#   }
+# }else{
+#   log_it("Linux Polygonizer")
+#   v_tsl = try(polygonizer(r_tsl))
+#   if("try-error" %in% class(v_tsl)){
+#     log_it("Terra Polygonizer")
+#     v_tsl = polygonizer_terra(r_tsl)
+#     names(v_tsl)[1]<-"DN"
+#   }
+# }
 
+log_it("Terra Polygonizer")
+v_tsl = polygonizer_terra(r_tsl)
+names(v_tsl)[1]<-"DN"
 
 
 log_it(system("df -h"))
