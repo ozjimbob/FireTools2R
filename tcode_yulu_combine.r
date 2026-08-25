@@ -71,9 +71,14 @@ names(p) <- "combo_id"
 p <- merge(p, out, by = "combo_id", all.x = TRUE)
 p$combo_id <- NULL
 
-p_lut <- dplyr::select(v_vegfire_table,VEG,MIN_,MAX_,VEGTEXT,NSWVegClass,NSWFormation)
-p <- merge(p,p_lut,by="VEG",all.x=TRUE)
-p <- subset(p,!is.na(p$VEG))
+
+#p_lut <- dplyr::select(v_vegfire_table,VEG,MIN_,MAX_,VEGTEXT,NSWVegClass,NSWFormation)
+
+
+p_lut <- dplyr::select(v_vegfire_table,all_of(c(f_vegid,f_vegmin,f_vegmax,f_vegfireprone,f_vegadv)))
+
+p <- merge(p,p_lut,by=f_vegid,all.x=TRUE)
+p <- subset(p,!is.na(p[[f_vegid]]))
 
 HTS_lut <- data.frame(HTS=c(1,2,3,4,5,9),
                       HTS_text =c("NoRegime","TooFrequentlyBurnt","Vulnerable","LongUnburnt","WithinThreshold","Unknown"))
