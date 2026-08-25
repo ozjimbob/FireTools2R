@@ -427,27 +427,32 @@ log_it("Processing times burnt raster complete")
 ##<-
 
 log_it("Vectorizing times burnt")
+# 
+# 
+# if(OS=="Windows"){
+#   #v_timesburnt = polygonizer_win(r_timesburnt)
+#   v_timesburnt = try(polygonizer_win(r_timesburnt))
+#   
+#   if("try-error" %in% class(v_timesburnt)){
+#     v_timesburnt = polygonizer_terra(r_timesburnt)
+#     names(v_timesburnt)[1]<-"DN"
+#   }
+#   
+# }else{
+#   log_it("Linux Polygonizer")
+#   v_timesburnt = try(polygonizer(r_timesburnt))
+#   if("try-error" %in% class(v_timesburnt)){
+#     v_timesburnt = polygonizer_terra(r_timesburnt)
+#     names(v_timesburnt)[1]<-"DN"
+#   }
+#   }
+#   
+log_it("Terra Polygonizer")
+v_timesburnt = polygonizer_terra(r_timesburnt)
+names(v_timesburnt)[1]<-"DN"
+  
+  
 
-
-if(OS=="Windows"){
-  #v_timesburnt = polygonizer_win(r_timesburnt)
-  v_timesburnt = try(polygonizer_win(r_timesburnt))
-  
-  if("try-error" %in% class(v_timesburnt)){
-    v_timesburnt = polygonizer_terra(r_timesburnt)
-    names(v_timesburnt)[1]<-"DN"
-  }
-  
-}else{
-  log_it("Linux Polygonizer")
-  v_timesburnt = try(polygonizer(r_timesburnt))
-  if("try-error" %in% class(v_timesburnt)){
-    v_timesburnt = polygonizer_terra(r_timesburnt)
-    names(v_timesburnt)[1]<-"DN"
-  }
-  
-  
-}
 
 v_timesburnt = st_as_sf(v_timesburnt)
 st_crs(v_timesburnt)=proj_crs
